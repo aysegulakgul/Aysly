@@ -1,0 +1,28 @@
+# bağımlılıklar ve derleme çıktıları
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# test çıktıları
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# ortam değişkenleri (gizli) — yalnızca örnek dosya depoya girer
+.env
+.env.*
+!.env.example
+
+# yerel veritabanı yedekleri (gerçek veri içerir)
+backups/
+
+# sistem / editör
+.DS_Store
+Thumbs.db
+*.log
+.vscode/*
+!.vscode/extensions.json

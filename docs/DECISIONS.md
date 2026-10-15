@@ -1,0 +1,305 @@
+# Karar Kaydı (Decision Log)
+
+> Durum: v0.4 · Son güncelleme: 2026-10-15
+
+Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar silinmez; değiştirilen karar `YERİNE GEÇİLDİ (D-yyy)` olarak işaretlenir ve yeni kayıt açılır.
+
+## Durum etiketleri
+
+| Etiket | Anlamı | Geliştirmede kullanılabilir mi? |
+|---|---|---|
+| `ONAYLI` | Ürün sahibi açıkça belirtti veya onayladı. | Evet |
+| `ÖNERİ` | Claude'un gerekçeli önerisi; onay bekliyor. | Hayır |
+| `AÇIK` | Karar verilmedi; seçenekler [OPEN_QUESTIONS.md](OPEN_QUESTIONS.md) içinde. | Hayır |
+| `YERİNE GEÇİLDİ (D-yyy)` | Daha yeni bir kararla değiştirildi. | Hayır |
+| `REDDEDİLDİ` | Ürün sahibi tarafından kabul edilmedi. | Hayır |
+
+## Kayıt şablonu
+
+```md
+## D-0xx — Başlık
+- Durum: ÖNERİ | ONAYLI | YERİNE GEÇİLDİ (D-0yy) | REDDEDİLDİ
+- Tarih: YYYY-MM-DD  · Karar veren: Ürün sahibi / Claude (öneri)
+- Bağlam · Karar · Alternatifler · Sonuçlar (etkilenen belgeler/kurallar)
+```
+
+---
+
+## 1. Ürün brief'inden gelen kararlar (ONAYLI, 2026-10-15)
+
+### D-001 — Önce analiz ve dokümantasyon, sonra kod
+- Durum: ONAYLI · Karar veren: Ürün sahibi
+- Karar: Faz 1'de uygulama kodu yazılmaz. Dokümantasyon tamamlanıp onaylanmadan Faz 2 başlamaz. (2026-10-15 tarihli ikinci mesajda yinelendi.)
+
+### D-002 — Tek hesap, birden fazla kullanım bağlamı
+- Durum: ONAYLI
+- Karar: Kişisel ve profesyonel işler tek hesapta yönetilir; hesap türü yoktur.
+
+### D-003 — Yetkilendirme sunucu tarafında zorunlu
+- Durum: ONAYLI
+- Karar: Asıl yetki kontrolü her istekte sunucuda yapılır; kritik bütünlük kuralları ayrıca veritabanı kısıtlarıyla korunur.
+
+### D-004 — Yönetici rolü kişisel verilere sınırsız erişim değildir
+- Durum: ONAYLI
+
+### D-005 — İlk sürümde mikroservis ve dağıtık sistem yok
+- Durum: ONAYLI (D-044 ile yinelendi)
+
+### D-006 — Ürün kararlarının kontrolü ürün sahibinde
+- Durum: ONAYLI
+
+### D-007 — MVP bireysel kullanıma odaklanır, mimari ekip kullanımına hazırdır
+- Durum: ONAYLI
+
+---
+
+## 2. Claude önerileri (ilk taslak; 2026-10-15'te D-060 ile toplu onaylandı)
+
+### D-010 — Modüler monolit mimari
+- Durum: **ONAYLI** (2026-10-15, D-044 kapsamında: "Tek uygulama içinde modüler, SOLID prensiplerine uygun bir mimari")
+- Karar: Tek uygulama, iş alanlarına göre modüller, modül başına katmanlar (domain / application / infrastructure / http). Ayrı bir arka plan sürecinin kullanılıp kullanılmayacağı OQ-024'e bağlıdır.
+
+### D-011 — Teknoloji yığını
+- Durum: YERİNE GEÇİLDİ (D-044)
+
+### D-012 — Her içerik çalışma alanına aittir; her kullanıcıya bir kişisel çalışma alanı
+- Durum: **ONAYLI** (D-060). D-030 (Inbox "her çalışma alanında") ve D-048 (çalışma alanı bazlı abonelik değerlendirmesi) bu modelle uyumludur.
+
+### D-013 — REST API (`/api/v1`) tek veri yazma yüzeyi
+- Durum: **ONAYLI** (D-060)
+- Not: D-044 ile TanStack Query varsayılan olarak yok. Bu kararla çelişmez: istemci, API'yi ince bir `fetch` istemcisi ve React'in yerleşik iyimser güncelleme aracı (`useOptimistic`) ile kullanır (ARCHITECTURE §3.7).
+
+### D-014 — İzin tabanlı RBAC + kaynak kapsamı
+- Durum: **ONAYLI** (D-060)
+
+### D-015 — Kimlikler UUIDv7
+- Durum: **ONAYLI** (D-060)
+
+### D-016 — Tarih/saat modeli
+- Durum: **ONAYLI** (D-060)
+
+### D-017 — Silme yaşam döngüsü: Aktif → Arşiv → Çöp → Kalıcı silme
+- Durum: **ONAYLI** (2026-10-15; D-031, D-035, D-043 ile)
+- Karar: Arşiv ve çöp ayrı kavramlardır. Silme önce çöpe taşımadır; kalıcı silme çöpten elle veya 30 gün sonunda otomatik yapılır. Arşivli kayıtlar salt okunurdur.
+
+### D-018 — İyimser eşzamanlılık (`version`)
+- Durum: **ONAYLI** (D-060)
+
+### D-019 — Oluşturma isteklerinde idempotency anahtarı
+- Durum: **ONAYLI** (D-060)
+
+### D-020 — MVP'de çevrimdışı mod yok, veri kaybı koruması var
+- Durum: **ONAYLI** (D-060)
+
+### D-021 — Abonelik altyapısı yok, yetkinlik soyutlaması var
+- Durum: "MVP'de ücretlendirme yok" kısmı **ONAYLI** (D-048). `EntitlementService` soyutlaması **REDDEDİLDİ** (D-061: gereksiz karmaşıklık); abonelik değerlendirildiğinde eklenir.
+
+### D-022 — Arama: PostgreSQL tam metin arama
+- Durum: **ONAYLI** (D-060)
+
+### D-023 — Arka plan işleri pg-boss ile
+- Durum: **REDDEDİLDİ** (2026-10-15, D-044: "pg-boss şimdilik kullanılmasın"). Yerine geçecek yaklaşım: OQ-024.
+
+### D-024 — Kullanıcı segmentleri hesap türü değildir
+- Durum: **ONAYLI** (D-060). D-002 ile uyumlu.
+
+---
+
+## 3. Açık soruların kapanışı (ONAYLI, 2026-10-15, karar veren: Ürün sahibi)
+
+### D-030 — Inbox modeli (OQ-001)
+- Karar: Her çalışma alanında **silinemeyen** bir Inbox bulunur ve menüde projelerden **ayrı** görünür.
+- Uygulama: Teknik olarak `kind='inbox'` olan bir sistem projesi; `tasks.project_id` her zaman doludur.
+- Alternatifler: Projesiz görevler (NULL), ayrı "işlenmedi" bayrağı — seçilmedi.
+- Sonuçlar: BR-TASK-002, BR-PROJ-006, BR-INBOX-*, DATA_MODEL `projects.kind`. Inbox'ın yeniden adlandırılamaması ve arşivlenememesi D-060 ile onaylandı.
+
+### D-031 — Proje silme (OQ-002)
+- Karar: Proje ve içindeki görevler (alt görevler dahil) birlikte çöpe taşınır, birlikte geri yüklenebilir.
+- Alternatifler: Görevleri Inbox'a taşımak, dolu projeyi silmeyi engellemek, her seferinde kullanıcıya sormak — seçilmedi.
+- Sonuçlar: BR-PROJ-005, BR-DEL-006, AC-06.
+
+### D-032 — Açık alt görevler varken ana görevi tamamlama (OQ-003)
+- Karar: Engellenmez. Kullanıcı uyarılır ve alt görevleri de tamamlama seçeneği sunulur.
+- Sonuçlar: BR-SUB-003; API `completeSubtasks` parametresi.
+
+### D-033 — Tekrarlayan görevler (OQ-004)
+- Karar: İki mod: planlanan tarihe göre (`fixed_schedule`) ve tamamlandıktan sonra (`after_completion`). Sonraki örnek, mevcut görev tamamlandığında oluşturulur.
+- Alternatifler: Önceden üretim, sanal örnekler — seçilmedi.
+- Sonuçlar: BR-REC-002. Tamamlamanın geri alınması (BR-REC-007) D-060 ile onaylandı.
+
+### D-034 — Hedef ilerlemesi (OQ-005)
+- Karar: Her hedef için otomatik veya manuel ilerleme seçilebilir; varsayılan otomatiktir.
+- Sonuçlar: BR-GOAL-002.
+
+### D-035 — Çöp kutusu saklama süresi (OQ-006)
+- Karar: 30 gün; sonra kalıcı silme.
+- Sonuçlar: BR-DEL-003. Otomatik silmenin tetiklenme yöntemi: OQ-024.
+
+### D-036 — Hesap silme (OQ-007)
+- Karar: 14 günlük, iptal edilebilir bekleme süresi. Yedeklerdeki verilerin silinme süreci belgelenir.
+- Sonuçlar: BR-ACC-005, SECURITY §8.4, LEGAL_AND_PRIVACY_REQUIREMENTS §6. Silme işinin tetiklenmesi: OQ-024.
+
+### D-037 — Bildirim kanalları (OQ-008)
+- Karar: MVP'de yalnızca uygulama içi bildirimler. E-posta bildirimleri sonraya kalır. Geliştirme ortamında e-posta için ücretli servis gerekmez.
+- Sonuçlar: BR-NOTIF-001, BR-NOTIF-004; `notification_deliveries` tablosu SONRA. Güvenlik/işlem e-postalarının kapsamı: OQ-026. Günlük özet: OQ-025.
+
+### D-038 — Diller (OQ-009)
+- Karar: Türkçe ve İngilizce; çeviri altyapısı baştan kurulur.
+
+### D-039 — Giriş yöntemleri (OQ-010)
+- Karar: İlk sürümde e-posta + şifre. Google ve diğer yöntemler sonraya.
+
+### D-040 — E-posta doğrulama (OQ-011)
+- Karar: Kullanıcı temel özellikleri hemen kullanabilir; e-posta gerektiren işlemlerde doğrulama zorunludur.
+- Sonuçlar: BR-ACC-004. Hangi işlemlerin kapsandığı: OQ-026.
+
+### D-041 — Görev durumları (OQ-012)
+- Karar: Yapılacak (`todo`), Devam ediyor (`in_progress`), Tamamlandı (`done`).
+
+### D-042 — Not editörü (OQ-013)
+- Karar: Başlık, liste, yapılacak listesi, bağlantı ve kod gibi temel özelliklere sahip, sade, Markdown tabanlı editör. İçerik Markdown olarak saklanır.
+- Sonuçlar: Editör paketi seçimi Faz 7'de (OQ-029).
+
+### D-043 — Arşiv (OQ-014)
+- Karar: Arşivlenen kayıtlar salt okunurdur; düzenlemek için önce arşivden çıkarılır.
+- Sonuçlar: BR-DEL-002. Arşivlenmiş projenin görevlerine uygulanması BR-PROJ-004'te netleştirildi ve D-060 ile onaylandı.
+
+### D-044 — Teknoloji yığını (OQ-015)
+- Karar:
+  - **Kullanılacak:** Next.js, TypeScript, PostgreSQL, Drizzle ORM, Better Auth.
+  - **Uygun yerlerde kullanılabilir:** Zod, Tailwind CSS, Radix UI, Vitest, Playwright.
+  - **Yalnızca gerekirse:** TanStack Query. İhtiyaç doğarsa gerekçesiyle önerilir ve onaydan sonra eklenir.
+  - **Kullanılmayacak (şimdilik):** pg-boss.
+  - Tek uygulama içinde modüler, SOLID prensiplerine uygun mimari; mikroservis yok.
+- Yerine geçtiği karar: D-011. Reddedilen: D-023.
+- Sonuçlar: ARCHITECTURE §3, §10; yardımcı kütüphaneler OQ-029; zamanlanmış işler OQ-024.
+
+### D-045 — Barındırma (OQ-016)
+- Karar: Şimdilik yalnızca ürün sahibinin bilgisayarında, yerel ortamda çalışır. Hosting, alan adı veya ücretli servis kullanılmaz. Mimari ileride yayına alınabilecek şekilde tasarlanır.
+- Sonuçlar: ARCHITECTURE §12 (yalnızca `local` ve `test` ortamları), hata izleme servisi çıkarıldı, yayına alma kararları OQ-032'ye ertelendi.
+
+### D-046 — Veri dışa aktarma (OQ-017)
+- Karar: MVP'de çalışma alanı JSON olarak dışa aktarılır. CSV ve içe aktarma sonraya kalır.
+- Uygulama: Yerel ortamda arka plan işi ve dosya deposu olmadığından, dışa aktarım doğrudan indirme olarak üretilir (D-060 ile onaylandı).
+- Sonuçlar: FR-AUTH-09, API §14. Kapsam: OQ-031.
+
+### D-047 — Takvim sürükle-bırak (OQ-018)
+- Karar: Masaüstünde hafta ve ay görünümlerinde sürükle-bırak; mobilde tarih seçici.
+
+### D-048 — Abonelik (OQ-019)
+- Karar: MVP'de ücretlendirme yok. İleride ihtiyaç olursa çalışma alanı bazlı abonelik modeli değerlendirilir.
+
+### D-049 — Yasal metinler (OQ-020)
+- Karar: KVKK, gizlilik ve kullanım koşulları için gereksinimler belgelenir. Hukuki metinler lansmandan önce uygun şekilde hazırlanır ve gözden geçirilir.
+- Sonuçlar: Yeni belge [LEGAL_AND_PRIVACY_REQUIREMENTS.md](LEGAL_AND_PRIVACY_REQUIREMENTS.md).
+
+### D-050 — Marka kimliği (OQ-021) — kısmen YERİNE GEÇİLDİ (D-063)
+- Karar: Şimdilik "Gece & Ay ışığı" teması. Sade, modern, göz yormayan tasarım; renkler merkezi olarak (token) tanımlanır.
+
+### D-051 — Kayıtlı görünümler (OQ-022)
+- Karar: MVP'de filtre ve sıralama ayarlarını kaydetme; paylaşılan görünümler sonraya.
+
+### D-052 — Analitik (OQ-023)
+- Karar: Şimdilik analitik kurulmaz. Beta aşamasında ihtiyaç yeniden değerlendirilir; kullanılırsa gizlilik odaklı olur ve görev veya not içerikleri gönderilmez.
+- Sonuçlar: PRD §8'deki başarı metrikleri şimdilik ölçülmez; hedef değerler ÖNERİ olarak kalır (beta kararıyla birlikte ele alınır).
+
+---
+
+## 4. İkinci tur kararlar (ONAYLI, 2026-10-15, karar veren: Ürün sahibi)
+
+### D-053 — Zamanlanmış işler (OQ-024)
+- Karar: Ayrı worker yok. Hatırlatıcılar uygulama açıkken işlenir. 30 günlük çöp ve 14 günlük hesap silme kontrolleri uygulama çalışırken yapılır. Uygulama kapalıyken arka plan işlemi çalışması gerekmez.
+- Uygulama: İşler use case olarak yazılır ve `Scheduler` arayüzü üzerinden tetiklenir. Hatırlatıcılar istemcinin bildirim sayacı yoklamasıyla (~60 sn), bakım işleri uygulama sunucusu açılışta ve saatte bir çalıştırılır; aynı anda tek çalışma için veritabanı kilidi kullanılır.
+- Alternatifler: Ayrı `pnpm worker` süreci, elle çalıştırılan bakım komutu — seçilmedi.
+- Sonuçlar: BR-REM-005, BR-DEL-003, BR-ACC-005, ARCHITECTURE §10, ERROR_HANDLING E18/E36/E37.
+
+### D-054 — Günlük özet (OQ-025)
+- Karar: MVP'de yok; dashboard yeterli.
+- Sonuçlar: FR-NOTIF-03 SONRA; BR-NOTIF-001.
+
+### D-055 — Güvenlik e-postaları ve yeniden doğrulama (OQ-026)
+- Karar: MVP'de şu e-postalar vardır: e-posta doğrulama, şifre sıfırlama, şifre değişikliği güvenlik bildirimi. Yerel ortamda dışarı gönderilmez; yerel e-posta yakalayıcıda görüntülenir. Veri dışa aktarma ve hesap silmede e-posta yerine şifreyle yeniden doğrulama yapılır.
+- Yorum (Claude): "E-posta doğrulama", e-posta adresi değiştirildiğinde yeni adresin doğrulanmasını da kapsar; bu, mevcut doğrulama e-postasının aynısıdır.
+- Kararda listelenmeyen iki e-posta (kayıt denemesi bildirimi, hesap silme talebi onayı): MVP'de yok (D-062).
+- Sonuçlar: BR-ACC-003, BR-ACC-004, BR-ACC-005, API §3, §14, SECURITY §4.
+
+### D-056 — Yerel PostgreSQL (OQ-027)
+- Karar: Docker Desktop; veritabanı yerelde çalışır.
+- Uygulama: Docker Compose ile PostgreSQL + Mailpit (yerel e-posta yakalayıcı). Entegrasyon testleri gerçek PostgreSQL ile çalışır.
+- Sonuçlar: README, ARCHITECTURE §12, TESTING_STRATEGY §8.
+
+### D-057 — Git ve CI (OQ-028)
+- Karar: Şimdilik yerel Git ve `pnpm verify`. GitHub Actions daha sonra değerlendirilebilir.
+- Sonuçlar: TESTING_STRATEGY §8, CODING_STANDARDS §10, ARCHITECTURE §12.5.
+
+### D-058 — Yardımcı kütüphaneler (OQ-029)
+- Karar: OQ-029 listesindeki ücretsiz paketler onaylıdır, ancak **otomatik olarak eklenmez**. Bir paket yalnızca onu gerçekten gerektiren özellik geliştirilirken eklenir; gereksiz bağımlılıktan kaçınılır.
+- Uygulama: Paketi ekleyen iş, raporunda hangi ihtiyaç için eklendiğini belirtir. Listede olmayan bir paket hâlâ CODING_STANDARDS §9 sürecine ve onaya tabidir.
+- Sonuçlar: ARCHITECTURE §3.9, CODING_STANDARDS §9.
+
+### D-059 — Dışa aktarma kapsamı (OQ-031)
+- Karar: JSON dışa aktarma; çalışma alanı içeriğine ek olarak profil ve kullanıcı tercihlerini de içerir. Şifreler, gizli anahtarlar ve güvenlik bilgileri dışa aktarılmaz.
+- Uygulama: Hariç tutulanlar: şifre hash'i, oturumlar ve oturum token'ları, doğrulama/sıfırlama token'ları, idempotency kayıtları, denetim kayıtları ve IP/user-agent bilgileri.
+- Sonuçlar: API §14, SECURITY §8.3, LEGAL §6.
+
+### D-060 — Kalan teknik önerilerin toplu onayı (OQ-030)
+- Karar: Önceki kararlarla çelişmeyen ve gereksiz karmaşıklık yaratmayan teknik öneriler onaylandı: D-012..D-024'teki öneriler (D-021'deki soyutlama hariç), REST API, tarih modeli, sınır değerleri, tüm `ÖNERİ` iş kuralları ve PRD §5.2 öncelikleri. BR-PROJ-004 gibi önceki kararları etkileyen kurallar netleştirildi.
+- Koşulun uygulanması: Gereksiz karmaşıklık ölçütüne uymayanlar D-061'de listelenmiş ve MVP'den çıkarılmıştır.
+- Kapsam dışı olan ürün/UX ayrıntıları sonradan D-063 ile onaylandı.
+
+### D-061 — "Gereksiz karmaşıklık" ölçütüyle MVP'den çıkarılanlar
+- Karar veren: Claude, D-060'taki ölçütü uygulayarak. Her madde geri alınabilir; ürün sahibi itiraz ederse eski haline döner.
+- Çıkarılanlar:
+  1. **`EntitlementService` soyutlaması** (D-021, BR-PERM-005): Ücretlendirme olmadan her zaman "izin ver" diyen servis gereksiz soyutlamadır. → Abonelik değerlendirildiğinde.
+  2. **`tasks.assignee_id` kolonu:** MVP'de kullanılmayan kolon. → Faz 10 migration'ı.
+  3. **Genel API hız sınırları** (okuma/yazma/arama): Tek kullanıcılı yerel ortamda değeri yok. MVP'de yalnızca kimlik doğrulama uç noktalarında (giriş, kayıt, şifre sıfırlama, doğrulama e-postası, dışa aktarma, hesap silme) kalır. → Yayına alma öncesi.
+  4. **`legal_acceptances` tablosu ve yasal sayfa altyapısı:** Yalnızca başka kullanıcılar kayıt olduğunda gerekir. → Yayına alma öncesi (LEGAL §9).
+  5. **Yedekten geri yüklemede silinmiş hesapları yeniden silme listesi:** Yerel, tek kullanıcılı ortamda gerekmez. → Yayına alma öncesi.
+  6. **Alt görev kuralları için veritabanı trigger'ı** (BR-SUB-001/002): Uygulama katmanı + testler yeterli; CHECK kısıtları korunur.
+  7. **Bağlamsal ipucu tetikleyicileri** (ONBOARDING §5: "aynı filtreyi 3 kez kurdun" vb.): İzleme mantığı gerektirir; "İlk adımlar" listesi yeterli. → P2.
+
+## 4b. Üçüncü tur kararlar (ONAYLI, 2026-10-15, karar veren: Ürün sahibi)
+
+### D-062 — Ek e-postalar (OQ-033)
+- Durum: ONAYLI · Tarih: 2026-10-15 · Karar veren: Ürün sahibi
+- Karar: "Biri bu adresle kayıt olmaya çalıştı" bildirimi ve hesap silme talebi onay e-postası MVP'de yoktur. Uygulama yayına alınmadan önce yeniden değerlendirilir (OQ-032).
+- Sonuçlar: BR-ACC-005, SECURITY §4.3, API §3, USER_FLOWS §3.10. MVP'de gönderilen e-postalar yalnızca D-055'tekilerdir.
+
+### D-063 — Ürün/UX ayrıntıları ve Figma'nın tek tasarım kaynağı olması (OQ-034)
+- Durum: ONAYLI · Tarih: 2026-10-15 · Karar veren: Ürün sahibi
+- Karar:
+  1. OQ-034'teki genel ürün/UX önerileri onaylandı: onboarding yaklaşımı, başlangıç projeleri, navigasyon yapısı, farklılaşma noktaları, tek kişisel çalışma alanı. PRD §8 hedefleri beta kararıyla ele alınır.
+  2. **Arayüz tasarımının tek ve temel kaynağı Figma'dır.** Onboarding, başlangıç projeleri, tipografi, renkler, boşluklar, bileşenler, sayfa düzenleri, klavye kısayolları, kenar çubuğu ve mobil navigasyon dahil tüm arayüz, Figma'daki tasarımlara birebir sadık kalınarak geliştirilir.
+  3. Claude tasarımı kendi yorumuyla değiştirmez ve yeni bir tasarım dili oluşturmaz.
+  4. Figma'da eksik veya belirsiz bir detay varsa, önemli bir kararı etkiliyorsa önce ürün sahibine sorulur.
+- Öncelik kuralı:
+  - Görsel tasarım, düzen ve etkileşim biçiminde **Figma**, UI_UX_DESIGN_SYSTEM.md, ONBOARDING ve USER_FLOWS'taki tasarım tariflerinin önündedir. Bu belgeler, Figma'dan çıkarılan değerlerle güncellenir.
+  - İş kuralları, yetki ve veri davranışında **BUSINESS_RULES.md** geçerlidir. Bir Figma ekranı onaylı bir iş kuralıyla çelişen bir davranış gösteriyorsa (ör. arşivli görevi düzenlenebilir göstermek), uygulamadan önce ürün sahibine sorulur (CLAUDE.md §5.4).
+  - Figma'da hiç tasarlanmamış bir ekran veya durum (ör. hata, boş durum, yükleniyor) için mevcut Figma bileşenleri ve token'ları kullanılır; yeni görsel dil üretilmez. Ekranın yapısı önemli bir karar gerektiriyorsa sorulur.
+- Yerine geçtiği karar: D-050 kısmen — "Gece & Ay ışığı" adı ve renk değerleri artık Figma'daki değerlere tabidir.
+- Sonuçlar: UI_UX_DESIGN_SYSTEM, ONBOARDING_AND_PERSONALIZATION, USER_FLOWS, CLAUDE.md §2–3.
+
+
+### D-064 — Figma'daki proje dışı çerçeveler
+- Durum: ONAYLI · Tarih: 2026-10-15 · Karar veren: Ürün sahibi
+- Karar: Figma dosyasındaki Product detail page (`1:534`), About (`1:629`), Article (`1:703`), Shop (`1:777`) ve Landing page (`1:902`) çerçeveleri Aysly'ye ait değildir ve referans alınmaz.
+- Sonuçlar: FIGMA_INVENTORY §3.
+
+### D-065 — Figma'da bulunmayan MVP ekranları
+- Durum: ONAYLI · Tarih: 2026-10-15 · Karar veren: Ürün sahibi
+- Karar: Figma'da tasarımı olmayan MVP ekranları (giriş, kayıt, şifre sıfırlama, e-posta doğrulama, onboarding, Ayarlar'ın diğer sekmeleri, bildirim merkezi, arşiv, çöp kutusu, hedef detayı, kayıtlı görünüm oluşturma) Claude tarafından kurulur. Koşullar:
+  1. Yalnızca Figma'daki mevcut bileşenler (`4:70582`) ve temel referanstaki token'lar (`4:69535`) kullanılır.
+  2. Düzen, en yakın Figma ekranının yapısını izler (ör. Ayarlar sekmeleri `Ayarlar · Görünüm` düzenini, Arşiv/Çöp `Inbox` liste düzenini).
+  3. Yeni bileşen, renk, yazı tipi veya tasarım dili üretilmez. Mevcut bileşenlerle karşılanamayan bir ihtiyaç doğarsa önce sorulur.
+  4. Her ekran tamamlandığında masaüstü ve mobil ekran görüntüsüyle ürün sahibinin onayına sunulur. Onaylanana kadar "geçici tasarım" sayılır.
+  5. Ürün sahibi bir ekranı sonradan Figma'ya eklerse Figma geçerli olur ve uygulama ona uyarlanır.
+- Alternatif: Ekranların önce Figma'ya eklenmesi — Faz 3'ü bekleteceği için seçilmedi.
+- Sonuçlar: FIGMA_INVENTORY §4, IMPLEMENTATION_PLAN Faz 3–8.
+
+---
+
+## 5. Faz kapanış kayıtları
+
+| Faz | Kapanış tarihi | Onaylayan | Not |
+|---|---|---|---|
+| Faz 1 — Analiz ve dokümantasyon | 2026-10-15 | Ürün sahibi ("Artık geliştirme aşamasına geçelim") | OQ-001..OQ-034 kapandı (D-030..D-063). Açık: yalnızca OQ-032 (yayına alma, ertelendi). |
