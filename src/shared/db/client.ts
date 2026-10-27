@@ -32,3 +32,7 @@ export async function closeDb(): Promise<void> {
   sqlClient = undefined;
   database = undefined;
 }
+
+/** Bir veritabanı işlemi (transaction) veya doğrudan bağlantı; modüller arası tek işlemde yazmak için (ARCHITECTURE §4.2). */
+export type DbTransaction = Parameters<Parameters<Database['transaction']>[0]>[0];
+export type DbExecutor = Database | DbTransaction;

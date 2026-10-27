@@ -12,6 +12,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Tarayıcı testleri ayrı bir derleme klasörüyle (.next-e2e) çalışır; geliştirme sunucusuyla çakışmaz.
+  distDir: process.env.NEXT_DIST_DIR ?? '.next',
   reactStrictMode: true,
   poweredByHeader: false,
   typedRoutes: true,

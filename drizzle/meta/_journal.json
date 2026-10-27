@@ -8,6 +8,20 @@
       "when": 1793138033784,
       "tag": "0000_extensions",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793139625974,
+      "tag": "0001_identity_workspaces",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793140614811,
+      "tag": "0002_projects_created_by_set_null",
+      "breakpoints": true
     }
   ]
 }

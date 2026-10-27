@@ -1,6 +1,6 @@
 # Karar Kaydı (Decision Log)
 
-> Durum: v0.5 · Son güncelleme: 2026-10-28
+> Durum: v0.6 · Son güncelleme: 2026-10-28
 
 Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar silinmez; değiştirilen karar `YERİNE GEÇİLDİ (D-yyy)` olarak işaretlenir ve yeni kayıt açılır.
 
@@ -298,7 +298,7 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Alternatif: Ekranların önce Figma'ya eklenmesi — Faz 3'ü bekleteceği için seçilmedi.
 - Sonuçlar: FIGMA_INVENTORY §4, IMPLEMENTATION_PLAN Faz 3–8.
 
----
+## 4c. Faz 2–3 sırasında alınan kararlar (2026-10-28)
 
 ### D-066 — Açık temadaki eksik iki renk (OQ-035)
 - Durum: ONAYLI · Tarih: 2026-10-28 · Karar veren: Ürün sahibi ("eksik rengi temaya uygun şekilde sen ekle")
@@ -307,6 +307,19 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
   - `palette/support-2` (açık) = `#d6d6cf` — açık paletin sıcak gri tonunda, kenarlık renginden bir ton koyu; beyaz panelde görünür (1,46). Ay ışığı dolgusuyla kontrastı 2,0'dır; ilerleme çubuğu her zaman yazılı etiketle (ör. "2/6 · %33") gösterildiği için bilgi yalnızca renkle verilmez.
 - Öneri: Figma'nın tek kaynak kalması için bu iki değer Figma'daki açık temaya da eklenebilir.
 - Sonuçlar: `src/ui/tokens.css`, UI_UX_DESIGN_SYSTEM §0; tema tercihi Faz 3'te etkinleşir.
+
+### D-067 — Kayıt işlemi kendi use case'imizde, oturumlar Better Auth'ta (teknik)
+- Durum: ONAYLI (teknik uygulama; onaylı BR-WS-001'i karşılamak için) · Tarih: 2026-10-28 · Karar veren: Claude (CLAUDE.md §5.5)
+- Bağlam: Better Auth'un kayıt sonrası kancaları, kullanıcı kaydı veritabanına işlendikten sonra çalışıyor. Bu yüzden "kullanıcı + kişisel alan + Inbox + tercihler tek işlemde" (BR-WS-001) Better Auth'un kendi kayıt uç noktasıyla sağlanamıyor.
+- Karar: Kayıt `POST /api/v1/auth/sign-up` üzerinden `registerUser` use case'iyle tek veritabanı işleminde yapılır. Şifre, Better Auth'un özetleme fonksiyonuyla (scrypt) özetlenir. Better Auth'un kayıt uç noktası kapalıdır (`disableSignUp`). Giriş, çıkış, oturumlar, şifre sıfırlama ve e-posta doğrulama Better Auth'tadır (`/api/auth/*`).
+- Sonuçlar: Ürün davranışı değişmedi. Entegrasyon testi, işlemin ortasındaki bir hatada hiçbir kaydın kalmadığını kanıtlıyor.
+
+### D-068 — `projects.created_by` kullanıcı silinince boşalır (teknik)
+- Durum: ONAYLI (teknik) · Tarih: 2026-10-28 · Karar veren: Claude
+- Bağlam: Bu alanın kullanıcıya bağlantısı silmeyi engellediği için hesap silme (BR-ACC-005) çalışamazdı; temizlik sırasında fark edildi.
+- Karar: Alan isteğe bağlı oldu ve kullanıcı silinince boşalıyor (`ON DELETE SET NULL`); migration 0002. Kullanıcı silindiğinde tüm verisinin kalktığını kanıtlayan entegrasyon testi eklendi.
+
+---
 
 ## 5. Faz kapanış kayıtları
 

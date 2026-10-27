@@ -12,12 +12,74 @@
     "notFound": "Aradığın sayfa bulunamadı ya da erişimin yok.",
     "forbidden": "Bu işlem için yetkin yok.",
     "versionConflict": "Bu kayıt başka bir yerde değiştirildi.",
-    "internal": "Beklenmeyen bir sorun oluştu. Tekrar dene; sorun sürerse bize şu kodu ilet."
+    "internal": "Beklenmeyen bir sorun oluştu. Tekrar dene; sorun sürerse bize şu kodu ilet.",
+    "rateLimited": "Çok fazla deneme yaptın. Lütfen biraz sonra tekrar dene."
   },
-  "rules": {},
+  "rules": {
+    "BR-ACC-001": "Bu e-posta adresiyle yeni hesap açılamıyor. Hesabın varsa giriş yap ya da şifreni sıfırla."
+  },
   "ui": {
     "offline": "Bağlantı yok. Değişikliklerin kaydedilemeyebilir.",
     "undo": "Geri al",
     "loading": "Yükleniyor"
+  },
+  "email": {
+    "verify": {
+      "subject": "Aysly: e-posta adresini doğrula",
+      "body": "Merhaba {name},\n\nE-posta adresini doğrulamak için bu bağlantıyı aç (24 saat geçerli):\n{url}\n\nBu isteği sen yapmadıysan bu e-postayı yok sayabilirsin."
+    },
+    "reset": {
+      "subject": "Aysly: şifre sıfırlama",
+      "body": "Merhaba {name},\n\nŞifreni sıfırlamak için bu bağlantıyı aç (30 dakika geçerli, tek kullanımlık):\n{url}\n\nBu isteği sen yapmadıysan bu e-postayı yok sayabilirsin; şifren değişmez."
+    },
+    "passwordChanged": {
+      "subject": "Aysly: şifren değişti",
+      "body": "Merhaba {name},\n\nAysly hesabının şifresi az önce değiştirildi ve diğer cihazlardaki oturumların kapatıldı.\n\nBu değişikliği sen yapmadıysan hemen \"Şifremi unuttum\" ile şifreni sıfırla."
+    }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Giriş yap",
+      "submit": "Giriş yap",
+      "forgot": "Şifremi unuttum",
+      "noAccount": "Hesabın yok mu?",
+      "toSignUp": "Kayıt ol",
+      "invalid": "E-posta veya şifre hatalı."
+    },
+    "signUp": {
+      "title": "Hesap oluştur",
+      "submit": "Kayıt ol",
+      "hasAccount": "Zaten hesabın var mı?",
+      "toSignIn": "Giriş yap",
+      "passwordHint": "En az 10 karakter."
+    },
+    "forgot": {
+      "title": "Şifremi unuttum",
+      "description": "E-posta adresini yaz; şifreni sıfırlaman için bir bağlantı gönderelim.",
+      "submit": "Bağlantı gönder",
+      "sent": "E-posta adresin kayıtlıysa şifre sıfırlama bağlantısı gönderdik. Gelen kutunu kontrol et.",
+      "back": "Girişe dön"
+    },
+    "reset": {
+      "title": "Yeni şifre belirle",
+      "submit": "Şifreyi değiştir",
+      "done": "Şifren değişti ve tüm cihazlardaki oturumların kapatıldı. Yeni şifrenle giriş yapabilirsin.",
+      "invalidLink": "Bu bağlantı geçersiz veya süresi dolmuş. Yeni bir bağlantı iste.",
+      "requestNew": "Yeni bağlantı iste"
+    },
+    "fields": {
+      "name": "Ad",
+      "email": "E-posta",
+      "password": "Şifre",
+      "newPassword": "Yeni şifre"
+    },
+    "reasons": {
+      "required": "Bu alan zorunlu.",
+      "invalid": "Geçerli bir e-posta adresi yaz.",
+      "too_short": "Şifre en az 10 karakter olmalı.",
+      "too_long": "Bu alan çok uzun.",
+      "too_common": "Bu şifre çok yaygın; başka bir şifre seç."
+    },
+    "network": "Bağlantı kurulamadı. İnternet bağlantını kontrol edip tekrar dene."
   }
 }

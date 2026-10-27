@@ -2,12 +2,11 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 test.describe('Faz 2 temel', () => {
-  test('ana sayfa çalışmayan özellik göstermez ve Türkçe açılır', async ({ page }) => {
-    await page.goto('/');
+  test('giriş sayfası Türkçe açılır ve çalışmayan özellik göstermez', async ({ page }) => {
+    await page.goto('/sign-in');
     await expect(page.locator('html')).toHaveAttribute('lang', 'tr');
-    await expect(page.getByText('Aysly geliştiriliyor')).toBeVisible();
-    // Yalnızca uygulama içeriği sayılır (geliştirme modundaki Next.js araç düğmesi hariç).
-    await expect(page.getByRole('main').getByRole('button')).toHaveCount(0);
+    // Yalnızca giriş formunun düğmesi vardır (geliştirme modundaki Next.js araç düğmesi hariç).
+    await expect(page.getByRole('main').getByRole('button')).toHaveText(['Giriş yap']);
   });
 
   test('İngilizce tarayıcıda İngilizce açılır (D-038)', async ({ browser }) => {
@@ -16,13 +15,13 @@ test.describe('Faz 2 temel', () => {
       extraHTTPHeaders: { 'accept-language': 'en-US,en' },
     });
     const page = await context.newPage();
-    await page.goto('/');
+    await page.goto('/sign-in');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-    await expect(page.getByText('Aysly is under construction')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
     await context.close();
   });
 
-  for (const path of ['/', '/dev/ui']) {
+  for (const path of ['/dev/ui']) {
     test(`${path} sayfasında kritik/ciddi erişilebilirlik ihlali yok (AC-11)`, async ({ page }) => {
       await page.goto(path);
       const results = await new AxeBuilder({ page })

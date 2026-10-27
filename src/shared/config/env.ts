@@ -8,11 +8,18 @@ const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
   APP_BASE_URL: z.url().default('http://localhost:3000'),
+  // Oturum imzalama anahtarı; en az 32 karakter. Yerelde `pnpm setup:env` rastgele üretir, depoya girmez.
+  AUTH_SECRET: z.string().min(32),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
   EMAIL_TRANSPORT: z.enum(['smtp', 'memory']).default('smtp'),
   SMTP_HOST: z.string().min(1).default('127.0.0.1'),
   SMTP_PORT: z.coerce.number().int().positive().default(1025),
   EMAIL_FROM: z.string().min(3).default('Aysly <no-reply@aysly.local>'),
+  // Kimlik doğrulama hız sınırları (SECURITY §4.4). Yalnızca otomatik tarayıcı testlerinde kapatılır.
+  AUTH_RATE_LIMIT_ENABLED: z
+    .enum(['true', 'false'])
+    .default('true')
+    .transform((v) => v === 'true'),
   SCHEDULER_ENABLED: z
     .enum(['true', 'false'])
     .default('true')

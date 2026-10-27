@@ -19,8 +19,27 @@ Bu dosya, **ürün sahibinin kararını bekleyen** konuların tek kaynağıdır.
 
 | ID | Konu | Engellediği faz | Öneri (kısa) | Durum |
 |---|---|---|---|---|
+| OQ-036 | Kayıtta "bu e-posta kullanımda" bilgisinin gizlenmesi ile kayıttan hemen sonra kullanım (D-040) arasındaki çelişki | Faz 3 (kapanış) | Kayıt ekranında genel bir mesaj; yayına alma öncesi yeniden değerlendir | AÇIK |
 | OQ-032 | Yayına alma (hosting, alan adı, e-posta sağlayıcı, hata izleme, yedekleme) | Yayın kararı (MVP sonrası) | Şimdi karar gerekmiyor | AÇIK (ertelendi) |
 
+
+### OQ-036 — Kayıtta hesap varlığının gizlenmesi ile "hemen kullanım" arasındaki çelişki
+
+**Bağlam.** İki onaylı karar kayıt ekranında çelişiyor:
+- BR-ACC-001 / SECURITY §4.3: Kayıt, mevcut bir e-postada hesabın var olduğunu ifşa etmemeli.
+- D-040: Kullanıcı kayıttan hemen sonra uygulamayı kullanabilmeli (kayıt olur olmaz oturum açılır).
+
+Yeni e-postada kullanıcı hemen uygulamaya girer. Mevcut e-postada ise giremez (başkasının hesabına oturum açılamaz). Bu fark, ekrandaki mesaj ne olursa olsun, e-postanın kayıtlı olduğunu dolaylı olarak gösterir. Ayrıca D-062 ile "biri bu adresle kayıt olmaya çalıştı" e-postası MVP'den çıktı.
+
+**Şu anki uygulama (geçici):** Mevcut e-postada kayıt reddedilir ve şu mesaj gösterilir: "Bu e-posta adresiyle yeni hesap açılamıyor. Hesabın varsa giriş yap ya da şifreni sıfırla." Kayıt isteği saatte 5 ile sınırlı.
+
+| Seçenek | Sonuç |
+|---|---|
+| A. Mevcut davranış (genel mesaj + hız sınırı) | Yaygın yaklaşım; e-posta varlığı dolaylı olarak anlaşılabilir. Yerel, tek kullanıcılı ortamda pratik risk yok. |
+| B. Kayıttan sonra e-posta doğrulanmadan uygulamaya girilemez | Hesap varlığı tamamen gizlenir; D-040 değişir (kullanıcı önce e-postasını doğrular). |
+| C. A şimdi, yayına alma öncesi B veya D-062'deki bilgi e-postasıyla yeniden değerlendirme | Önerilen |
+
+**Öneri:** C. BR-ACC-001'in "hesap varlığını açıkça söylemez" ifadesi, yayına alma kararına kadar "dolaylı ifşa hız sınırıyla sınırlandırılır" olarak okunur.
 
 ### OQ-032 — Yayına alma (ertelendi)
 
@@ -30,6 +49,7 @@ D-045 gereği şimdilik yalnızca yerel ortam kullanılıyor. Yayına alma karar
 - HTTPS ve güvenlik başlıkları.
 - Harici zamanlayıcı ihtiyacı (D-053 yerel çözümdür).
 - CI/CD (D-057).
+- Oturum token'larının veritabanında özetlenerek saklanması ve 90 günlük mutlak oturum sınırı (SECURITY §4.2 uygulama notları).
 - D-061 ile yayına ertelenen maddeler (genel hız sınırları, `legal_acceptances`, silinen hesap listesi) ve D-062 e-postaları.
 - LEGAL §9 kontrol listesi.
 

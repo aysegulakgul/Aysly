@@ -105,7 +105,9 @@ Kimlik doğrulama kütüphanesi kendi uç noktalarını `/api/auth/*` altında s
 | POST | `/me/deletion` | Hesap silme talebi | `{ currentPassword }` | `202 { scheduledFor }` | BR-ACC-005 (D-036) | 3/gün |
 | DELETE | `/me/deletion` | Silme talebini iptal | — | `204` | BR-ACC-005 | — |
 
-Hesap varlığını ifşa etmeme: `sign-up` mevcut e-postada da kullanıcıya genel bir yanıt verir ve hesap varlığını ifşa etmez (SECURITY §4.3). Mevcut hesap sahibine bilgi e-postası MVP'de gönderilmez; yayına alma öncesi yeniden değerlendirilir (D-062). Geliştirme ortamında tüm e-postalar yerel yakalayıcıda kalır (D-037, D-045).
+**Uygulanan yollar (Faz 3, D-067):** Kayıt `POST /api/v1/auth/sign-up` (gövde: `{ name, email, password, timezone? }`; dil, çerezden veya tarayıcı dilinden). Diğer kimlik işlemleri Better Auth uç noktalarıdır: `POST /api/auth/sign-in/email`, `POST /api/auth/sign-out`, `GET /api/auth/get-session`, `POST /api/auth/request-password-reset`, `GET /api/auth/reset-password/:token`, `POST /api/auth/reset-password`, `GET /api/auth/verify-email`, `POST /api/auth/send-verification-email`, `POST /api/auth/change-password`, `GET /api/auth/list-sessions`, `POST /api/auth/revoke-session`, `POST /api/auth/revoke-other-sessions`. Better Auth'un kayıt uç noktası kapalıdır. Hata gövdeleri Better Auth biçimindedir (`{ code, message }`); kendi uç noktalarımız §2.4 biçimini kullanır.
+
+Hesap varlığını ifşa etmeme: `sign-up` mevcut e-postada da kullanıcıya genel bir yanıt verir ve hesap varlığını ifşa etmez (SECURITY §4.3). Mevcut hesap sahibine bilgi e-postası MVP'de gönderilmez; yayına alma öncesi yeniden değerlendirilir (D-062). Mevcut e-postada verilen yanıt OQ-036'ya bağlıdır. Geliştirme ortamında tüm e-postalar yerel yakalayıcıda kalır (D-037, D-045).
 
 ## 4. Çalışma alanı ve tercihler
 

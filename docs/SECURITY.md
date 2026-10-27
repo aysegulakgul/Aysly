@@ -42,6 +42,13 @@ Her madde **[MVP]** (lansman öncesi zorunlu) veya **[SONRA]** olarak işaretlid
 - Çerez: `HttpOnly; SameSite=Lax; Path=/`; `Secure` ve `__Host-` öneki [YAYIN]da zorunlu. Yerelde `http://localhost` kullanıldığı için bu iki ayar ortama göre yapılandırılır (ARCHITECTURE §12.3).
 - Süreler ve geçersiz kılma: BR-ACC-006. Girişte oturum kimliği yenilenir (session fixation önlemi).
 
+**Uygulama notları (Faz 3):**
+- Oturum çerezi `aysly.session_token`: HttpOnly, SameSite=Lax, 30 gün kayan süre (BR-ACC-006). Secure ve `__Host-` öneki yalnızca üretimde. E2E testiyle doğrulandı.
+- **Bilinen sapma:** Better Auth oturum token'ını veritabanında açık metin olarak saklar; §4.2 ise yalnızca özetinin saklanmasını öngörür. Çerezdeki değer imzalıdır; veritabanına erişen biri oturumları kullanabilir. Yerel, tek kullanıcılı ortamda kabul edilebilir; yayına alma öncesi ele alınacak (OQ-032 listesine eklendi).
+- **90 günlük mutlak oturum sınırı** Better Auth'ta yerleşik değil; şu an yalnızca 30 günlük kayan süre uygulanıyor. Yayına alma öncesi ele alınacak.
+- Origin kontrolü: Better Auth uç noktalarında kütüphanenin kendi kontrolü (`trustedOrigins`), kayıt uç noktasında `shared/http/origin.ts`.
+- Kayıt hız sınırında `X-Forwarded-For` başlığına güvenilmez; yerelde proxy olmadığından tüm istekler tek anahtarı paylaşır.
+
 ### 4.3. Hesap numaralandırmayı önleme
 - Giriş hatası genel mesaj; şifre sıfırlama her zaman aynı yanıt; kayıt, mevcut e-postada genel yanıt (mevcut sahibe bilgi e-postası MVP'de yok, D-062).
 - Yanıt süreleri benzer tutulur (mevcut olmayan kullanıcı için de hash hesaplanır).

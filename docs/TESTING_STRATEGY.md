@@ -192,5 +192,7 @@ flowchart LR
 
 Başarısız test "flaky" ise devre dışı bırakılmaz; karantinaya alınıp hemen düzeltilir ve faz raporunda belirtilir.
 
+**Tarayıcı testlerinin ortamı (Faz 3):** Playwright, ayrı bir uygulama örneğini 3100 portunda ve ayrı derleme klasörüyle (`.next-e2e`) başlatır. Her çalıştırmada sıfırdan kurulan `aysly_e2e` veritabanını kullanır, böylece geliştirme veritabanına dokunmaz. E-postalar Mailpit API'sinden okunur. Testlerde kimlik doğrulama hız sınırı kapalıdır (`AUTH_RATE_LIMIT_ENABLED=false`); sınırın kendisi entegrasyon testiyle kanıtlanır.
+
 ## 9. Tamamlanma tanımı (test açısından)
 Bir değişiklik şu koşullarla tamamdır: ilgili BR testleri yazıldı/güncellendi; yetki matrisi güncel; `pnpm verify` tamamen yeşil (gerçekten çalıştırıldı); düzeltilen hata için regresyon testi var; yeni E2E akışı gerekiyorsa eklendi.

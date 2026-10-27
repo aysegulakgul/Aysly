@@ -9,7 +9,7 @@
 |---|---|---|---|---|---|
 | 1 | Ürün analizi, mimari kararlar, dokümantasyon | **Kapandı** | — | 2026-10-27 | 2026-10-27 |
 | 2 | Proje altyapısı ve temel mimari | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
-| 3 | Kimlik doğrulama, hesap, tercihler, onboarding | **Devam ediyor** | D-065 ekranları onaya sunulacak | 2026-10-28 | — |
+| 3 | Kimlik doğrulama, hesap, tercihler, onboarding | **Devam ediyor** — kimlik doğrulama bölümü tamam | Giriş ekranlarının onayı (D-065); OQ-036 | 2026-10-28 | — |
 | 4 | Görev yönetimi, Inbox, My Tasks, dashboard | Başlamadı | — | — | — |
 | 5 | Projeler ve görev görünümleri | Başlamadı | — | — | — |
 | 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | Başlamadı | — | — | — |
@@ -89,6 +89,10 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
 - **Bağımlılık:** Faz 2; Figma ekranları (D-063).
 - **Kapsam:** FR-AUTH-01..07 (e-posta + şifre, D-039), BR-ACC-001..004, BR-ACC-006, BR-WS-001, BR-PREF-001..003; güvenlik e-postaları ve şifreyle yeniden doğrulama (D-040, D-055); ayarlar (profil, görünüm, dil TR/EN, tarih/saat, güvenlik/oturumlar); onboarding (ONBOARDING §2–3); uygulama kabuğu (kenar çubuğu, Inbox'ın menüde ayrı girişi D-030, mobil navigasyon, boş dashboard).
 - **Kabul:** Kayıt → kişisel alan + Inbox + tercihler tek işlemde; giriş/çıkış/sıfırlama/doğrulama E2E (e-postalar yerel yakalayıcıdan okunarak); hız sınırları test edildi; numaralandırma önlemleri test edildi; ayar değişiklikleri kalıcı; arayüz TR/EN geçişi çalışıyor.
+
+- **İlerleme (2026-10-28):**
+  - **Tamam:** Veritabanı (kimlik, çalışma alanı, üyelik, Inbox, tercihler, denetim); tek işlemli kayıt (BR-WS-001, D-067); Better Auth ile giriş, çıkış, oturum, şifre sıfırlama, e-posta doğrulama; güvenlik e-postaları (D-055); hız sınırları ve Origin kontrolü; giriş, kayıt, şifremi unuttum ve şifre sıfırlama ekranları (D-065, onay bekliyor); korumalı ana sayfa.
+  - **Kalan:** Uygulama kabuğu (Figma kenar çubuğu ve alt navigasyon), Ayarlar · Görünüm (Figma) ile tema ve dil tercihleri, Profil ve Güvenlik ayarları (şifre değiştirme, oturumlar, e-posta değiştirme), çıkış düğmesi, onboarding.
 
 ### Faz 4 — Görev yönetimi, Inbox, My Tasks, dashboard
 - **Bağımlılık:** Faz 3.
