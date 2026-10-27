@@ -8,11 +8,11 @@ Aysly; görevleri, projeleri, günlük planı, notları ve hedefleri tek, sakin 
 
 | | |
 |---|---|
-| Mevcut faz | **Faz 2 — Altyapı** (tamamlandı, kapanış onayı bekleniyor) |
+| Mevcut faz | **Faz 3 — Kimlik doğrulama, tercihler, onboarding** (devam ediyor) |
 | Uygulama kodu | Altyapı ve temel bileşenler var; kullanıcıya açık özellik henüz yok |
 | Çalışma ortamı | Yalnızca yerel bilgisayar; hosting ve ücretli servis yok |
 | Teknoloji | Next.js, TypeScript, PostgreSQL, Drizzle, Better Auth |
-| Sonraki adım | Faz 2 kapanış onayı, [OQ-035](docs/OPEN_QUESTIONS.md) (açık tema), ardından Faz 3 (giriş, kayıt, onboarding) |
+| Sonraki adım | Faz 3 ekranlarının (D-065) onayı |
 
 Ayrıntılı durum: [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 

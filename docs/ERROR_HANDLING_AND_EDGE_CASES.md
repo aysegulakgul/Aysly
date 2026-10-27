@@ -1,6 +1,6 @@
 # Hata Durumları ve Uç Senaryolar
 
-> Durum: v0.3 · Son güncelleme: 2026-10-15
+> Durum: v0.3 · Son güncelleme: 2026-10-27
 > Her senaryo: beklenen sistem davranışı, kullanıcı mesajı (Türkçe ana metin; çeviri anahtarı uygulamada), gerekli testler. Kural kimlikleri BUSINESS_RULES'a referanstır.
 
 ## 1. Kullanıcı mesajı ilkeleri

@@ -1,6 +1,6 @@
 # Kodlama Standartları ve SOLID
 
-> Durum: v0.3 · Son güncelleme: 2026-10-15
+> Durum: v0.3 · Son güncelleme: 2026-10-27
 > İlgili: [ARCHITECTURE.md](ARCHITECTURE.md) (katmanlar ve klasörler bu belgede tekrar edilmez)
 
 ## 1. Genel

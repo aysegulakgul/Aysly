@@ -1,15 +1,15 @@
 # Aşamalı Geliştirme Planı
 
-> Durum: v0.4 · Son güncelleme: 2026-10-15
+> Durum: v0.5 · Son güncelleme: 2026-10-28
 > v0.2: OQ-001..OQ-023 kararları işlendi. Çalışma ortamı yalnızca yerel (D-045); "beta" ve "yayına alma" ayrı bir karara bağlandı (OQ-032).
 
 ## 1. Faz durumu (tek gerçek kaynak)
 
 | Faz | Ad | Durum | Engelleyen açık sorular | Başlangıç | Kapanış |
 |---|---|---|---|---|---|
-| 1 | Ürün analizi, mimari kararlar, dokümantasyon | **Kapandı** | — | 2026-10-15 | 2026-10-15 |
-| 2 | Proje altyapısı ve temel mimari | **Kapı kontrolünde** — teslimler tamam, `pnpm verify` yeşil; ürün sahibinin kapanış onayı bekleniyor | — | 2026-10-28 | — |
-| 3 | Kimlik doğrulama, hesap, tercihler, onboarding | Başlamadı | OQ-035 (açık tema); D-065 ekranları onaya sunulacak | — | — |
+| 1 | Ürün analizi, mimari kararlar, dokümantasyon | **Kapandı** | — | 2026-10-27 | 2026-10-27 |
+| 2 | Proje altyapısı ve temel mimari | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
+| 3 | Kimlik doğrulama, hesap, tercihler, onboarding | **Devam ediyor** | D-065 ekranları onaya sunulacak | 2026-10-28 | — |
 | 4 | Görev yönetimi, Inbox, My Tasks, dashboard | Başlamadı | — | — | — |
 | 5 | Projeler ve görev görünümleri | Başlamadı | — | — | — |
 | 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | Başlamadı | — | — | — |
@@ -57,7 +57,7 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
 ### Faz 1 — Ürün analizi, mimari kararlar ve dokümantasyon
 - **Kapsam:** Bu belge seti.
 - **Teslim:** README, CLAUDE.md, docs/* (18 belge).
-- **Durum:** Kapandı (2026-10-15). OQ-001..OQ-034 kapandı (D-030..D-063); yalnızca OQ-032 ertelendi.
+- **Durum:** Kapandı (2026-10-27). OQ-001..OQ-034 kapandı (D-030..D-063); yalnızca OQ-032 ertelendi.
 - **Kabul:** Teknik öneriler onaylandı (D-060); ürün/UX ayrıntıları onaylandı (OQ-034); Faz 2–3'ü engelleyen OQ'lar yanıtlandı.
 - **Kapanış eylemi:** OQ-034 ile onaylanan ayrıntılar `ONAYLI` yapılır; ürün sahibi "Faz 1 kapandı" der; DECISIONS §5'e işlenir.
 
@@ -73,7 +73,7 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
   - `EmailSender` arayüzü, Mailpit SMTP adaptörü ve testler için bellek içi adaptör; ücretli servis yok.
   - Test altyapısı: Vitest, Playwright, Testcontainers ile gerçek PostgreSQL (D-056); diğer test paketleri ihtiyaç duyuldukça (D-058); fabrikalar.
   - `pnpm verify` doğrulama komutu ve git hook'ları (TESTING_STRATEGY §8); BR izlenebilirlik betiği.
-  - Tasarım token'ları **Figma'dan birebir** (D-063; renk, tipografi, boşluk, köşe, gölge), temel bileşenler: Button, Input, Chip, Progress, Banner, Toast (görünüm), EmptyState, Skeleton; Figma ikonları. **Sapma:** Dialog, ilk kullanıldığı Faz 4'e bırakıldı (D-058). Açık tema token'ları tanımlı ama etkin değil; iki Figma değeri eksik (OQ-035), bu yüzden yalnızca koyu tema çalışıyor.
+  - Tasarım token'ları **Figma'dan birebir** (D-063; renk, tipografi, boşluk, köşe, gölge), temel bileşenler: Button, Input, Chip, Progress, Banner, Toast (görünüm), EmptyState, Skeleton; Figma ikonları. **Sapma:** Dialog, ilk kullanıldığı Faz 4'e bırakıldı (D-058). Açık temadaki iki eksik değer D-066 ile eklendi; tema seçimi Faz 3'te etkinleşir.
   - i18n iskeleti, Türkçe + İngilizce (D-038).
   - Sağlık uç noktaları.
 - **Kabul:** README'deki adımlarla temiz bir Windows makinesinde uygulama yerelde çalışır; `pnpm verify` tüm adımlarıyla yeşil; mimari kural ihlali içeren örnek kod doğrulamada yakalanıyor (denendi); `/api/health/ready` 200; yedek alma ve geri yükleme betiği denendi; test e-postası yerel yakalayıcıda görüldü.

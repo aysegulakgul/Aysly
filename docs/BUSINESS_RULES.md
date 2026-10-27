@@ -1,6 +1,6 @@
 # Merkezi İş Kuralları
 
-> Durum: v0.3 · Son güncelleme: 2026-10-15 · Uygulama durumu: Hiçbir kural henüz uygulanmadı.
+> Durum: v0.3 · Son güncelleme: 2026-10-27 · Uygulama durumu: Hiçbir kural henüz uygulanmadı.
 > v0.3: OQ-024..OQ-031 kararları işlendi (D-053..D-060). OQ-030 ile teknik öneriler onaylandı; "gereksiz karmaşıklık" ölçütüyle çıkarılanlar D-061 kaydındadır. OQ-033 kapandı (D-062): BR-ACC-005 için onay e-postası MVP'de yok.
 
 Bu dosya Aysly'deki iş kurallarının **tek gerçek kaynağıdır**. Diğer belgeler kuralları kimlikleriyle referans verir; kuralı yeniden tanımlamaz. Kod içinde bir kuralı uygulayan yer, yorumla kural kimliğini belirtir (ör. `// BR-TASK-004`). Testler kural kimliğini test adında taşır.
@@ -587,15 +587,15 @@ Bir kayıt hem arşivli hem çöpte olabilir; geri yüklenince arşivli durumuna
 
 | Tarih | Kural | Değişiklik | Karar |
 |---|---|---|---|
-| 2026-10-15 | Tümü | İlk taslak | Faz 1 |
-| 2026-10-15 | BR-TASK-002/003, BR-SUB-003, BR-REC-002, BR-PROJ-005/006, BR-DEL-001/002/003, BR-GOAL-002, BR-NOTIF-001, BR-VIEW-001, BR-ACC-004/005 | Onaylı kısımlar `ONAYLI` yapıldı | D-017, D-030..D-043, D-051 |
-| 2026-10-15 | BR-NOTIF-002/004 | E-posta kanalı SONRA'ya taşındı | D-037 |
-| 2026-10-15 | BR-REM-005, BR-DEL-003, BR-ACC-005 | Tetikleme yöntemi pg-boss'tan bağımsızlaştırıldı | D-044 |
-| 2026-10-15 | BR-PROJ-004 | Arşivli projenin görevlerinin salt okunurluğu eklendi | D-043'ten türetildi |
-| 2026-10-15 | Tüm `ÖNERİ` kurallar | `ONAYLI` yapıldı | D-060 (OQ-030) |
-| 2026-10-15 | BR-PROJ-004 | İçerik netleştirildi: arşivli projenin görevleri salt okunur; taşıma/tekil silme kuralları eklendi | D-043, D-060 |
-| 2026-10-15 | BR-REM-005, BR-DEL-003, BR-ACC-005 | Tetikleme: yalnızca uygulama açık/çalışırken; worker yok | D-053 |
-| 2026-10-15 | BR-ACC-003, BR-ACC-004 | Güvenlik e-postaları ve doğrulama gerektiren işlemler kesinleşti | D-055 |
-| 2026-10-15 | BR-NOTIF-001 | Günlük özet MVP dışı | D-054 |
-| 2026-10-15 | BR-PERM-005 | SONRA'ya alındı (EntitlementService yazılmayacak) | D-061 |
-| 2026-10-15 | BR-SUB-001 | DB trigger kaldırıldı; uygulama + test yeterli | D-061 |
+| 2026-10-27 | Tümü | İlk taslak | Faz 1 |
+| 2026-10-27 | BR-TASK-002/003, BR-SUB-003, BR-REC-002, BR-PROJ-005/006, BR-DEL-001/002/003, BR-GOAL-002, BR-NOTIF-001, BR-VIEW-001, BR-ACC-004/005 | Onaylı kısımlar `ONAYLI` yapıldı | D-017, D-030..D-043, D-051 |
+| 2026-10-27 | BR-NOTIF-002/004 | E-posta kanalı SONRA'ya taşındı | D-037 |
+| 2026-10-27 | BR-REM-005, BR-DEL-003, BR-ACC-005 | Tetikleme yöntemi pg-boss'tan bağımsızlaştırıldı | D-044 |
+| 2026-10-27 | BR-PROJ-004 | Arşivli projenin görevlerinin salt okunurluğu eklendi | D-043'ten türetildi |
+| 2026-10-27 | Tüm `ÖNERİ` kurallar | `ONAYLI` yapıldı | D-060 (OQ-030) |
+| 2026-10-27 | BR-PROJ-004 | İçerik netleştirildi: arşivli projenin görevleri salt okunur; taşıma/tekil silme kuralları eklendi | D-043, D-060 |
+| 2026-10-27 | BR-REM-005, BR-DEL-003, BR-ACC-005 | Tetikleme: yalnızca uygulama açık/çalışırken; worker yok | D-053 |
+| 2026-10-27 | BR-ACC-003, BR-ACC-004 | Güvenlik e-postaları ve doğrulama gerektiren işlemler kesinleşti | D-055 |
+| 2026-10-27 | BR-NOTIF-001 | Günlük özet MVP dışı | D-054 |
+| 2026-10-27 | BR-PERM-005 | SONRA'ya alındı (EntitlementService yazılmayacak) | D-061 |
+| 2026-10-27 | BR-SUB-001 | DB trigger kaldırıldı; uygulama + test yeterli | D-061 |

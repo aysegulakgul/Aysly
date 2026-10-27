@@ -1,6 +1,6 @@
 # Figma Envanteri
 
-> Durum: v0.1 · Son güncelleme: 2026-10-15 · Karar: D-063 (arayüzde tek kaynak Figma)
+> Durum: v0.1 · Son güncelleme: 2026-10-27 · Karar: D-063 (arayüzde tek kaynak Figma)
 > Dosya: [Aysly (Figma)](https://www.figma.com/design/XciejfKVEdq0ik3dg4jY2O/Aysly) · fileKey `XciejfKVEdq0ik3dg4jY2O` · Sayfa `0:1` ("Page 1")
 > Bu belge, Figma'daki çerçevelerin düğüm kimliklerini ve MVP kapsamıyla eşleşmesini tutar. Ayrıntılı değerler (renk, tipografi, boşluk) Faz 2'de Figma'dan okunup UI_UX_DESIGN_SYSTEM.md'ye işlenecek. Figma'da değişiklik yapıldıkça bu belge yeniden üretilir.
 

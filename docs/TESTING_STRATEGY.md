@@ -1,6 +1,6 @@
 # Test Stratejisi ve Kabul Kriterleri
 
-> Durum: v0.3 · Son güncelleme: 2026-10-15 · Uygulama durumu: Test altyapısı kurulmadı (Faz 2).
+> Durum: v0.3 · Son güncelleme: 2026-10-27 · Uygulama durumu: Test altyapısı kurulmadı (Faz 2).
 > Araçlar: Vitest ve Playwright (D-044). Testing Library, Testcontainers (Docker, D-056), axe-core, fast-check onaylı ama yalnızca ihtiyaç duyulduğunda eklenir (D-058). Kapsam hedefleri D-060 ile onaylı.
 
 ## 1. İlkeler

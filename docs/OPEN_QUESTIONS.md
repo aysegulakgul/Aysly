@@ -1,6 +1,6 @@
 # Açık Sorular (Karar Bekleyen Konular)
 
-> Durum: v0.4 · Son güncelleme: 2026-10-15 · Sahibi: Ürün sahibi (karar), Claude (hazırlık)
+> Durum: v0.5 · Son güncelleme: 2026-10-28 · Sahibi: Ürün sahibi (karar), Claude (hazırlık)
 
 Bu dosya, **ürün sahibinin kararını bekleyen** konuların tek kaynağıdır. Bir konu burada `AÇIK` durumdayken, ona bağlı geliştirme **yapılamaz** ve ilgili belgeler bu kararı kesinleşmiş gibi yazamaz (bkz. [CLAUDE.md](../CLAUDE.md) §5).
 
@@ -20,25 +20,8 @@ Bu dosya, **ürün sahibinin kararını bekleyen** konuların tek kaynağıdır.
 | ID | Konu | Engellediği faz | Öneri (kısa) | Durum |
 |---|---|---|---|---|
 | OQ-032 | Yayına alma (hosting, alan adı, e-posta sağlayıcı, hata izleme, yedekleme) | Yayın kararı (MVP sonrası) | Şimdi karar gerekmiyor | AÇIK (ertelendi) |
-| OQ-035 | Açık temada iki Figma token'ı eksik (`palette/support-1`, `palette/support-2`) | Faz 3 (tema tercihi) | Figma'ya açık tema değerlerinin eklenmesi | AÇIK |
 
 
-### OQ-035 — Açık tema için eksik iki Figma değişkeni
-
-**Bağlam.** Figma'daki koyu tema (`4:69542`) tüm değişkenleri tanımlıyor. Açık temada (`4:69560`) iki değişkenin değeri yok:
-| Değişken | Koyu temadaki değer | Kullanıldığı yer |
-|---|---|---|
-| `palette/support-1` | `#282e49` | Seçili kenar çubuğu öğesinin zemini (UI/NavItem), "Devam ediyor" çipinin zemini (UI/Chip) |
-| `palette/support-2` | `#000000` | İlerleme çubuğunun boş kısmı (UI/Progress) |
-
-D-063 gereği bu değerleri kendim üretmiyorum. Açık tema bu iki değer olmadan eksik görünür; bu yüzden Faz 2'de uygulama yalnızca koyu temayla çalışıyor. Tema tercihi (açık/koyu/sistem, BR-PREF-001) Faz 3'te geliyor.
-
-| Seçenek | |
-|---|---|
-| A. İki değeri Figma'daki açık temaya eklersin | Önerilen; Figma tek kaynak kalır |
-| B. Açık tema MVP'de olmaz, uygulama yalnızca koyu temada çalışır | Tema ayarı sadeleşir; BR-PREF-001 ve Ayarlar · Görünüm ekranı buna göre değişir |
-
-**Öneri:** A. Değerler eklenene kadar koyu tema kullanılır.
 ### OQ-032 — Yayına alma (ertelendi)
 
 D-045 gereği şimdilik yalnızca yerel ortam kullanılıyor. Yayına alma kararı verildiğinde şu konular birlikte ele alınacak:
@@ -91,5 +74,6 @@ D-045 gereği şimdilik yalnızca yerel ortam kullanılıyor. Yayına alma karar
 | OQ-031 | Dışa aktarma kapsamı | Profil ve tercihler dahil; şifreler, gizli anahtarlar ve güvenlik bilgileri hariç. | D-059 |
 | OQ-033 | Ek e-postalar | Kayıt denemesi bildirimi ve hesap silme onay e-postası MVP'de yok; yayına alma öncesi yeniden değerlendirilir. | D-062 |
 | OQ-034 | Ürün/UX ayrıntıları | Genel öneriler onaylandı; arayüz tasarımında tek kaynak Figma; eksik/belirsiz detayda önce ürün sahibine sorulur. | D-063 |
+| OQ-035 | Açık temada eksik iki Figma rengi | Claude temaya uygun belirledi: support-1 `#dfe3f6`, support-2 `#d6d6cf`. | D-066 |
 
 Kapanan soruların değerlendirilen seçenekleri DECISIONS.md'deki ilgili kaydın "Alternatifler" alanında özetlenmiştir.

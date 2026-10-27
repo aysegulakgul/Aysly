@@ -1,6 +1,6 @@
 # Veri Modeli
 
-> Durum: v0.3 · Son güncelleme: 2026-10-15 · Uygulama durumu: Şema oluşturulmadı, migration yok.
+> Durum: v0.3 · Son güncelleme: 2026-10-27 · Uygulama durumu: Şema oluşturulmadı, migration yok.
 > PostgreSQL + Drizzle ONAYLI (D-044); Docker Desktop üzerinde yerel (D-056). Alan ayrıntıları ve sınırlar D-060 ile onaylı; D-061 sadeleştirmeleri uygulanmıştır.
 > Veritabanı: PostgreSQL 16+ (ONAYLI, D-044). Bu belgedeki alanlar **hedef şemadır**; açık sorulara bağlı alanlar işaretlenmiştir.
 

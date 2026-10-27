@@ -1,6 +1,6 @@
 # Kullanıcı Segmentleri ve Personalar
 
-> Durum: v0.3 · Son güncelleme: 2026-10-15
+> Durum: v0.3 · Son güncelleme: 2026-10-27
 > İlgili: [PRD.md](PRD.md) · [ROLES_AND_PERMISSIONS.md](ROLES_AND_PERMISSIONS.md) · [ONBOARDING_AND_PERSONALIZATION.md](ONBOARDING_AND_PERSONALIZATION.md)
 
 ## 1. Beş kavramın ayrımı

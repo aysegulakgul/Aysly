@@ -2,8 +2,8 @@
  * Aysly tasarım token'ları — Figma "Foundations / Aysly tasarım referansı" (4:69535) değişkenlerinden birebir (D-063).
  * Koyu: 4:69542 · Açık: 4:69560. Değer değiştirmek için önce Figma güncellenir.
  *
- * Faz 2 notu: Açık temada palette/support-1 ve palette/support-2 Figma'da tanımlı değil (ürün sahibine soruldu).
- * Bu nedenle tema seçimi Faz 3'e kadar yalnızca koyu temadır; açık tema token'ları tanımlı ama etkin değil.
+ * Açık temadaki palette/support-1 ve palette/support-2 Figma'da yoktu; değerler D-066 ile eklendi.
+ * Tema seçimi (açık/koyu/sistem) Faz 3'te kullanıcı tercihiyle etkinleşir; o zamana kadar koyu tema kullanılır.
  */
 :root,
 [data-theme='dark'] {
@@ -39,6 +39,8 @@
   --warning: #9a5b00;
   --danger: #b42318;
   --info: #2563a8;
-  /* --support-1, --support-2: Figma'da açık tema değeri yok (bkz. üst not). */
+  /* Figma'da açık tema karşılığı olmayan iki değer; ürün sahibinin isteğiyle temaya uygun belirlendi (D-066). */
+  --support-1: #dfe3f6;
+  --support-2: #d6d6cf;
   color-scheme: light;
 }
