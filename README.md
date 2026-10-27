@@ -8,11 +8,11 @@ Aysly; görevleri, projeleri, günlük planı, notları ve hedefleri tek, sakin 
 
 | | |
 |---|---|
-| Mevcut faz | **Faz 1 — Ürün analizi ve dokümantasyon** |
-| Uygulama kodu | **Henüz yok** |
+| Mevcut faz | **Faz 2 — Altyapı** (tamamlandı, kapanış onayı bekleniyor) |
+| Uygulama kodu | Altyapı ve temel bileşenler var; kullanıcıya açık özellik henüz yok |
 | Çalışma ortamı | Yalnızca yerel bilgisayar; hosting ve ücretli servis yok |
 | Teknoloji | Next.js, TypeScript, PostgreSQL, Drizzle, Better Auth |
-| Sonraki adım | [OQ-033 ve OQ-034](docs/OPEN_QUESTIONS.md) yanıtı ve Faz 1 kapanış onayı |
+| Sonraki adım | Faz 2 kapanış onayı, [OQ-035](docs/OPEN_QUESTIONS.md) (açık tema), ardından Faz 3 (giriş, kayıt, onboarding) |
 
 Ayrıntılı durum: [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 
@@ -46,15 +46,34 @@ Belgelerde her karar/kural bir etiket taşır: `ONAYLI` (ürün sahibi onayladı
 
 ## Kurulum ve çalıştırma
 
-> ⚠️ **Henüz uygulanmadı.** Aşağıdaki adımlar Faz 2'de geçerli olacak **hedef** adımlardır. Uygulama yalnızca yerel bilgisayarda çalışır; hosting veya ücretli servis gerekmez. PostgreSQL ve yerel e-posta yakalayıcı (Mailpit) Docker Desktop üzerinde çalışır (D-056).
+Uygulama yalnızca bu bilgisayarda (yerel) çalışır; hosting veya ücretli servis gerekmez (D-045).
 
-Gereksinimler (planlanan): Node.js LTS, pnpm, Docker Desktop (PostgreSQL ve Mailpit konteynerleri, D-056).
+**Gereksinimler:** Node.js 22 veya üstü, pnpm 10 (`npm install -g pnpm@10`), Docker Desktop (açık olmalı), Git.
 
-Planlanan adımlar: bağımlılıkları kur (`pnpm install`) → `docker compose up -d` (PostgreSQL + Mailpit) → `.env.example` dosyasını `.env` olarak kopyala → `pnpm db:migrate` → (isteğe bağlı) `pnpm db:seed` → `pnpm dev` → `http://localhost:3000`.
+**İlk kurulum** (proje klasöründe, sırayla):
+1. `pnpm install` — bağımlılıkları kurar.
+2. `docker compose up -d` — PostgreSQL 17 (port 5433) ve Mailpit (e-posta yakalayıcı) başlatılır.
+3. `.env.example` dosyasını `.env` adıyla kopyala (yerel değerler hazırdır).
+4. `pnpm db:migrate` — veritabanını günceller.
+5. `pnpm hooks:install` — commit öncesi hızlı kontrolleri etkinleştirir.
+6. `pnpm dev` — uygulama `http://localhost:3000` adresinde açılır.
 
-Planlanan komutlar: `pnpm verify` (tüm kontroller), `pnpm test`, `pnpm test:integration`, `pnpm test:e2e`, `pnpm lint`, `pnpm typecheck`, `pnpm db:backup`, `pnpm db:restore`.
+**Yararlı adresler (geliştirme):**
+- `http://localhost:3000/dev/ui` — Figma bileşenlerinin karşılaştırma sayfası (yalnızca geliştirmede).
+- `http://localhost:8025` — Mailpit: uygulamanın gönderdiği e-postalar burada görünür, dışarı gönderilmez.
+- `http://localhost:3000/api/health/ready` — uygulama ve veritabanı durumu.
 
-Gerçek verini içeren veritabanına migration uygulamadan önce mutlaka `pnpm db:backup` çalıştır.
+**Komutlar:**
+| Komut | Ne yapar |
+|---|---|
+| `pnpm verify` | Tüm kontroller: biçim, lint, tip, mimari, testler (birim, entegrasyon, tarayıcı), derleme, bağımlılık güvenliği |
+| `pnpm test` / `pnpm test:integration` / `pnpm test:e2e` | Birim / gerçek veritabanlı entegrasyon / tarayıcı testleri |
+| `pnpm db:backup` | Yerel veritabanını `backups/` klasörüne yedekler (son 7 yedek saklanır) |
+| `pnpm db:restore backups/<dosya>.dump` | Önce güncel yedeği alır, sonra seçilen yedeği geri yükler |
+| `pnpm arch` | Mimari katman kurallarını denetler |
+
+> Gerçek verini içeren veritabanına migration uygulamadan önce mutlaka `pnpm db:backup` çalıştır.
+> Entegrasyon testleri kendi geçici veritabanlarını açar; senin verine dokunmaz.
 
 ## Geliştirme süreci
 Her geliştirme [CLAUDE.md §7](CLAUDE.md) sürecini izler: belgeleri oku → etkiyi değerlendir → gerekirse onay al → geliştir → test et → belgeleri güncelle → raporla. Fazlar arası geçiş [faz kapısı](docs/IMPLEMENTATION_PLAN.md) kontrolüne tabidir.

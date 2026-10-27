@@ -1,0 +1,23 @@
+{
+  "app": {
+    "name": "Aysly",
+    "tagline": "Yapılacakları değil, düzeni yönet."
+  },
+  "foundation": {
+    "title": "Aysly geliştiriliyor",
+    "description": "Altyapı hazır. Giriş, görevler ve diğer ekranlar sonraki aşamalarda eklenecek; bu sayfada henüz çalışan bir özellik yok."
+  },
+  "errors": {
+    "validation": "Bazı alanlar geçersiz.",
+    "notFound": "Aradığın sayfa bulunamadı ya da erişimin yok.",
+    "forbidden": "Bu işlem için yetkin yok.",
+    "versionConflict": "Bu kayıt başka bir yerde değiştirildi.",
+    "internal": "Beklenmeyen bir sorun oluştu. Tekrar dene; sorun sürerse bize şu kodu ilet."
+  },
+  "rules": {},
+  "ui": {
+    "offline": "Bağlantı yok. Değişikliklerin kaydedilemeyebilir.",
+    "undo": "Geri al",
+    "loading": "Yükleniyor"
+  }
+}

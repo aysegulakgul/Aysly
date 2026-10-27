@@ -34,7 +34,7 @@
 | HTTP adaptörleri | Kapsam yüzdesi yerine: her uç nokta için §2.7 (API_CONTRACTS) listesi |
 | UI | Kritik bileşenler (TaskRow, DatePicker, QuickAdd, NoteEditor) davranış testleri |
 
-Kapsam yüzdesi tek başına kalite ölçütü değildir; **BR izlenebilirlik raporu** (hangi kuralın testi var) `pnpm verify` içinde üretilir: `scripts/br-coverage` kural kimliklerini BUSINESS_RULES.md'den okur, testlerde arar, eksikleri listeler. `ONAYLI` bir kuralın testi yoksa doğrulama başarısız olur.
+Kapsam yüzdesi tek başına kalite ölçütü değildir. `pnpm verify` içindeki **kural izlenebilirlik raporu** (`scripts/br-coverage.mjs`) şunları denetler: (1) kodda `// BR-XXX-000` yorumuyla uygulanan her kuralın en az bir testi vardır; (2) kod ve testlerde geçen her kural kimliği BUSINESS_RULES.md'de tanımlıdır. İkisinden biri sağlanmazsa doğrulama başarısız olur. Henüz uygulanmamış (gelecek fazlara ait) kurallar hata sayılmaz; rapor yalnızca sayılarını gösterir. Faz kapanışında, o fazın kapsamındaki kuralların uygulanmış ve testli olduğu ayrıca kontrol edilir.
 
 ## 4. Modül bazında temel test senaryoları
 

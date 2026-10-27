@@ -18,6 +18,8 @@ Kaynak: Figma `4:69535` (Foundations), değişkenler `4:69542` (koyu) ve `4:6956
 | Bileşenler | `4:70582`: Banner, Button (Primary/Secondary/Ghost/Danger), Tab, Chip, Progress, Input, TaskRow, BoardCard, NavItem, BottomNav, Toast/Undo, Skeleton, EmptyState, Sidebar | Uygulamada bu adlarla kurulur |
 
 Ayrıntılar (her bileşenin ölçüleri, ekran düzenleri) ilgili ekran geliştirilirken Figma'dan okunur. §5–§11'deki hareket, durum metni ve kısayol tarifleri, Figma'da karşılığı yoksa D-065 kapsamında kullanılır.
+
+**Uygulama durumu (Faz 2):** Token'lar `src/ui/tokens.css` içinde Figma adlarına karşılık gelen CSS değişkenleri olarak tanımlı; Tailwind yalnızca bunlara bağlı (`src/app/globals.css`). Koyu temadaki `palette/support-1` (#282e49) ve `palette/support-2` (#000000) değişkenlerinin açık temada karşılığı Figma'da yok (OQ-035). Bu nedenle uygulama şimdilik yalnızca koyu temada çalışıyor. İkonlar Figma'dan değiştirilmeden indirildi (`public/icons/`). Bileşenler `src/ui/components/` altında; geliştirmede `http://localhost:3000/dev/ui` sayfasında Figma ile karşılaştırılabilir.
 ## 1. Tasarım ilkeleri
 1. **Sakin:** Düşük doygunluklu yüzeyler, tek vurgu rengi; renk yalnızca anlam taşıdığında (öncelik, durum, hata).
 2. **Okunabilir:** Gövde metni 15–16 px, satır yüksekliği 1,5; kontrast WCAG AA (metin ≥ 4,5:1, büyük metin ve UI ≥ 3:1).

@@ -1,0 +1,70 @@
+@import 'tailwindcss';
+@import '../ui/tokens.css';
+
+/* Tailwind yardımcı sınıfları yalnızca Figma token'larına bağlanır (CODING_STANDARDS §7). */
+@theme inline {
+  --color-page: var(--bg-page);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-moonlight: var(--moonlight);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --color-support-1: var(--support-1);
+  --color-support-2: var(--support-2);
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+
+  /* Figma text/* — boyut / satır yüksekliği */
+  --text-xs: 12px;
+  --text-xs--line-height: 16px;
+  --text-sm: 13px;
+  --text-sm--line-height: 20px;
+  --text-base: 15px;
+  --text-base--line-height: 22px;
+  --text-lg: 17px;
+  --text-lg--line-height: 26px;
+  --text-xl: 20px;
+  --text-xl--line-height: 28px;
+  --text-2xl: 26px;
+  --text-2xl--line-height: 34px;
+
+  /* Figma radius/* */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
+html,
+body {
+  background: var(--bg-page);
+  color: var(--text);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Odak halkası: 2 px + 2 px boşluk (Figma Ritim ve geometri). */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

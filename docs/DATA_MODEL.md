@@ -320,6 +320,13 @@ Ayrıntı: ARCHITECTURE §12.4. Ek kurallar:
 - Her migration'ın bir PR açıklaması vardır: amaç, kilit etkisi, veri dönüşümü var mı, geri dönüş planı.
 - Tablo/kolon adı değişikliği bu belgenin güncellenmesini gerektirir.
 
+
+### 7.1. Uygulanan migration'lar
+| No | Dosya | İçerik | Faz |
+|---|---|---|---|
+| 0000 | `drizzle/0000_extensions.sql` | `unaccent`, `pg_trgm` uzantıları | 2 |
+
+Faz 3'ün ilk migration'ı: `users` ve kimlik doğrulama tabloları, `workspaces`, `workspace_memberships`, `user_preferences`, `idempotency_keys`, `audit_events`.
 ## 8. Başlangıç ve test verileri
 - **Sistem verisi:** Yok (roller kodda sabit, D-014). Inbox projesi kullanıcı kaydında oluşturulur.
 - **Onboarding örnek verisi:** Kullanıcının seçimine göre (ONBOARDING §3) oluşturulur, `onboarding_sample` etiketiyle değil, normal kayıt olarak; kullanıcı silebilir. Örnek içerik oluşturma isteğe bağlıdır (onboarding: Figma tasarımı esas, D-063).
