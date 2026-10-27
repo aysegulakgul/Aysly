@@ -1,15 +1,15 @@
 # Aşamalı Geliştirme Planı
 
-> Durum: v0.4 · Son güncelleme: 2026-10-15
+> Durum: v0.5 · Son güncelleme: 2026-10-28
 > v0.2: OQ-001..OQ-023 kararları işlendi. Çalışma ortamı yalnızca yerel (D-045); "beta" ve "yayına alma" ayrı bir karara bağlandı (OQ-032).
 
 ## 1. Faz durumu (tek gerçek kaynak)
 
 | Faz | Ad | Durum | Engelleyen açık sorular | Başlangıç | Kapanış |
 |---|---|---|---|---|---|
-| 1 | Ürün analizi, mimari kararlar, dokümantasyon | **Kapandı** | — | 2026-10-15 | 2026-10-15 |
-| 2 | Proje altyapısı ve temel mimari | **Başlamadı — ortam bekleniyor** | Docker Desktop kuruldu, bilgisayarın yeniden başlatılması bekleniyor | — | — |
-| 3 | Kimlik doğrulama, hesap, tercihler, onboarding | Başlamadı | Figma ekranları (D-063) | — | — |
+| 1 | Ürün analizi, mimari kararlar, dokümantasyon | **Kapandı** | — | 2026-10-27 | 2026-10-27 |
+| 2 | Proje altyapısı ve temel mimari | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
+| 3 | Kimlik doğrulama, hesap, tercihler, onboarding | **Devam ediyor** | D-065 ekranları onaya sunulacak | 2026-10-28 | — |
 | 4 | Görev yönetimi, Inbox, My Tasks, dashboard | Başlamadı | — | — | — |
 | 5 | Projeler ve görev görünümleri | Başlamadı | — | — | — |
 | 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | Başlamadı | — | — | — |
@@ -57,7 +57,7 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
 ### Faz 1 — Ürün analizi, mimari kararlar ve dokümantasyon
 - **Kapsam:** Bu belge seti.
 - **Teslim:** README, CLAUDE.md, docs/* (18 belge).
-- **Durum:** Kapandı (2026-10-15). OQ-001..OQ-034 kapandı (D-030..D-063); yalnızca OQ-032 ertelendi.
+- **Durum:** Kapandı (2026-10-27). OQ-001..OQ-034 kapandı (D-030..D-063); yalnızca OQ-032 ertelendi.
 - **Kabul:** Teknik öneriler onaylandı (D-060); ürün/UX ayrıntıları onaylandı (OQ-034); Faz 2–3'ü engelleyen OQ'lar yanıtlandı.
 - **Kapanış eylemi:** OQ-034 ile onaylanan ayrıntılar `ONAYLI` yapılır; ürün sahibi "Faz 1 kapandı" der; DECISIONS §5'e işlenir.
 
@@ -67,16 +67,23 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
   - Yerel Git deposu (D-057), pnpm, TS strict, ESLint/Prettier, `dependency-cruiser` kuralları, özel lint kuralları.
   - Next.js iskeleti, `src/` klasör yapısı (ARCHITECTURE §5.2), boş modül iskeletleri.
   - Docker Compose ile yerel PostgreSQL ve Mailpit (D-056); `.env.example`; Zod ile ortam değişkeni doğrulama.
-  - Drizzle kurulumu, ilk migration (`workspaces`, `workspace_memberships`, `idempotency_keys`, `audit_events`), migration komutları; `pnpm db:backup` / `pnpm db:restore` betikleri.
-  - `shared/kernel` (Result, DomainError, ID, Clock), `shared/http` (hata eşleyici, requestId, Origin kontrolü, idempotency ara katmanı iskeleti, hız sınırı), `shared/observability` (pino).
-  - `Scheduler` arayüzü ve uygulama içi adaptör (açılışta + saatte bir, veritabanı kilidiyle; D-053); örnek "ping" bakım işi.
-  - `EmailSender` arayüzü ve yerel adaptör (Mailpit/terminal); ücretli servis yok.
+  - Drizzle kurulumu, ilk migration, migration komutları; `pnpm db:backup` / `pnpm db:restore` betikleri. **Sapma (teknik):** İlk migration yalnızca arama uzantılarını (`unaccent`, `pg_trgm`) kurar. Planlanan tabloların hepsi `users` tablosuna yabancı anahtarla bağlı olduğu için, `users` ile birlikte Faz 3'ün ilk migration'ına taşındı; böylece yabancı anahtarsız geçici tablo oluşmadı.
+  - `shared/kernel` (Result, DomainError, ID, Clock), `shared/http` (hata eşleyici, requestId), `shared/observability` (pino). **Sapma:** Origin kontrolü, idempotency ve hız sınırı ilk uç noktalarıyla birlikte Faz 3'te (kullanılacakları yerde) eklenir.
+  - `Scheduler` arayüzü ve uygulama içi adaptör (açılışta + saatte bir, veritabanı kilidiyle; D-053). Faz 2'de kayıtlı iş yok; ilk iş (çöp temizliği) Faz 4'te.
+  - `EmailSender` arayüzü, Mailpit SMTP adaptörü ve testler için bellek içi adaptör; ücretli servis yok.
   - Test altyapısı: Vitest, Playwright, Testcontainers ile gerçek PostgreSQL (D-056); diğer test paketleri ihtiyaç duyuldukça (D-058); fabrikalar.
   - `pnpm verify` doğrulama komutu ve git hook'ları (TESTING_STRATEGY §8); BR izlenebilirlik betiği.
-  - Tasarım token'ları **Figma'dan birebir** (D-063; renk, tipografi, boşluk, köşe, gölge), temel bileşenler: Button, Input, Dialog, Toast, EmptyState, Skeleton; açık/koyu tema.
+  - Tasarım token'ları **Figma'dan birebir** (D-063; renk, tipografi, boşluk, köşe, gölge), temel bileşenler: Button, Input, Chip, Progress, Banner, Toast (görünüm), EmptyState, Skeleton; Figma ikonları. **Sapma:** Dialog, ilk kullanıldığı Faz 4'e bırakıldı (D-058). Açık temadaki iki eksik değer D-066 ile eklendi; tema seçimi Faz 3'te etkinleşir.
   - i18n iskeleti, Türkçe + İngilizce (D-038).
   - Sağlık uç noktaları.
 - **Kabul:** README'deki adımlarla temiz bir Windows makinesinde uygulama yerelde çalışır; `pnpm verify` tüm adımlarıyla yeşil; mimari kural ihlali içeren örnek kod doğrulamada yakalanıyor (denendi); `/api/health/ready` 200; yedek alma ve geri yükleme betiği denendi; test e-postası yerel yakalayıcıda görüldü.
+- **Sonuç (2026-10-28):** Teslimler tamamlandı; üç sapma (ilk migration kapsamı; Origin kontrolü, idempotency ve hız sınırının Faz 3'e kalması; Dialog'un Faz 4'e kalması) yukarıda belirtildi. Kabul koşulları:
+  - `pnpm verify` 12 adımın tamamıyla yeşil: kilit dosyası, biçim, lint, tip, mimari, kural izlenebilirliği, 20 birim, migration kontrolü, 9 entegrasyon, derleme, 10 tarayıcı testi, bağımlılık denetimi.
+  - Bilerek eklenen bir katman ihlali (domain → veritabanı) mimari denetimde yakalandı.
+  - `/api/health/ready` 200 döndü.
+  - Yedek alma ve geri yükleme döngüsü denendi.
+  - Test e-postası Mailpit'te görüldü (otomatik entegrasyon testi).
+  - "README adımlarıyla temiz bir makinede kurulum" bu bilgisayarda doğrulandı; ikinci bir makinede denenmedi.
 
 ### Faz 3 — Kimlik doğrulama, hesap, tercihler, onboarding
 - **Bağımlılık:** Faz 2; Figma ekranları (D-063).

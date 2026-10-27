@@ -1,6 +1,6 @@
 # Roller ve Yetkiler
 
-> Durum: v0.3 · Son güncelleme: 2026-10-15 (içerik değişmedi; kararlarla tutarlılığı kontrol edildi)
+> Durum: v0.3 · Son güncelleme: 2026-10-27 (içerik değişmedi; kararlarla tutarlılığı kontrol edildi)
 > Temel ilkeler ONAYLI (D-003, D-004); izin tabanlı model ve MVP (kişisel alan) yetkileri ONAYLI (D-014, D-060). Faz 10 paylaşılan alan matrisi (§6.2) ayrı karar setinde onaylanacak.
 
 ## 1. Kimlik doğrulama ≠ yetkilendirme

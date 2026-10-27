@@ -1,0 +1,23 @@
+{
+  "app": {
+    "name": "Aysly",
+    "tagline": "Manage order, not to-dos."
+  },
+  "foundation": {
+    "title": "Aysly is under construction",
+    "description": "The foundation is ready. Sign-in, tasks and other screens will be added in the next phases; nothing on this page works yet."
+  },
+  "errors": {
+    "validation": "Some fields are invalid.",
+    "notFound": "The page you're looking for doesn't exist or you don't have access.",
+    "forbidden": "You don't have permission for this action.",
+    "versionConflict": "This record was changed somewhere else.",
+    "internal": "Something unexpected happened. Try again; if it persists, share this code with us."
+  },
+  "rules": {},
+  "ui": {
+    "offline": "No connection. Your changes may not be saved.",
+    "undo": "Undo",
+    "loading": "Loading"
+  }
+}

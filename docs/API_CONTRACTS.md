@@ -1,6 +1,6 @@
 # API Sözleşmeleri
 
-> Durum: v0.3 · Son güncelleme: 2026-10-15 · Uygulama durumu: Hiçbir uç nokta uygulanmadı.
+> Durum: v0.3 · Son güncelleme: 2026-10-27 · Uygulama durumu: Hiçbir uç nokta uygulanmadı.
 > Yaklaşım: Sürümlü REST, JSON (D-013, ONAYLI — D-060). Bu belge, Zod şemaları yazıldıktan sonra şemalarla tutarlı tutulur; ileride OpenAPI belgesi şemalardan otomatik üretilir.
 
 ## 1. İçindekiler

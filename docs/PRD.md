@@ -1,6 +1,6 @@
 # Aysly — Ürün Gereksinimleri Dokümanı (PRD)
 
-> Durum: v0.3 · Son güncelleme: 2026-10-15 · Uygulama durumu: Kod yok
+> Durum: v0.3 · Son güncelleme: 2026-10-27 · Uygulama durumu: Kod yok
 > v0.2: OQ-001..OQ-023 kararları işlendi (D-030..D-052). Çalışma ortamı şimdilik yalnızca yerel (D-045).
 > Etiketler: `ONAYLI` · `ÖNERİ` · `AÇIK (OQ-xxx)` · `SONRA` — anlamları [DECISIONS.md](DECISIONS.md) içinde.
 

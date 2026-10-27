@@ -1,9 +1,11 @@
 # Karar Kaydı (Decision Log)
 
-> Durum: v0.4 · Son güncelleme: 2026-10-15
+> Durum: v0.5 · Son güncelleme: 2026-10-28
 
 Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar silinmez; değiştirilen karar `YERİNE GEÇİLDİ (D-yyy)` olarak işaretlenir ve yeni kayıt açılır.
 
+
+> **Tarih notu (2026-10-28):** Bu oturumun başında bilgisayarın saati 12 gün 9 saat 51 dakika gerideydi; belgeler ilk olarak 2026-10-15 tarihiyle yazıldı. Saat düzeltildikten sonra tarihler ölçülen farka göre gerçek tarihe çevrildi: saat düzeltilmeden önceki tüm kayıtlar (Faz 1, D-001..D-065) **2026-10-27** gecesine aittir (gece yarısını geçen kayıtlar için ±1 gün). Saat düzeltildikten sonraki kayıtlar doğru tarihlidir. İlk iki git commit'i (`1eaf4c7`, `d05bba2`) de eski saatle kaydedildi; commit geçmişi değiştirilmedi.
 ## Durum etiketleri
 
 | Etiket | Anlamı | Geliştirmede kullanılabilir mi? |
@@ -25,11 +27,11 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 
 ---
 
-## 1. Ürün brief'inden gelen kararlar (ONAYLI, 2026-10-15)
+## 1. Ürün brief'inden gelen kararlar (ONAYLI, 2026-10-27)
 
 ### D-001 — Önce analiz ve dokümantasyon, sonra kod
 - Durum: ONAYLI · Karar veren: Ürün sahibi
-- Karar: Faz 1'de uygulama kodu yazılmaz. Dokümantasyon tamamlanıp onaylanmadan Faz 2 başlamaz. (2026-10-15 tarihli ikinci mesajda yinelendi.)
+- Karar: Faz 1'de uygulama kodu yazılmaz. Dokümantasyon tamamlanıp onaylanmadan Faz 2 başlamaz. (2026-10-27 tarihli ikinci mesajda yinelendi.)
 
 ### D-002 — Tek hesap, birden fazla kullanım bağlamı
 - Durum: ONAYLI
@@ -53,10 +55,10 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 
 ---
 
-## 2. Claude önerileri (ilk taslak; 2026-10-15'te D-060 ile toplu onaylandı)
+## 2. Claude önerileri (ilk taslak; 2026-10-27'te D-060 ile toplu onaylandı)
 
 ### D-010 — Modüler monolit mimari
-- Durum: **ONAYLI** (2026-10-15, D-044 kapsamında: "Tek uygulama içinde modüler, SOLID prensiplerine uygun bir mimari")
+- Durum: **ONAYLI** (2026-10-27, D-044 kapsamında: "Tek uygulama içinde modüler, SOLID prensiplerine uygun bir mimari")
 - Karar: Tek uygulama, iş alanlarına göre modüller, modül başına katmanlar (domain / application / infrastructure / http). Ayrı bir arka plan sürecinin kullanılıp kullanılmayacağı OQ-024'e bağlıdır.
 
 ### D-011 — Teknoloji yığını
@@ -79,7 +81,7 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Durum: **ONAYLI** (D-060)
 
 ### D-017 — Silme yaşam döngüsü: Aktif → Arşiv → Çöp → Kalıcı silme
-- Durum: **ONAYLI** (2026-10-15; D-031, D-035, D-043 ile)
+- Durum: **ONAYLI** (2026-10-27; D-031, D-035, D-043 ile)
 - Karar: Arşiv ve çöp ayrı kavramlardır. Silme önce çöpe taşımadır; kalıcı silme çöpten elle veya 30 gün sonunda otomatik yapılır. Arşivli kayıtlar salt okunurdur.
 
 ### D-018 — İyimser eşzamanlılık (`version`)
@@ -98,14 +100,14 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Durum: **ONAYLI** (D-060)
 
 ### D-023 — Arka plan işleri pg-boss ile
-- Durum: **REDDEDİLDİ** (2026-10-15, D-044: "pg-boss şimdilik kullanılmasın"). Yerine geçecek yaklaşım: OQ-024.
+- Durum: **REDDEDİLDİ** (2026-10-27, D-044: "pg-boss şimdilik kullanılmasın"). Yerine geçecek yaklaşım: OQ-024.
 
 ### D-024 — Kullanıcı segmentleri hesap türü değildir
 - Durum: **ONAYLI** (D-060). D-002 ile uyumlu.
 
 ---
 
-## 3. Açık soruların kapanışı (ONAYLI, 2026-10-15, karar veren: Ürün sahibi)
+## 3. Açık soruların kapanışı (ONAYLI, 2026-10-27, karar veren: Ürün sahibi)
 
 ### D-030 — Inbox modeli (OQ-001)
 - Karar: Her çalışma alanında **silinemeyen** bir Inbox bulunur ve menüde projelerden **ayrı** görünür.
@@ -205,7 +207,7 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 
 ---
 
-## 4. İkinci tur kararlar (ONAYLI, 2026-10-15, karar veren: Ürün sahibi)
+## 4. İkinci tur kararlar (ONAYLI, 2026-10-27, karar veren: Ürün sahibi)
 
 ### D-053 — Zamanlanmış işler (OQ-024)
 - Karar: Ayrı worker yok. Hatırlatıcılar uygulama açıkken işlenir. 30 günlük çöp ve 14 günlük hesap silme kontrolleri uygulama çalışırken yapılır. Uygulama kapalıyken arka plan işlemi çalışması gerekmez.
@@ -258,15 +260,15 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
   6. **Alt görev kuralları için veritabanı trigger'ı** (BR-SUB-001/002): Uygulama katmanı + testler yeterli; CHECK kısıtları korunur.
   7. **Bağlamsal ipucu tetikleyicileri** (ONBOARDING §5: "aynı filtreyi 3 kez kurdun" vb.): İzleme mantığı gerektirir; "İlk adımlar" listesi yeterli. → P2.
 
-## 4b. Üçüncü tur kararlar (ONAYLI, 2026-10-15, karar veren: Ürün sahibi)
+## 4b. Üçüncü tur kararlar (ONAYLI, 2026-10-27, karar veren: Ürün sahibi)
 
 ### D-062 — Ek e-postalar (OQ-033)
-- Durum: ONAYLI · Tarih: 2026-10-15 · Karar veren: Ürün sahibi
+- Durum: ONAYLI · Tarih: 2026-10-27 · Karar veren: Ürün sahibi
 - Karar: "Biri bu adresle kayıt olmaya çalıştı" bildirimi ve hesap silme talebi onay e-postası MVP'de yoktur. Uygulama yayına alınmadan önce yeniden değerlendirilir (OQ-032).
 - Sonuçlar: BR-ACC-005, SECURITY §4.3, API §3, USER_FLOWS §3.10. MVP'de gönderilen e-postalar yalnızca D-055'tekilerdir.
 
 ### D-063 — Ürün/UX ayrıntıları ve Figma'nın tek tasarım kaynağı olması (OQ-034)
-- Durum: ONAYLI · Tarih: 2026-10-15 · Karar veren: Ürün sahibi
+- Durum: ONAYLI · Tarih: 2026-10-27 · Karar veren: Ürün sahibi
 - Karar:
   1. OQ-034'teki genel ürün/UX önerileri onaylandı: onboarding yaklaşımı, başlangıç projeleri, navigasyon yapısı, farklılaşma noktaları, tek kişisel çalışma alanı. PRD §8 hedefleri beta kararıyla ele alınır.
   2. **Arayüz tasarımının tek ve temel kaynağı Figma'dır.** Onboarding, başlangıç projeleri, tipografi, renkler, boşluklar, bileşenler, sayfa düzenleri, klavye kısayolları, kenar çubuğu ve mobil navigasyon dahil tüm arayüz, Figma'daki tasarımlara birebir sadık kalınarak geliştirilir.
@@ -281,12 +283,12 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 
 
 ### D-064 — Figma'daki proje dışı çerçeveler
-- Durum: ONAYLI · Tarih: 2026-10-15 · Karar veren: Ürün sahibi
+- Durum: ONAYLI · Tarih: 2026-10-27 · Karar veren: Ürün sahibi
 - Karar: Figma dosyasındaki Product detail page (`1:534`), About (`1:629`), Article (`1:703`), Shop (`1:777`) ve Landing page (`1:902`) çerçeveleri Aysly'ye ait değildir ve referans alınmaz.
 - Sonuçlar: FIGMA_INVENTORY §3.
 
 ### D-065 — Figma'da bulunmayan MVP ekranları
-- Durum: ONAYLI · Tarih: 2026-10-15 · Karar veren: Ürün sahibi
+- Durum: ONAYLI · Tarih: 2026-10-27 · Karar veren: Ürün sahibi
 - Karar: Figma'da tasarımı olmayan MVP ekranları (giriş, kayıt, şifre sıfırlama, e-posta doğrulama, onboarding, Ayarlar'ın diğer sekmeleri, bildirim merkezi, arşiv, çöp kutusu, hedef detayı, kayıtlı görünüm oluşturma) Claude tarafından kurulur. Koşullar:
   1. Yalnızca Figma'daki mevcut bileşenler (`4:70582`) ve temel referanstaki token'lar (`4:69535`) kullanılır.
   2. Düzen, en yakın Figma ekranının yapısını izler (ör. Ayarlar sekmeleri `Ayarlar · Görünüm` düzenini, Arşiv/Çöp `Inbox` liste düzenini).
@@ -298,8 +300,17 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 
 ---
 
+### D-066 — Açık temadaki eksik iki renk (OQ-035)
+- Durum: ONAYLI · Tarih: 2026-10-28 · Karar veren: Ürün sahibi ("eksik rengi temaya uygun şekilde sen ekle")
+- Karar: Figma'da açık tema karşılığı olmayan iki değişken, temaya uygun olarak Claude tarafından belirlendi. Bu, D-063'ün (Figma tek kaynak) ürün sahibinin açık izniyle yapılan tek istisnasıdır.
+  - `palette/support-1` (açık) = `#dfe3f6` — koyu temadaki ilişkiyi korur: yüzeyden ayrışma 1,28 (koyuda 1,29); üzerindeki birincil metnin kontrastı 6,07 (AA).
+  - `palette/support-2` (açık) = `#d6d6cf` — açık paletin sıcak gri tonunda, kenarlık renginden bir ton koyu; beyaz panelde görünür (1,46). Ay ışığı dolgusuyla kontrastı 2,0'dır; ilerleme çubuğu her zaman yazılı etiketle (ör. "2/6 · %33") gösterildiği için bilgi yalnızca renkle verilmez.
+- Öneri: Figma'nın tek kaynak kalması için bu iki değer Figma'daki açık temaya da eklenebilir.
+- Sonuçlar: `src/ui/tokens.css`, UI_UX_DESIGN_SYSTEM §0; tema tercihi Faz 3'te etkinleşir.
+
 ## 5. Faz kapanış kayıtları
 
 | Faz | Kapanış tarihi | Onaylayan | Not |
 |---|---|---|---|
-| Faz 1 — Analiz ve dokümantasyon | 2026-10-15 | Ürün sahibi ("Artık geliştirme aşamasına geçelim") | OQ-001..OQ-034 kapandı (D-030..D-063). Açık: yalnızca OQ-032 (yayına alma, ertelendi). |
+| Faz 1 — Analiz ve dokümantasyon | 2026-10-27 | Ürün sahibi ("Artık geliştirme aşamasına geçelim") | OQ-001..OQ-034 kapandı (D-030..D-063). Açık: yalnızca OQ-032 (yayına alma, ertelendi). |
+| Faz 2 — Proje altyapısı | 2026-10-28 | Ürün sahibi ("onaylıyorum") | `pnpm verify` 12/12 yeşil; sapmalar IMPLEMENTATION_PLAN Faz 2 Sonuç bölümünde. `feat/faz-2-altyapi` → `main`. |

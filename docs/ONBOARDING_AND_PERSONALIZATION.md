@@ -1,6 +1,6 @@
 # Onboarding ve Kişiselleştirme
 
-> Durum: v0.4 · Son güncelleme: 2026-10-15 · Genel yaklaşım ONAYLI (D-063). **Ekranlar, adımlar, metinler ve başlangıç projelerinin görünümü Figma'daki tasarımlara birebir uyar**; bu belge ile Figma çelişirse Figma geçerlidir, davranış/iş kuralı farkı varsa sorulur. Bağlamsal ipucu tetikleyicileri (§5) P2 (D-061).
+> Durum: v0.4 · Son güncelleme: 2026-10-27 · Genel yaklaşım ONAYLI (D-063). **Ekranlar, adımlar, metinler ve başlangıç projelerinin görünümü Figma'daki tasarımlara birebir uyar**; bu belge ile Figma çelişirse Figma geçerlidir, davranış/iş kuralı farkı varsa sorulur. Bağlamsal ipucu tetikleyicileri (§5) P2 (D-061).
 > İlgili: [USER_PERSONAS.md](USER_PERSONAS.md) · BR-PREF-001..003 · BR-DASH-001
 
 ## 1. Hedefler

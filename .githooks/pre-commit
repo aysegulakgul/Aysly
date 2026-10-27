@@ -1,0 +1,3 @@
+#!/bin/sh
+# Hızlı kontroller (TESTING_STRATEGY §8). Tam doğrulama: pnpm verify
+pnpm -s format:check && pnpm -s lint && pnpm -s typecheck

@@ -1,6 +1,6 @@
 # Yasal ve Gizlilik Gereksinimleri (KVKK, Gizlilik, Kullanım Koşulları)
 
-> Durum: v0.2 · Son güncelleme: 2026-10-15 · Karar: D-049 (kapsam D-059, D-061)
+> Durum: v0.2 · Son güncelleme: 2026-10-27 · Karar: D-049 (kapsam D-059, D-061)
 > **Bu belge hukuki görüş değildir.** Ürünün yasal metinler ve gizlilik yükümlülükleri açısından ihtiyaç duyduğu **ürün ve teknik gereksinimleri** listeler. Hukuki metinler (aydınlatma metni, gizlilik politikası, kullanım koşulları, çerez politikası) lansmandan önce hukuk alanında yetkin bir kişi tarafından hazırlanır ve gözden geçirilir (D-049). "⚖️ Hukuki teyit" işaretli maddeler, uzman doğrulaması olmadan kesin kabul edilmez.
 
 ## 1. Kapsam ve zamanlama

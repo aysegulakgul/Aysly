@@ -1,8 +1,25 @@
 # UI/UX ve Tasarım Sistemi
 
-> Durum: v0.4 · Son güncelleme: 2026-10-15
+> Durum: v0.4 · Son güncelleme: 2026-10-27
 > **Tasarımın tek kaynağı Figma'dır (D-063).** Bu belgedeki renk, tipografi, boşluk, bileşen, kısayol ve wireframe değerleri Figma incelenmeden önce yazılmış **ön taslaktır**; Faz 2'de Figma'dan çıkarılan değerlerle değiştirilecek. Figma ile bu belge çeliştiğinde Figma geçerlidir. Figma'da olmayan bir şey bu belgeden "tasarım kararı" olarak alınmaz; önemliyse ürün sahibine sorulur. İlkeler (§1) ve erişilebilirlik hedefleri (§10, WCAG 2.2 AA) geçerliliğini korur; Figma'daki bir öğe bunlarla çelişirse sorulur. Tüm değerler tasarım token'ı olarak tanımlanır; bileşenler sabit renk/ölçü kullanmaz.
 
+
+## 0. Figma doğrulaması (D-063)
+
+Kaynak: Figma `4:69535` (Foundations), değişkenler `4:69542` (koyu) ve `4:69560` (açık). Faz 2 başında okundu.
+
+| Alan | Figma'daki değer | Bu belgeyle karşılaştırma |
+|---|---|---|
+| Renkler (koyu + açık) | `background/page`, `surface/default`, `surface/muted`, `border/default`, `text/primary`, `text/secondary`, `action/primary`, `action/on-primary`, `accent/moonlight`, `feedback/success|warning|danger|info` | §2.1–2.2'deki değerlerle **birebir aynı** → doğrulandı |
+| Tipografi | Inter; `text/xs 12`, `sm 13`, `base 15`, `lg 17`, `xl 20`, `2xl 26`; ağırlıklar 400 gövde · 500 vurgu · 600 başlık | §3 ile aynı → doğrulandı |
+| Boşluk | `space/4, 8, 12, 16, 20, 24, 32, 40` (+48 Ritim panelinde) | §4 ile aynı → doğrulandı |
+| Köşe | `radius/sm 6`, `radius/md 10`, 14 (modal) | §4 ile aynı → doğrulandı |
+| Ritim | Rahat satır 44 px, sıkı masaüstü 32 px, mobil kontrol ≥ 44 px, liste en fazla 960 px, pano ve takvim tam genişlik, kenar çubuğu 232 px | §4 ve §7 ile aynı; kenar çubuğu genişliği (232 px) Figma'dan eklendi |
+| Bileşenler | `4:70582`: Banner, Button (Primary/Secondary/Ghost/Danger), Tab, Chip, Progress, Input, TaskRow, BoardCard, NavItem, BottomNav, Toast/Undo, Skeleton, EmptyState, Sidebar | Uygulamada bu adlarla kurulur |
+
+Ayrıntılar (her bileşenin ölçüleri, ekran düzenleri) ilgili ekran geliştirilirken Figma'dan okunur. §5–§11'deki hareket, durum metni ve kısayol tarifleri, Figma'da karşılığı yoksa D-065 kapsamında kullanılır.
+
+**Uygulama durumu (Faz 2):** Token'lar `src/ui/tokens.css` içinde Figma adlarına karşılık gelen CSS değişkenleri olarak tanımlı; Tailwind yalnızca bunlara bağlı (`src/app/globals.css`). Açık temada Figma'da karşılığı olmayan `palette/support-1` ve `palette/support-2` değerleri D-066 ile eklendi (`#dfe3f6`, `#d6d6cf`). Tema seçimi Faz 3'te kullanıcı tercihiyle etkinleşir. İkonlar Figma'dan değiştirilmeden indirildi (`public/icons/`). Bileşenler `src/ui/components/` altında; geliştirmede `http://localhost:3000/dev/ui` sayfasında Figma ile karşılaştırılabilir.
 ## 1. Tasarım ilkeleri
 1. **Sakin:** Düşük doygunluklu yüzeyler, tek vurgu rengi; renk yalnızca anlam taşıdığında (öncelik, durum, hata).
 2. **Okunabilir:** Gövde metni 15–16 px, satır yüksekliği 1,5; kontrast WCAG AA (metin ≥ 4,5:1, büyük metin ve UI ≥ 3:1).
@@ -10,7 +27,7 @@
 4. **Tutarlı eylemler:** Aynı eylem her yerde aynı simge, aynı konum, aynı kısayol.
 5. **Geri alınabilirlik görünür:** Yıkıcı eylemlerden sonra "Geri al" bildirimi.
 
-## 2. Marka ve renk (ön taslak — Figma değerleriyle değiştirilecek, D-063)
+## 2. Marka ve renk (Figma ile doğrulandı — §0, D-063)
 
 Kavram: **"Gece & Ay ışığı"** — "Aysly" adındaki *ay* çağrışımından; derin gece mavisi güven ve odak, sıcak ay ışığı vurgusu ilerleme ve başarı anları için.
 

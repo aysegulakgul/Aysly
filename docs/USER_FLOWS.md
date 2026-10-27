@@ -1,6 +1,6 @@
 # Ekranlar, Navigasyon ve Kullanıcı Akışları
 
-> Durum: v0.4 · Son güncelleme: 2026-10-15
+> Durum: v0.4 · Son güncelleme: 2026-10-27
 > Ekran yapıları, navigasyon ve görsel düzen için Figma tek kaynaktır (D-063). Bu belgedeki ekran tarifleri ve ASCII çizimler Figma öncesi taslaktır; Figma ile çelişirse Figma geçerlidir. Akışlardaki iş kuralı davranışları (BR-*) ise BUSINESS_RULES'a bağlıdır.
 > İlgili: [UI_UX_DESIGN_SYSTEM.md](UI_UX_DESIGN_SYSTEM.md) (görsel kurallar, wireframe'ler) · [BUSINESS_RULES.md](BUSINESS_RULES.md) · [ERROR_HANDLING_AND_EDGE_CASES.md](ERROR_HANDLING_AND_EDGE_CASES.md)
 

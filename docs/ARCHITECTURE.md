@@ -1,6 +1,6 @@
 # Sistem Mimarisi
 
-> Durum: v0.3 · Son güncelleme: 2026-10-15 · Uygulama durumu: **Hiçbir bileşen henüz kurulmadı.** Bu belge hedef mimariyi tanımlar.
+> Durum: v0.3 · Son güncelleme: 2026-10-27 · Uygulama durumu: **Hiçbir bileşen henüz kurulmadı.** Bu belge hedef mimariyi tanımlar.
 > Temel yığın **ONAYLI** (D-044), çalışma ortamı yalnızca yerel (D-045). Zamanlanmış işler D-053, Docker ile yerel PostgreSQL D-056, yerel Git + `pnpm verify` D-057, yardımcı kütüphaneler yalnızca gerektiğinde D-058. Teknik öneriler D-060 ile onaylı; D-061 sadeleştirmeleri geçerli.
 
 ## 1. Mimari hedefler
@@ -36,7 +36,7 @@ flowchart LR
 * Zamanlanmış işler ayrı bir süreç olmadan uygulamanın içinde çalışır (D-053, §10).
 
 - **Uygulama:** Arayüzü sunar (React Server Components + istemci bileşenleri) ve `/api/v1` REST uç noktalarını barındırır.
-- **PostgreSQL:** Tek veri kaynağı. Docker Desktop üzerinde Docker Compose ile çalışır (D-056).
+- **PostgreSQL:** Tek veri kaynağı. Docker Desktop üzerinde Docker Compose ile çalışır (D-056). Port **5433** (bu bilgisayarda 5432 başka bir yerel PostgreSQL kurulumunca kullanılıyor); yalnızca 127.0.0.1'e açık.
 - **E-posta:** Dışarıya gerçek e-posta gönderilmez (D-037, D-045). `EmailSender` arayüzünün yerel uygulaması, e-postaları Docker üzerinde çalışan Mailpit'e gönderir; tarayıcıdan görüntülenir (D-055, D-056).
 - **Yayına alındığında (OQ-032):** Aynı bileşenler; e-posta sağlayıcısı, hata izleme ve harici zamanlayıcı arayüzlerin arkasına takılır. Kod değişmez, yalnızca yapılandırma ve adaptörler eklenir.
 
@@ -111,6 +111,22 @@ Bu tablodaki paketler onaylıdır ama **baştan kurulmaz**. Her paket, onu gerek
 | ~~Arka plan işleri: pg-boss~~ | Reddedildi (D-044) | Yerine D-053 |
 | ~~Hata izleme: Sentry~~ | Çıkarıldı (barındırılan servis, D-045) | Yayın kararında yeniden değerlendirilir (OQ-032) |
 
+
+### 3.10. Faz 2'de kurulan sürümler ve teknik notlar
+| Paket | Sürüm | Not |
+|---|---|---|
+| Next.js / React | 16.4 / 19.3 | App Router, `typedRoutes` |
+| TypeScript | 6.0 | 7.x (yeni yerel derleyici) çıktı, ancak typescript-eslint henüz desteklemiyor; 6.0 seçildi |
+| Drizzle ORM / drizzle-kit | 0.45 / 0.31 | Sürücü: `postgres` (postgres.js) |
+| Zod | 4.6 | |
+| next-intl | 4.14 | URL'de dil öneki yok; dil çerezden veya tarayıcı dilinden |
+| Tailwind CSS | 4.3 | Yardımcı sınıflar yalnızca Figma token'larına bağlı (`src/ui/tokens.css`, `src/app/globals.css`) |
+| pino, nodemailer | 10.4, 10.2 | Log ve Mailpit SMTP |
+| Vitest, Playwright, Testcontainers, axe-core, dependency-cruiser | 5.0, 1.64, 12.2, 4.14, 18.7 | Test ve mimari denetim |
+
+- Better Auth Faz 3'te eklenecek (D-058: yalnızca gerektiğinde).
+- pnpm kurulum betikleri varsayılan olarak kapalı; yalnızca `esbuild` ve `unrs-resolver` izinli (SECURITY §10).
+- Bilinen uyarı: drizzle-kit'in eski bir alt bağımlılığı olan esbuild ≤0.24.2'de orta düzey bir açık var (GHSA-67mh-4wv8-2f99). Açık, esbuild'in geliştirme sunucusunu etkiliyor; bu projede o sunucu kullanılmıyor ve paket yalnızca geliştirmede çalışıyor. drizzle-kit güncellendiğinde yeniden kontrol edilecek.
 ## 4. Mimari stil: Modüler monolit
 
 Kod iş alanlarına (bounded context benzeri) göre **modüllere**, her modül **katmanlara** ayrılır.
@@ -200,11 +216,14 @@ aysly/
 │  │  ├─ http/                     # hata eşleme, istek bağlamı, idempotency, hız sınırı (yalnızca kimlik doğrulama uç noktaları, D-061)
 │  │  ├─ auth/                     # CurrentActor çözümleme (identity modülü üzerinden)
 │  │  ├─ config/                   # Zod ile doğrulanan ortam değişkenleri
-│  │  └─ observability/            # logger, requestId, hata izleme
+│  │  ├─ observability/            # logger (pino, hassas alan maskeleme)
+│  │  ├─ jobs/                     # Scheduler portu, uygulama içi zamanlayıcı, PostgreSQL advisory lock (D-053)
+│  │  ├─ email/                    # EmailSender portu, Mailpit SMTP ve bellek içi adaptörler (D-055)
+│  │  └─ composition.ts            # bağımlılıkların elle bağlandığı tek yer
 │  ├─ ui/                          # tasarım sistemi bileşenleri, token'lar
 │  ├─ client/                      # tipli API istemcisi, iyimser güncelleme yardımcıları
 │  ├─ i18n/                        # çeviri dosyaları (tr.json, en.json)
-│  └─ jobs/                        # zamanlanmış iş tanımları + Scheduler adaptörü (use case çağırır; D-053)
+│  └─ instrumentation.ts           # sunucu açılışında zamanlayıcıyı başlatır (D-053)
 ├─ drizzle/                        # üretilmiş SQL migration dosyaları
 ├─ tests/
 │  ├─ e2e/                         # Playwright
@@ -320,7 +339,7 @@ Hosting, alan adı ve ücretli servis kullanılmaz (D-045). Gereken her şey üc
 ### 12.2. Ortam değişkenleri
 - Tümü `shared/config/env.ts` içinde Zod ile doğrulanır; eksik/geçersizse uygulama **başlamaz**.
 - `.env.example` depoda (değersiz), `.env*` dosyaları `.gitignore`'da.
-- MVP anahtarları: `DATABASE_URL`, `AUTH_SECRET`, `APP_BASE_URL` (`http://localhost:3000`), `EMAIL_TRANSPORT` (`smtp` = yerel Mailpit; testlerde bellek içi adaptör), `SMTP_HOST` / `SMTP_PORT`, `EMAIL_FROM`, `LOG_LEVEL`, `NODE_ENV`.
+- MVP anahtarları (güncel liste `.env.example`): `DATABASE_URL`, `AUTH_SECRET` (Faz 3), `APP_BASE_URL` (`http://localhost:3000`), `EMAIL_TRANSPORT` (`smtp` = yerel Mailpit; testlerde bellek içi adaptör), `SMTP_HOST` / `SMTP_PORT`, `EMAIL_FROM`, `LOG_LEVEL`, `NODE_ENV`.
 - İstemciye açık değişkenler yalnızca `NEXT_PUBLIC_` önekiyle ve yalnızca gizli olmayan değerler için.
 
 ### 12.3. Yayına hazırlık ilkeleri (şimdi uygulanır; yayına alma ertelendi)
