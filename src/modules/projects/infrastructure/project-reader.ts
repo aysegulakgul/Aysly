@@ -1,14 +1,30 @@
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, asc, eq, isNull, sql } from 'drizzle-orm';
 import type { WorkspaceScope } from '@/modules/workspaces';
 import type { DbExecutor } from '@/shared/db/client';
 import { isUuid } from '@/shared/kernel/id';
 import { projects } from './schema';
 
-export type ProjectRef = { id: string; kind: 'inbox' | 'standard'; archived: boolean };
+export type ProjectRef = {
+  id: string;
+  name: string;
+  kind: 'inbox' | 'standard';
+  archived: boolean;
+};
 
-const columns = { id: projects.id, kind: projects.kind, archivedAt: projects.archivedAt };
-const toRef = (row: { id: string; kind: string; archivedAt: Date | null }): ProjectRef => ({
+const columns = {
+  id: projects.id,
+  name: projects.name,
+  kind: projects.kind,
+  archivedAt: projects.archivedAt,
+};
+const toRef = (row: {
+  id: string;
+  name: string;
+  kind: string;
+  archivedAt: Date | null;
+}): ProjectRef => ({
   id: row.id,
+  name: row.name,
   kind: row.kind === 'inbox' ? 'inbox' : 'standard',
   archived: row.archivedAt !== null,
 });
@@ -43,4 +59,23 @@ export async function findInboxRef(db: DbExecutor, scope: WorkspaceScope): Promi
     .limit(1);
   if (!row) throw new Error('çalışma alanında Inbox yok'); // BR-PROJ-006 ihlali: beklenmeyen durum
   return toRef(row);
+}
+
+/** Arşivlenmemiş, çöpte olmayan projeler; Inbox ilk sırada (API_CONTRACTS §5), sonra konum sırası. */
+export async function listActiveProjects(
+  db: DbExecutor,
+  scope: WorkspaceScope,
+): Promise<ProjectRef[]> {
+  const rows = await db
+    .select(columns)
+    .from(projects)
+    .where(
+      and(
+        eq(projects.workspaceId, scope.workspaceId),
+        isNull(projects.archivedAt),
+        isNull(projects.deletedAt),
+      ),
+    )
+    .orderBy(sql`${projects.kind} <> 'inbox'`, asc(projects.position));
+  return rows.map(toRef);
 }

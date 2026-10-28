@@ -22,7 +22,7 @@ test.describe('Inbox ve hızlı ekleme', () => {
     await page.getByLabel('Hızlı ekle').fill('Diş hekimi randevusu al');
     await page.getByRole('button', { name: 'Öncelik' }).click();
     await page.getByRole('radio', { name: '⚑ Yüksek' }).click();
-    await page.getByRole('button', { name: 'Tarih' }).click();
+    await page.getByRole('button', { name: 'Tarih', exact: true }).click();
     await page.getByRole('button', { name: 'Yarın' }).click();
     await page.getByRole('button', { name: 'Uygula' }).click();
     await page.getByRole('button', { name: 'Görev ekle' }).last().click();
@@ -135,7 +135,7 @@ test.describe('Inbox ve hızlı ekleme', () => {
     await page.goto('/inbox');
     await page.waitForLoadState('networkidle');
     await addTask(page, 'Erişilebilirlik görevi');
-    await page.getByRole('button', { name: 'Tarih' }).click();
+    await page.getByRole('button', { name: 'Tarih', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Uygula' })).toBeVisible();
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])

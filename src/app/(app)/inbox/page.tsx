@@ -1,19 +1,20 @@
 import { getTranslations } from 'next-intl/server';
-import { findInboxTasks } from '@/modules/tasks';
+import { findInboxTasks, findTaskDetail } from '@/modules/tasks';
 import { getPersonalScope, getViewer } from '../../viewer';
 import { PageFrame } from '../page-frame';
 import { QuickCapture } from '../tasks/quick-capture';
-import type { TaskUiContext } from '../tasks/task-context';
+import { buildTaskContext } from '../tasks/task-context.server';
+import { TaskDetailPanel } from '../tasks/task-detail';
 import { InboxList } from './inbox-list';
 
 /**
- * Inbox (Figma 4:66650 masaüstü, 4:68036 mobil). Hızlı ekleme ve "İşlenecekler" listesi. Projeye taşıma, çoklu
- * seçim ve "Tarih ver" satır eylemleri taşıma ve toplu işlemlerle birlikte (Faz 4, 3–4. bölüm) gelir.
+ * Inbox (Figma 4:66650 masaüstü, 4:68036 mobil): hızlı ekleme ve "İşlenecekler". `?task=` görev detay panelini
+ * açar (4:66875). Çoklu seçim ("Seç") toplu işlemlerle birlikte gelir.
  */
 export default async function InboxPage({
   searchParams,
 }: {
-  searchParams: Promise<{ add?: string }>;
+  searchParams: Promise<{ add?: string; task?: string }>;
 }) {
   const [viewer, scope, t, query] = await Promise.all([
     getViewer(),
@@ -22,13 +23,11 @@ export default async function InboxPage({
     searchParams,
   ]);
   if (!viewer || !scope) return null;
-  const tasks = await findInboxTasks(scope);
-  const context: TaskUiContext = {
-    workspaceId: scope.workspaceId,
-    timezone: viewer.preferences.timezone,
-    weekStart: viewer.preferences.weekStart,
-    timeFormat: viewer.preferences.timeFormat,
-  };
+  const [tasks, context, detail] = await Promise.all([
+    findInboxTasks(scope),
+    buildTaskContext(viewer, scope),
+    query.task ? findTaskDetail(scope, query.task) : null,
+  ]);
   return (
     <PageFrame title={t('title')}>
       <div className="flex w-full flex-col gap-2">
@@ -37,6 +36,7 @@ export default async function InboxPage({
       </div>
       <QuickCapture context={context} autoFocus={query.add === '1'} />
       <InboxList tasks={tasks} context={context} />
+      {query.task ? <TaskDetailPanel detail={detail} context={context} /> : null}
     </PageFrame>
   );
 }

@@ -370,6 +370,14 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Kayıt hatasında "Tekrar dene" aynı idempotency anahtarıyla gönderir (BR-TASK-007): yanıtı kaybolan istek tekrarlansa da tek görev oluşur (E2E ile doğrulandı).
 - Açılır pencereler için yığında onaylı Radix UI'dan `@radix-ui/react-popover` eklendi.
 
+### D-078 — Görevlerim, görev detayı, alt görev ve etiket uygulama ayrıntıları (teknik/uygulama)
+- Durum: ONAYLI (teknik; D-071 ilkesi) · Tarih: 2026-10-28 · Karar veren: Claude
+- Görevlerim (Figma 4:66732): yalnızca "Liste" ve "Son tarih" gruplaması. Pano/Takvim sekmeleri, "Filtrele" ve gruplama seçimi Faz 5–6'da gelir; o zamana kadar gösterilmez. "Görev ekle" Inbox'taki hızlı eklemeyi açar (BR-INBOX-001).
+- Görev detayı (Figma 4:66875): `?task=<id>` ile açılan panel; masaüstünde sağda, mobilde tam ekran. Tekrar, hatırlatıcı (Faz 6), bağlı kayıtlar (Faz 7) ve "…" menüsü (arşiv/çöp, 4. bölüm) gösterilmez. Açıklama düz metin olarak saklanır ve gösterilir; Markdown görüntüleme (SafeMarkdown) notlarla birlikte Faz 7'de.
+- Etiketler: `PATCH tagNames` kümeyi değiştirir. Normalleştirme uygulamada yapılır (BR-TAG-001). Etiket silme ve yeniden adlandırma (BR-TAG-002) ayrı bir yönetim ekranı gerektirdiğinden Faz 5'teki kayıtlı görünümlerle birlikte ele alınır.
+- Alt görevli görev tamamlanırken Figma "Görevi tamamla" (4:69469) penceresi çıkar (BR-SUB-003). İşlem ve alt görevlerin tamamlanması tek veritabanı işleminde; taşımada da alt görevler aynı işlemde taşınır.
+- Yeni paket: `@radix-ui/react-dialog` (yığında onaylı Radix). Figma'dan `chevron-down` ikonu indirildi.
+
 ---
 
 ## 5. Faz kapanış kayıtları

@@ -12,6 +12,9 @@ export type TaskChanges = Partial<{
   due: Due | null;
   completedAt: Date | null;
   completedBy: string | null;
+  projectId: string;
+  parentTaskId: string | null;
+  position: string;
 }>;
 
 export type NewTask = {
@@ -54,13 +57,59 @@ export type TaskRepository = {
   list(scope: WorkspaceScope, filter: TaskListFilter): Promise<Task[]>;
   /** Projedeki açık, arşivlenmemiş, çöpte olmayan üst düzey görev sayısı. */
   countOpen(scope: WorkspaceScope, projectId: string): Promise<number>;
+  /** Görevlerim (BR-INBOX-004): verilen projelerdeki açık, arşivlenmemiş üst düzey görevler. */
+  listOpenInProjects(scope: WorkspaceScope, projectIds: readonly string[]): Promise<Task[]>;
+  /** Çöpte olmayan alt görevler (arşivliler dahil), sıralı. */
+  listSubtasks(scope: WorkspaceScope, parentId: string): Promise<Task[]>;
+  subtaskCounts(
+    scope: WorkspaceScope,
+    parentIds: readonly string[],
+  ): Promise<Map<string, { total: number; done: number }>>;
+  /** BR-SUB-003: ebeveynle aynı işlemde açık alt görevleri tamamlar. */
+  completeOpenSubtasks(
+    scope: WorkspaceScope,
+    parentId: string,
+    now: Date,
+    actorId: string,
+  ): Promise<void>;
+  /** BR-SUB-002: ebeveyn taşınınca alt görevler de aynı projeye geçer. */
+  moveSubtasks(
+    scope: WorkspaceScope,
+    parentId: string,
+    projectId: string,
+    now: Date,
+  ): Promise<void>;
+};
+
+/** Etiket bağlantıları (tags modülünden). */
+export type TagPort = {
+  replace(
+    scope: WorkspaceScope,
+    taskId: string,
+    names: readonly string[],
+    now: Date,
+  ): Promise<void>;
+  forTasks(
+    scope: WorkspaceScope,
+    taskIds: readonly string[],
+  ): Promise<Map<string, { id: string; name: string; color: string }[]>>;
+  /** Çalışma alanında henüz olmayan adlar ve mevcut etiket sayısı (BR-TAG-003 sınırı için). */
+  missing(scope: WorkspaceScope, names: readonly string[]): Promise<string[]>;
+  count(scope: WorkspaceScope): Promise<number>;
 };
 
 /** Görevin bağlanacağı proje bilgisi (projects modülünden). */
-export type ProjectRef = { id: string; kind: 'inbox' | 'standard'; archived: boolean };
+export type ProjectRef = {
+  id: string;
+  name: string;
+  kind: 'inbox' | 'standard';
+  archived: boolean;
+};
 
 export type ProjectDirectory = {
   /** Çöpteki proje bulunamadı sayılır. */
   find(scope: WorkspaceScope, projectId: string): Promise<ProjectRef | null>;
   inbox(scope: WorkspaceScope): Promise<ProjectRef>;
+  /** Arşivlenmemiş ve çöpte olmayan projeler; Inbox ilk sırada. */
+  listActive(scope: WorkspaceScope): Promise<ProjectRef[]>;
 };

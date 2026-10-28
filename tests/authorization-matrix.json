@@ -136,6 +136,43 @@
       "method": "GET",
       "path": "/api/v1/workspaces",
       "access": "self"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/tasks/[id]/move",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tasks/01900000-0000-7000-8000-000000000002/move",
+      "body": {
+        "version": 1,
+        "projectId": "x"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/tasks/[id]/detach",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tasks/01900000-0000-7000-8000-000000000002/detach",
+      "body": {
+        "version": 1
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/[ws]/my-tasks",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/my-tasks"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/[ws]/projects",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/[ws]/tags",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tags"
     }
   ]
 }

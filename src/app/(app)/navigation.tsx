@@ -13,6 +13,7 @@ function useSection() {
   return {
     today: pathname === '/',
     inbox: pathname === '/inbox',
+    myTasks: pathname === '/my-tasks',
     settings: pathname.startsWith('/settings'),
     menu: pathname === '/menu',
   };
@@ -21,7 +22,15 @@ function useSection() {
 const Divider = () => <div className="h-px w-full shrink-0 bg-border" />;
 
 /** Figma UI/Sidebar (4:66491): 232 px, surface-muted zemin, 16 px iç boşluk, 12 px aralık. */
-export function Sidebar({ userName, inboxCount }: { userName: string; inboxCount: number }) {
+export function Sidebar({
+  userName,
+  inboxCount,
+  myTasksCount,
+}: {
+  userName: string;
+  inboxCount: number;
+  myTasksCount: number;
+}) {
   const t = useTranslations('shell');
   const section = useSection();
   return (
@@ -47,6 +56,15 @@ export function Sidebar({ userName, inboxCount }: { userName: string; inboxCount
           countLabel={t('inboxCount', { count: inboxCount })}
         >
           {t('inbox')}
+        </NavItem>
+        <NavItem
+          href="/my-tasks"
+          glyph="✓"
+          active={section.myTasks}
+          count={badge(myTasksCount)}
+          countLabel={t('myTasksCount', { count: myTasksCount })}
+        >
+          {t('myTasks')}
         </NavItem>
         <NavItem href="/" glyph="☼" active={section.today}>
           {t('today')}

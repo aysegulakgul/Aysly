@@ -1,76 +1,32 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef, useState } from 'react';
-import { apiPost } from '@/client/api';
+import { useState } from 'react';
 import type { TaskView } from '@/modules/tasks';
-import { Banner, EmptyState, Toast } from '@/ui/components/feedback';
+import { EmptyState } from '@/ui/components/feedback';
 import { Icon } from '@/ui/components/icon';
-import { TaskRow, useTaskMeta } from '../tasks/task-row';
+import { GiveDate, MoveToProject } from '../tasks/row-actions';
+import { useTaskCompletion } from '../tasks/task-actions';
 import type { TaskUiContext } from '../tasks/task-context';
-
-const UNDO_MS = 5000; // BR-TASK-004: 5 sn'lik "Geri al"
+import { TaskRow, isOverdue, useTaskMeta } from '../tasks/task-row';
 
 /**
- * Inbox listesi (Figma "Capture list" 4:66707): "İşlenecekler" grubu. Tamamlanan görev listeden hemen çıkar;
- * 5 saniye boyunca "Geri al" ile yeniden açılabilir (BR-TASK-004).
+ * Inbox listesi (Figma "Capture list" 4:66707): "İşlenecekler" grubu, satırda "Projeye taşı" (masaüstü ve mobil)
+ * ve mobilde "Tarih ver" (4:68036). Tamamlama ve "Geri al" ortak akıştan (BR-TASK-004, BR-SUB-003).
  */
 export function InboxList({ tasks, context }: { tasks: TaskView[]; context: TaskUiContext }) {
   const t = useTranslations('tasks');
-  const tUi = useTranslations('ui');
-  const router = useRouter();
   const meta = useTaskMeta(context);
-  const [hidden, setHidden] = useState<Set<string>>(new Set());
-  const [undo, setUndo] = useState<{ id: string; version: number } | null>(null);
-  const [failed, setFailed] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
-
-  useEffect(() => () => clearTimeout(timer.current), []);
-
-  const base = `/api/v1/workspaces/${context.workspaceId}/tasks` as const;
-  const visible = tasks.filter((task) => !hidden.has(task.id));
-
-  async function complete(task: TaskView) {
-    setFailed(false);
-    setHidden((set) => new Set(set).add(task.id));
-    const result = await apiPost<TaskView>(`${base}/${task.id}/complete`, {
-      version: task.version,
-    });
-    if (!result.ok) {
-      setHidden((set) => {
-        const next = new Set(set);
-        next.delete(task.id);
-        return next;
-      });
-      setFailed(true);
-      return;
-    }
-    setUndo({ id: task.id, version: result.data.version });
-    clearTimeout(timer.current);
-    timer.current = setTimeout(() => setUndo(null), UNDO_MS);
-    router.refresh(); // Inbox sayacı güncellenir
-  }
-
-  async function revert() {
-    if (!undo) return;
-    clearTimeout(timer.current);
-    const { id, version } = undo;
-    setUndo(null);
-    const result = await apiPost(`${base}/${id}/reopen`, { version });
-    if (result.ok) {
-      setHidden((set) => {
-        const next = new Set(set);
-        next.delete(id);
-        return next;
-      });
-    } else setFailed(true);
-    router.refresh();
-  }
+  const completion = useTaskCompletion(context);
+  const [moved, setMoved] = useState<string>();
+  const visible = tasks.filter((task) => !completion.hidden.has(task.id));
 
   return (
     <>
-      {failed ? <Banner>{t('completeFailed')}</Banner> : null}
+      {completion.ui}
+      <p role="status" aria-live="polite" className={moved ? 'text-sm text-success' : 'sr-only'}>
+        {moved ? `✓ ${moved}` : ''}
+      </p>
       {visible.length === 0 ? (
         <EmptyState
           icon={<Icon name="inbox" />}
@@ -90,23 +46,29 @@ export function InboxList({ tasks, context }: { tasks: TaskView[]; context: Task
               <TaskRow
                 key={task.id}
                 task={task}
-                meta={meta(task, t('quickAdd.target'))}
-                onComplete={() => void complete(task)}
+                meta={meta(task)}
+                overdue={isOverdue(task, context.today)}
+                onComplete={() => completion.complete(task)}
+                actions={
+                  <>
+                    <MoveToProject
+                      task={task}
+                      context={context}
+                      onMoved={(project) =>
+                        setMoved(t('move.moved', { title: task.title, project }))
+                      }
+                    />
+                    <span className="lg:hidden">
+                      <GiveDate task={task} context={context} />
+                    </span>
+                  </>
+                }
               />
             ))}
           </ul>
         </section>
       )}
-      {undo ? (
-        <div className="fixed inset-x-4 bottom-[100px] z-20 mx-auto max-w-[420px] lg:right-auto lg:bottom-6 lg:left-[264px] lg:mx-0 lg:w-[420px]">
-          <Toast
-            icon={<Icon name="check" />}
-            message={t('completed')}
-            actionLabel={tUi('undo')}
-            onAction={() => void revert()}
-          />
-        </div>
-      ) : null}
+      <p className="text-sm text-text-secondary">{t('inboxFooter')}</p>
     </>
   );
 }

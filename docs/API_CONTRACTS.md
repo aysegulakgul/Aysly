@@ -174,6 +174,8 @@ Hesap varlığını ifşa etmeme: `sign-up` mevcut e-postada da kullanıcıya ge
 
 **Uygulandı (Faz 4, 1. bölüm):** `GET/POST /workspaces/{ws}/tasks`, `GET/PATCH /workspaces/{ws}/tasks/{id}`, `POST …/complete`, `POST …/reopen`; ayrıca `GET /workspaces`. Oluşturma gövdesinde şimdilik `title, description, projectId, priority, startDate, due` desteklenir; `parentTaskId`, etiketler, hatırlatıcılar, tekrar ve `position` ilgili bölümlerde eklenir (o zamana kadar bilinmeyen alan olarak 400). Liste şimdilik `projectId` ve `status` filtrelerini destekler; üst düzey, arşivsiz görevler, `position` sırasıyla. `Idempotency-Key` başlığı zorunludur (yoksa 400). Yanıt nesnesinde `tags`, `subtaskCount`, `reminders`, `recurrence` henüz yoktur.
 
+**Uygulandı (Faz 4, 3. bölüm):** Oluşturmada `parentTaskId` ve `tagNames`; `PATCH` gövdesinde `tagNames` (görevin etiket kümesini verilen adlarla **değiştirir**; boş dizi tüm etiketleri kaldırır); `POST …/complete` gövdesinde `completeSubtasks`; `POST …/move` (`{ version, projectId }`, sıra hedefin sonu; sıra içi taşıma Faz 5'te), `POST …/detach`; `GET /workspaces/{ws}/my-tasks` (`[{ group: overdue|today|tomorrow|thisWeek|later|none, tasks }]`); `GET /workspaces/{ws}/projects` (salt okunur ilk sürüm: `{ id, name, kind }`, Inbox ilk); `GET /workspaces/{ws}/tags`. Liste ve detay yanıtlarında `project { id, name, kind }`, `tags`, `subtaskCount { total, done }`; detayda ayrıca `subtasks`. Etiket yönetimi uç noktaları (`POST/PATCH/DELETE /tags`, BR-TAG-002) henüz yok.
+
 ### 6.2. Liste sorgusu (`TaskFilter` v1)
 
 | Parametre | Tür | Örnek | Not |

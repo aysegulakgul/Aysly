@@ -148,5 +148,83 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
         );
       return row?.n ?? 0;
     },
+
+    async listOpenInProjects(scope, projectIds) {
+      if (projectIds.length === 0) return [];
+      const rows = await db
+        .select()
+        .from(tasks)
+        .where(
+          and(
+            inScope(scope),
+            isNull(tasks.archivedAt),
+            isNull(tasks.parentTaskId),
+            ne(tasks.status, 'done'),
+            inArray(tasks.projectId, [...projectIds]),
+          ),
+        )
+        .orderBy(asc(tasks.dueDate), asc(tasks.dueAt), desc(tasks.priority), asc(tasks.position));
+      return rows.map(toTask);
+    },
+
+    async listSubtasks(scope, parentId) {
+      const rows = await db
+        .select()
+        .from(tasks)
+        .where(and(inScope(scope), eq(tasks.parentTaskId, parentId)))
+        .orderBy(asc(tasks.position), asc(tasks.id));
+      return rows.map(toTask);
+    },
+
+    async subtaskCounts(scope, parentIds) {
+      const counts = new Map<string, { total: number; done: number }>();
+      if (parentIds.length === 0) return counts;
+      const rows = await db
+        .select({
+          parentId: tasks.parentTaskId,
+          total: count(),
+          done: sql<number>`count(*) filter (where ${tasks.status} = 'done')`.mapWith(Number),
+        })
+        .from(tasks)
+        .where(
+          and(
+            inScope(scope),
+            isNull(tasks.archivedAt),
+            inArray(tasks.parentTaskId, [...parentIds]),
+          ),
+        )
+        .groupBy(tasks.parentTaskId);
+      for (const row of rows) {
+        if (row.parentId) counts.set(row.parentId, { total: row.total, done: row.done });
+      }
+      return counts;
+    },
+
+    async completeOpenSubtasks(scope, parentId, now, actorId) {
+      await db
+        .update(tasks)
+        .set({
+          status: 'done',
+          completedAt: now,
+          completedBy: actorId,
+          version: sql`${tasks.version} + 1`,
+          updatedAt: now,
+        })
+        .where(
+          and(
+            inScope(scope),
+            eq(tasks.parentTaskId, parentId),
+            ne(tasks.status, 'done'),
+            isNull(tasks.archivedAt),
+          ),
+        );
+    },
+
+    async moveSubtasks(scope, parentId, projectId, now) {
+      await db
+        .update(tasks)
+        .set({ projectId, version: sql`${tasks.version} + 1`, updatedAt: now })
+        .where(and(eq(tasks.workspaceId, scope.workspaceId), eq(tasks.parentTaskId, parentId)));
+    },
   };
 }

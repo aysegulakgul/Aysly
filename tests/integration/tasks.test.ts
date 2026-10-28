@@ -3,7 +3,10 @@ import { NextResponse } from 'next/server';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { registerUser } from '@/modules/identity/application/register-user';
 import { createDrizzleRegistrationStore } from '@/modules/identity/infrastructure/drizzle-registration-store';
-import { createTask, completeTask, getTask } from '@/modules/tasks/application/tasks';
+import { moveTask, myTasks } from '@/modules/tasks/application/organize';
+import { completeTask, createTask, getTask, updateTask } from '@/modules/tasks/application/tasks';
+import { completeOnboarding } from '@/modules/preferences/application/onboarding';
+import { createDrizzleOnboardingStore } from '@/modules/preferences/infrastructure/drizzle-onboarding-store';
 import { taskDeps } from '@/modules/tasks/http/task-handlers';
 import { resolveWorkspaceScope, type WorkspaceScope } from '@/modules/workspaces';
 import { createSqlClient, type Database } from '@/shared/db/client';
@@ -207,3 +210,71 @@ describe('BR-TASK-007: idempotency', () => {
     expect(row?.n).toBe(0);
   });
 });
+
+describe('alt görev, etiket ve taşıma (veritabanı)', () => {
+  it('BR-TAG-001: "İş" ve "iş" aynı etikettir; etiket kümesi değiştirilir', async () => {
+    const { scope } = await newUser('a@ornek.test');
+    const t1 = await createTask(deps(), scope, { title: 'A', tagNames: ['İş', 'ev'] });
+    const t2 = await createTask(deps(), scope, { title: 'B', tagNames: ['iş'] });
+    if (!t1.ok || !t2.ok) throw new Error('oluşturulamadı');
+    const [row] = await client<{ n: number }[]>`select count(*)::int as n from tags`;
+    expect(row?.n).toBe(2);
+    await updateTask(deps(), scope, t1.value.id, { version: 1, tagNames: ['ev'] });
+    const links = await client<{ name: string }[]>`
+      select g.name from task_tags tt join tags g on g.id = tt.tag_id where tt.task_id = ${t1.value.id}`;
+    expect(links.map((l) => l.name)).toEqual(['ev']);
+  });
+
+  it('BR-SUB-002 / BR-INBOX-002: ebeveyn taşınınca alt görevler aynı işlemde taşınır', async () => {
+    const { scope, userId } = await newUser('a@ornek.test');
+    await completeOnboardingWithProject(userId);
+    const [ev] = await client<{ id: string }[]>`select id from projects where kind = 'standard'`;
+    const parent = await createTask(deps(), scope, { title: 'Ana' });
+    if (!parent.ok) throw new Error('oluşturulamadı');
+    await createTask(deps(), scope, { title: 'Alt', parentTaskId: parent.value.id });
+    const moved = await database.transaction((tx) =>
+      moveTask({ ...taskDeps(tx), clock }, scope, parent.value.id, {
+        version: 1,
+        projectId: ev!.id,
+      }),
+    );
+    expect(moved.ok).toBe(true);
+    const rows = await client<{ project_id: string }[]>`select project_id from tasks`;
+    expect(rows.every((r) => r.project_id === ev!.id)).toBe(true);
+  });
+
+  it('BR-SUB-003: alt görevlerle birlikte tamamlama tek işlemde; BR-INBOX-004: arşivli proje Görevlerim dışında', async () => {
+    const { scope, userId } = await newUser('a@ornek.test');
+    await completeOnboardingWithProject(userId);
+    const parent = await createTask(deps(), scope, { title: 'Ana' });
+    if (!parent.ok) throw new Error('oluşturulamadı');
+    await createTask(deps(), scope, { title: 'A1', parentTaskId: parent.value.id });
+    await createTask(deps(), scope, { title: 'A2', parentTaskId: parent.value.id });
+    await database.transaction((tx) =>
+      completeTask({ ...taskDeps(tx), clock }, scope, parent.value.id, {
+        version: 1,
+        completeSubtasks: true,
+      }),
+    );
+    const [open] = await client<
+      { n: number }[]
+    >`select count(*)::int as n from tasks where status <> 'done'`;
+    expect(open?.n).toBe(0);
+
+    const [ev] = await client<{ id: string }[]>`select id from projects where kind = 'standard'`;
+    await createTask(deps(), scope, { title: 'Ev görevi', projectId: ev!.id });
+    await client`update projects set archived_at = now() where id = ${ev!.id}`;
+    const groups = await myTasks(deps(), scope, { today: '2026-10-28', weekStart: 1 });
+    expect(groups).toEqual({ ok: true, value: [] });
+  });
+});
+
+/** Örnek "Ev" projesi (onboarding yoluyla, gerçek akış). */
+async function completeOnboardingWithProject(userId: string) {
+  await completeOnboarding(
+    { store: createDrizzleOnboardingStore(database), clock },
+    { userId },
+    { intents: ['personal', 'work'], createSamples: true },
+  );
+  await client`delete from projects where kind = 'standard' and name <> 'Ev'`;
+}

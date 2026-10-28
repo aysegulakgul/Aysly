@@ -17,7 +17,11 @@
     "BR-ACC-001": "A new account can't be created with this email. If you have an account, sign in or reset your password.",
     "BR-ACC-004": "Verify your email address first.",
     "BR-PROJ-004": "Tasks can’t be added to an archived project. Unarchive the project first.",
-    "BR-DEL-002": "Archived items are read-only. Unarchive to change them."
+    "BR-DEL-002": "Archived items are read-only. Unarchive to change them.",
+    "BR-SUB-001": "A subtask can’t have its own subtasks.",
+    "BR-SUB-002": "A subtask can’t be moved on its own. Turn it into a standalone task first.",
+    "BR-SUB-005": "A task can have at most 100 subtasks.",
+    "BR-TAG-003": "A task can have at most 20 tags and a workspace at most 500."
   },
   "ui": {
     "offline": "No connection. Your changes may not be saved.",
@@ -100,7 +104,9 @@
     "inbox": "Inbox",
     "addTask": "Add task",
     "add": "Add",
-    "inboxCount": "{count} open tasks"
+    "inboxCount": "{count} open tasks",
+    "myTasks": "My tasks",
+    "myTasksCount": "{count} open tasks"
   },
   "dashboard": {
     "greeting": {
@@ -272,7 +278,11 @@
     },
     "row": {
       "complete": "Complete: {title}",
-      "noDate": "No date"
+      "noDate": "No date",
+      "today": "Today",
+      "overdue": "Overdue",
+      "subtasks": "{done}/{total} subtasks",
+      "open": "Open: {title}"
     },
     "completed": "Task completed.",
     "completeFailed": "The task couldn’t be completed. Try again.",
@@ -282,6 +292,75 @@
       "group": "To process",
       "emptyTitle": "Inbox is empty",
       "emptyDescription": "Jot down whatever comes to mind with quick add; find its place later."
+    },
+    "groups": {
+      "overdue": "Overdue",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "thisWeek": "This week",
+      "later": "Later",
+      "none": "No date"
+    },
+    "myTasks": {
+      "title": "My tasks",
+      "subtitle": "{count, plural, =0 {No open tasks} one {# open task} other {# open tasks}} across your projects and Inbox.",
+      "emptyTitle": "No open tasks",
+      "emptyDescription": "Add a task with quick add; it appears here by its due date.",
+      "collapse": "Collapse {group}",
+      "expand": "Expand {group}"
+    },
+    "move": {
+      "button": "Move to project",
+      "title": "Move to project",
+      "search": "Search projects",
+      "placeholder": "Type a project name…",
+      "hint": "Dates and other fields are kept. Subtasks move with their parent.",
+      "empty": "No matching project.",
+      "moved": "“{title}” moved to {project}."
+    },
+    "giveDate": "Set date",
+    "inboxFooter": "Setting a date doesn’t take a task out of the Inbox. Move it to a project to organize it.",
+    "detail": {
+      "label": "Task details",
+      "close": "Close",
+      "title": "Title",
+      "complete": "Complete",
+      "reopen": "Reopen",
+      "project": "Project",
+      "status": "Status",
+      "statuses": {
+        "todo": "To do",
+        "in_progress": "In progress",
+        "done": "Done"
+      },
+      "priority": "Priority",
+      "start": "Start",
+      "due": "Due",
+      "noDate": "No date",
+      "tags": "Tags",
+      "tagsPlaceholder": "Type a tag, press Enter",
+      "removeTag": "Remove tag {tag}",
+      "description": "Description",
+      "descriptionPlaceholder": "Add details…",
+      "subtasks": "Subtasks",
+      "addSubtask": "Add subtask",
+      "detach": "Make standalone task",
+      "parent": "Parent task: {title}",
+      "footer": "Created: {date} · Field changes are saved instantly.",
+      "saved": "Saved",
+      "saveFailed": "Couldn’t save. Try again.",
+      "conflict": "This task was changed somewhere else.",
+      "keepMine": "Apply mine",
+      "takeTheirs": "Take the latest",
+      "notFound": "The task doesn’t exist or you don’t have access."
+    },
+    "completeDialog": {
+      "title": "Complete the subtasks too?",
+      "description": "{done} of {total} subtasks are done. You can complete the remaining {open} as well, or only the main task.",
+      "all": "Complete subtasks too",
+      "onlyParent": "Complete only the main task",
+      "cancel": "Cancel",
+      "footnote": "Completing all subtasks doesn’t complete the main task automatically."
     }
   }
 }

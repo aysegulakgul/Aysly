@@ -212,6 +212,8 @@ Tek seviye alt görev (BR-SUB-001) ve ebeveynle aynı proje (BR-SUB-002) uygulam
 
 `tags`: `id`, `workspace_id`, `name` (1–50), `name_normalized` (Türkçe küçük harf + `unaccent`), `color`, `created_at`, `updated_at`. `UNIQUE (workspace_id, name_normalized)` (BR-TAG-001).
 
+**Uygulama notu (Faz 4):** `name_normalized` uygulamada üretilir (`tags/domain/tag.ts`: Türkçe küçük harf, `ı→i`, aksanlar kaldırılır; veritabanı `unaccent` kullanılmaz).
+
 `task_tags`: `task_id`, `tag_id`, `workspace_id`; PK `(task_id, tag_id)`; her iki FK bileşik (`workspace_id` ile) ve `ON DELETE CASCADE`. İndeks `(tag_id)`.
 `note_tags`: aynı yapı, `note_id`.
 
@@ -329,6 +331,7 @@ Ayrıntı: ARCHITECTURE §12.4. Ek kurallar:
 | 0000 | `drizzle/0000_extensions.sql` | `unaccent`, `pg_trgm` uzantıları | 2 |
 | 0001 | `drizzle/0001_identity_workspaces.sql` | `users`, `auth_sessions`, `auth_accounts`, `auth_verifications`, `auth_rate_limits`, `workspaces`, `workspace_memberships`, `projects`, `user_preferences`, `audit_events` | 3 |
 | 0002 | `drizzle/0002_projects_created_by_set_null.sql` | `projects.created_by` isteğe bağlı, kullanıcı silinince boşalır (D-068) | 3 |
+| 0004 | `drizzle/0004_tags.sql` | `tags`, `task_tags` (bileşik FK'lar; `note_tags` Faz 7) | 4 |
 | 0003 | `drizzle/0003_tasks_idempotency.sql` | `tasks` (tekrar ve arama kolonları hariç; D-076), `idempotency_keys` | 4 |
 
 Notlar: `idempotency_keys` ilk oluşturma uç noktalarıyla birlikte Faz 4'te eklenecek. Kimlik tablolarının alan adları Better Auth'un beklediği adlardır (`users.email_verified` boolean; DATA_MODEL §3.1'deki `email_verified_at` yerine). Hız sınırı sayaçları `auth_rate_limits` tablosunda tutulur.

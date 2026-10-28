@@ -8,6 +8,7 @@ import { getSessionStartedAt } from '@/modules/identity';
 import { findOnboardingOffer } from '@/modules/preferences';
 import { getPersonalScope, getViewer } from '../viewer';
 import { QuickCapture } from './tasks/quick-capture';
+import { buildTaskContext } from './tasks/task-context.server';
 import { PageFrame } from './page-frame';
 import { dayPart, firstName, longDate } from './time-display';
 
@@ -40,16 +41,7 @@ export default async function TodayPage() {
         </p>
       </div>
       {/* BR-INBOX-001: bağlamsız hızlı ekleme Inbox'a ekler (Figma 4:66533). */}
-      {scope ? (
-        <QuickCapture
-          context={{
-            workspaceId: scope.workspaceId,
-            timezone,
-            weekStart: viewer.preferences.weekStart,
-            timeFormat: viewer.preferences.timeFormat,
-          }}
-        />
-      ) : null}
+      {scope ? <QuickCapture context={await buildTaskContext(viewer, scope)} /> : null}
       <Panel>
         <EmptyState
           icon={<Icon name="inbox" />}

@@ -20,11 +20,13 @@ import {
   type Task,
   type TaskStatus,
 } from '../domain/task';
-import type { ProjectDirectory, TaskChanges, TaskRepository } from './ports';
+import { TAGS_PER_RECORD, TAGS_PER_WORKSPACE, prepareTagNames } from '@/modules/tags';
+import type { ProjectDirectory, TagPort, TaskChanges, TaskRepository } from './ports';
 
 export type TaskDeps = {
   tasks: TaskRepository;
   projects: ProjectDirectory;
+  tags: TagPort;
   clock: Clock;
   newId: () => string;
 };
@@ -36,7 +38,31 @@ export type CreateTaskCommand = {
   priority?: Priority | undefined;
   startDate?: string | null | undefined;
   due?: DueInput | null | undefined;
+  parentTaskId?: string | null | undefined;
+  tagNames?: readonly string[] | undefined;
 };
+
+export const SUBTASKS_PER_TASK = 100; // BR-SUB-005
+
+/**
+ * BR-TAG-001/003: adlar normalleştirilir; kayıt başına en fazla 20, çalışma alanında en fazla 500 etiket.
+ * Hata yoksa uygulanacak ad listesi döner.
+ */
+async function checkTags(
+  deps: TaskDeps,
+  scope: WorkspaceScope,
+  raw: readonly string[] | undefined,
+): Promise<Result<string[] | undefined, DomainError>> {
+  if (raw === undefined) return ok(undefined);
+  const { names, issues } = prepareTagNames(raw);
+  if (issues.length) return err(validationError(issues));
+  if (names.length > TAGS_PER_RECORD) return err(businessRule('BR-TAG-003'));
+  const missing = await deps.tags.missing(scope, names);
+  if (missing.length && (await deps.tags.count(scope)) + missing.length > TAGS_PER_WORKSPACE) {
+    return err(businessRule('BR-TAG-003'));
+  }
+  return ok(names);
+}
 
 /** BR-DEL-002: arşivlenmiş görev salt okunurdur; önce arşivden çıkarılmalıdır. */
 const readOnly = (task: Task) => task.archivedAt !== null;
@@ -63,18 +89,38 @@ export async function createTask(
   const startDate = command.startDate ?? null;
   issues.push(...checkStartBeforeDue(startDate, due));
   if (issues.length > 0 || !title.ok) return err(validationError(issues));
+  const tagNames = await checkTags(deps, scope, command.tagNames);
+  if (!tagNames.ok) return tagNames;
 
-  const project = command.projectId
-    ? await deps.projects.find(scope, command.projectId)
-    : await deps.projects.inbox(scope);
-  if (!project) return err(notFound());
-  if (project.archived) return err(businessRule('BR-PROJ-004'));
+  // BR-SUB-001/002/005: alt görev üst düzey bir göreve bağlanır, projesi ebeveyninkidir.
+  let parentTaskId: string | null = null;
+  let projectId: string;
+  if (command.parentTaskId) {
+    const parent = await deps.tasks.findById(scope, command.parentTaskId);
+    if (!parent) return err(notFound());
+    if (parent.parentTaskId !== null) return err(businessRule('BR-SUB-001'));
+    if (readOnly(parent)) return err(businessRule('BR-DEL-002'));
+    const siblings = await deps.tasks.subtaskCounts(scope, [parent.id]);
+    if ((siblings.get(parent.id)?.total ?? 0) >= SUBTASKS_PER_TASK) {
+      return err(businessRule('BR-SUB-005'));
+    }
+    parentTaskId = parent.id;
+    projectId = parent.projectId;
+  } else {
+    const project = command.projectId
+      ? await deps.projects.find(scope, command.projectId)
+      : await deps.projects.inbox(scope);
+    if (!project) return err(notFound());
+    if (project.archived) return err(businessRule('BR-PROJ-004'));
+    projectId = project.id;
+  }
 
-  const last = await deps.tasks.lastPosition(scope, project.id, null);
+  const now = deps.clock.now();
+  const last = await deps.tasks.lastPosition(scope, projectId, parentTaskId);
   const task = await deps.tasks.insert(scope, {
     id: deps.newId(),
-    projectId: project.id,
-    parentTaskId: null,
+    projectId,
+    parentTaskId,
     title: title.value,
     description,
     priority: command.priority ?? 0,
@@ -82,8 +128,9 @@ export async function createTask(
     due,
     position: generateKeyBetween(last, null),
     createdBy: scope.userId,
-    now: deps.clock.now(),
+    now,
   });
+  if (tagNames.value?.length) await deps.tags.replace(scope, task.id, tagNames.value, now);
   return ok(task);
 }
 
@@ -95,6 +142,7 @@ export type UpdateTaskCommand = {
   priority?: Priority | undefined;
   startDate?: string | null | undefined;
   due?: DueInput | null | undefined;
+  tagNames?: readonly string[] | undefined;
 };
 
 /**
@@ -143,8 +191,14 @@ export async function updateTask(
     issues.push(...checkStartBeforeDue(startDate, due));
   }
   if (issues.length > 0) return err(validationError(issues));
+  const tagNames = await checkTags(deps, scope, command.tagNames);
+  if (!tagNames.ok) return tagNames;
 
-  return save(deps, scope, current, command.version, changes);
+  const saved = await save(deps, scope, current, command.version, changes);
+  if (saved.ok && tagNames.value !== undefined) {
+    await deps.tags.replace(scope, current.id, tagNames.value, deps.clock.now());
+  }
+  return saved;
 }
 
 async function save(
@@ -165,16 +219,23 @@ export async function completeTask(
   deps: TaskDeps,
   scope: WorkspaceScope,
   id: string,
-  command: { version: number },
+  command: { version: number; completeSubtasks?: boolean | undefined },
 ): Promise<Result<Task, DomainError>> {
   const allowed = authorize(scope, 'task.complete');
   if (!allowed.ok) return allowed;
   const current = await deps.tasks.findById(scope, id);
   if (!current) return err(notFound());
   if (readOnly(current)) return err(businessRule('BR-DEL-002'));
-  const changes = completion(current, deps.clock.now(), scope.userId);
+  const now = deps.clock.now();
+  const changes = completion(current, now, scope.userId);
   if (!changes) return ok(current);
-  return save(deps, scope, current, command.version, changes);
+  const saved = await save(deps, scope, current, command.version, changes);
+  // BR-SUB-003: varsayılan yalnızca ana görev; istenirse açık alt görevler aynı işlemde tamamlanır.
+  // Tüm alt görevlerin tamamlanması ebeveyni otomatik tamamlamaz (ters yön yok).
+  if (saved.ok && command.completeSubtasks) {
+    await deps.tasks.completeOpenSubtasks(scope, current.id, now, scope.userId);
+  }
+  return saved;
 }
 
 /** BR-TASK-004: yeniden açma; tamamlama bilgisi temizlenir. Açık görevde değişiklik yapılmaz. */

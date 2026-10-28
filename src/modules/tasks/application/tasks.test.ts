@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { WorkspaceScope } from '@/modules/workspaces';
 import { fixedClock } from '@/shared/kernel/clock';
 import type { Task } from '../domain/task';
+import { detachTask, moveTask, myTasks } from './organize';
 import type { ProjectRef, TaskRepository } from './ports';
 import {
   completeTask,
@@ -13,11 +14,12 @@ import {
 } from './tasks';
 
 const scope = { userId: 'u1', workspaceId: 'w1', role: 'owner' } as WorkspaceScope;
-const INBOX: ProjectRef = { id: 'inbox', kind: 'inbox', archived: false };
+const INBOX: ProjectRef = { id: 'inbox', name: 'Inbox', kind: 'inbox', archived: false };
 
 /** Bellekte, kapsamı uygulayan sahte depo. */
-function setup(projects: ProjectRef[] = []) {
+function setup(projects: ProjectRef[] = [], tagCount = 0) {
   const rows = new Map<string, Task>();
+  const tagLinks = new Map<string, string[]>();
   let seq = 0;
   const repo: TaskRepository = {
     async insert(s, t) {
@@ -73,17 +75,80 @@ function setup(projects: ProjectRef[] = []) {
           !t.deletedAt &&
           !t.parentTaskId,
       ).length,
+    listOpenInProjects: async (s, ids) =>
+      [...rows.values()].filter(
+        (t) =>
+          t.workspaceId === s.workspaceId &&
+          ids.includes(t.projectId) &&
+          t.status !== 'done' &&
+          !t.archivedAt &&
+          !t.deletedAt &&
+          !t.parentTaskId,
+      ),
+    listSubtasks: async (s, parentId) =>
+      [...rows.values()].filter(
+        (t) => t.workspaceId === s.workspaceId && t.parentTaskId === parentId,
+      ),
+    subtaskCounts: async (s, ids) => {
+      const map = new Map<string, { total: number; done: number }>();
+      for (const t of rows.values()) {
+        if (t.workspaceId !== s.workspaceId || !t.parentTaskId || !ids.includes(t.parentTaskId))
+          continue;
+        const c = map.get(t.parentTaskId) ?? { total: 0, done: 0 };
+        map.set(t.parentTaskId, {
+          total: c.total + 1,
+          done: c.done + (t.status === 'done' ? 1 : 0),
+        });
+      }
+      return map;
+    },
+    completeOpenSubtasks: async (_s, parentId, now, actorId) => {
+      for (const t of rows.values()) {
+        if (t.parentTaskId === parentId && t.status !== 'done') {
+          rows.set(t.id, {
+            ...t,
+            status: 'done',
+            completedAt: now,
+            completedBy: actorId,
+            version: t.version + 1,
+          });
+        }
+      }
+    },
+    moveSubtasks: async (_s, parentId, projectId) => {
+      for (const t of rows.values()) {
+        if (t.parentTaskId === parentId)
+          rows.set(t.id, { ...t, projectId, version: t.version + 1 });
+      }
+    },
   };
   const deps: TaskDeps = {
     tasks: repo,
     projects: {
       find: async (_s, id) => projects.find((p) => p.id === id) ?? null,
       inbox: async () => INBOX,
+      listActive: async () => [INBOX, ...projects.filter((p) => !p.archived)],
+    },
+    tags: {
+      replace: async (_s, taskId, names) => {
+        tagLinks.set(taskId, [...names]);
+      },
+      forTasks: async (_s, ids) =>
+        new Map(
+          ids
+            .filter((id) => tagLinks.has(id))
+            .map((id) => [
+              id,
+              tagLinks.get(id)!.map((name) => ({ id: name, name, color: 'slate' })),
+            ]),
+        ),
+      missing: async (_s, names) => [...names],
+      count: async () => tagCount,
     },
     clock: fixedClock(new Date('2026-10-28T09:00:00Z')),
     newId: () => `t${++seq}`,
   };
-  return { deps, rows };
+  return { deps, rows, tagLinks };
 }
 
 const value = <T>(r: { ok: boolean; value?: T }) => {
@@ -126,7 +191,7 @@ describe('createTask', () => {
   });
 
   it('BR-PROJ-004: arşivlenmiş projeye görev eklenmez; bilinmeyen proje bulunamadı', async () => {
-    const { deps } = setup([{ id: 'p1', kind: 'standard', archived: true }]);
+    const { deps } = setup([{ id: 'p1', name: 'Ev', kind: 'standard', archived: true }]);
     expect(await createTask(deps, scope, { title: 'x', projectId: 'p1' })).toEqual({
       ok: false,
       error: { kind: 'business_rule', rule: 'BR-PROJ-004' },
@@ -226,5 +291,118 @@ describe('inboxBadge', () => {
     value(await completeTask(deps, scope, a.id, { version: 1 }));
     rows.set(c.id, { ...rows.get(c.id)!, archivedAt: deps.clock.now() });
     expect(await inboxBadge(deps, scope)).toEqual({ ok: true, value: 1 });
+  });
+});
+
+describe('alt görevler', () => {
+  it('BR-SUB-002: alt görev ebeveynin projesini alır; BR-SUB-001: alt görevin alt görevi olamaz', async () => {
+    const { deps } = setup([{ id: 'ev', name: 'Ev', kind: 'standard', archived: false }]);
+    const parent = value(await createTask(deps, scope, { title: 'Ana', projectId: 'ev' }));
+    const child = value(
+      await createTask(deps, scope, { title: 'Alt', parentTaskId: parent.id, projectId: 'inbox' }),
+    );
+    expect(child).toMatchObject({ projectId: 'ev', parentTaskId: parent.id });
+    expect(await createTask(deps, scope, { title: 'Torun', parentTaskId: child.id })).toEqual({
+      ok: false,
+      error: { kind: 'business_rule', rule: 'BR-SUB-001' },
+    });
+  });
+
+  it('BR-SUB-005: en fazla 100 alt görev', async () => {
+    const { deps } = setup();
+    const parent = value(await createTask(deps, scope, { title: 'Ana' }));
+    for (let i = 0; i < 100; i++)
+      await createTask(deps, scope, { title: `A${i}`, parentTaskId: parent.id });
+    expect(await createTask(deps, scope, { title: 'Fazla', parentTaskId: parent.id })).toEqual({
+      ok: false,
+      error: { kind: 'business_rule', rule: 'BR-SUB-005' },
+    });
+  });
+
+  it('BR-SUB-003: varsayılan yalnızca ana görev; istenirse alt görevler de tamamlanır', async () => {
+    const { deps, rows } = setup();
+    const parent = value(await createTask(deps, scope, { title: 'Ana' }));
+    const a = value(await createTask(deps, scope, { title: 'A', parentTaskId: parent.id }));
+    value(await completeTask(deps, scope, parent.id, { version: 1 }));
+    expect(rows.get(a.id)?.status).toBe('todo');
+
+    const parent2 = value(await createTask(deps, scope, { title: 'Ana 2' }));
+    const b = value(await createTask(deps, scope, { title: 'B', parentTaskId: parent2.id }));
+    value(await completeTask(deps, scope, parent2.id, { version: 1, completeSubtasks: true }));
+    expect(rows.get(b.id)).toMatchObject({ status: 'done', completedBy: 'u1' });
+  });
+});
+
+describe('etiketler', () => {
+  it('BR-TAG-001: tekrarlar ve # öneki temizlenir; BR-TAG-003: en fazla 20', async () => {
+    const { deps, tagLinks } = setup();
+    const task = value(
+      await createTask(deps, scope, { title: 'A', tagNames: ['#iş', 'İŞ', ' ev '] }),
+    );
+    expect(tagLinks.get(task.id)).toEqual(['iş', 'ev']);
+    const many = Array.from({ length: 21 }, (_, i) => `e${i}`);
+    expect(await createTask(deps, scope, { title: 'B', tagNames: many })).toEqual({
+      ok: false,
+      error: { kind: 'business_rule', rule: 'BR-TAG-003' },
+    });
+  });
+
+  it('BR-TAG-003: çalışma alanı 500 etiket sınırı yeni etiketi engeller', async () => {
+    const { deps } = setup([], 500);
+    expect(await createTask(deps, scope, { title: 'A', tagNames: ['yeni'] })).toEqual({
+      ok: false,
+      error: { kind: 'business_rule', rule: 'BR-TAG-003' },
+    });
+  });
+});
+
+describe('taşıma ve Görevlerim', () => {
+  const ev: ProjectRef = { id: 'ev', name: 'Ev', kind: 'standard', archived: false };
+  const old: ProjectRef = { id: 'eski', name: 'Eski', kind: 'standard', archived: true };
+
+  it('BR-INBOX-002: taşıma yalnızca projeyi değiştirir; alt görevler birlikte taşınır', async () => {
+    const { deps, rows } = setup([ev]);
+    const task = value(
+      await createTask(deps, scope, { title: 'A', priority: 2, due: { date: '2026-11-01' } }),
+    );
+    const child = value(await createTask(deps, scope, { title: 'Alt', parentTaskId: task.id }));
+    const moved = value(await moveTask(deps, scope, task.id, { version: 1, projectId: 'ev' }));
+    expect(moved).toMatchObject({
+      projectId: 'ev',
+      title: 'A',
+      priority: 2,
+      due: { date: '2026-11-01' },
+    });
+    expect(rows.get(child.id)?.projectId).toBe('ev');
+  });
+
+  it('BR-SUB-002: alt görev tek başına taşınamaz; BR-PROJ-004: arşivli projeye taşınamaz', async () => {
+    const { deps } = setup([ev, old]);
+    const task = value(await createTask(deps, scope, { title: 'A' }));
+    const child = value(await createTask(deps, scope, { title: 'Alt', parentTaskId: task.id }));
+    expect(await moveTask(deps, scope, child.id, { version: 1, projectId: 'ev' })).toEqual({
+      ok: false,
+      error: { kind: 'business_rule', rule: 'BR-SUB-002' },
+    });
+    expect(await moveTask(deps, scope, task.id, { version: 1, projectId: 'eski' })).toEqual({
+      ok: false,
+      error: { kind: 'business_rule', rule: 'BR-PROJ-004' },
+    });
+    const detached = value(await detachTask(deps, scope, child.id, { version: 1 }));
+    expect(detached.parentTaskId).toBeNull();
+  });
+
+  it('BR-INBOX-004: Görevlerim açık üst düzey görevleri son tarihe göre gruplar', async () => {
+    const { deps } = setup([ev]);
+    value(await createTask(deps, scope, { title: 'Geç', due: { date: '2026-10-20' } }));
+    value(await createTask(deps, scope, { title: 'Bugün', due: { date: '2026-10-28' } }));
+    value(await createTask(deps, scope, { title: 'Tarihsiz', projectId: 'ev' }));
+    const result = value(await myTasks(deps, scope, { today: '2026-10-28', weekStart: 1 }));
+    expect(result.map((g) => [g.group, g.items.map((i) => i.task.title)])).toEqual([
+      ['overdue', ['Geç']],
+      ['today', ['Bugün']],
+      ['none', ['Tarihsiz']],
+    ]);
+    expect(result[2]?.items[0]?.project.name).toBe('Ev');
   });
 });
