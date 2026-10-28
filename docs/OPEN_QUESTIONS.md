@@ -19,11 +19,10 @@ Bu dosya, **ürün sahibinin kararını bekleyen** konuların tek kaynağıdır.
 
 | ID | Konu | Engellediği faz | Öneri (kısa) | Durum |
 |---|---|---|---|---|
-| OQ-036 | Kayıtta "bu e-posta kullanımda" bilgisinin gizlenmesi ile kayıttan hemen sonra kullanım (D-040) arasındaki çelişki | Faz 3 (kapanış) | Kayıt ekranında genel bir mesaj; yayına alma öncesi yeniden değerlendir | AÇIK |
 | OQ-032 | Yayına alma (hosting, alan adı, e-posta sağlayıcı, hata izleme, yedekleme) | Yayın kararı (MVP sonrası) | Şimdi karar gerekmiyor | AÇIK (ertelendi) |
 
 
-### OQ-036 — Kayıtta hesap varlığının gizlenmesi ile "hemen kullanım" arasındaki çelişki
+### OQ-036 — Kayıtta hesap varlığının gizlenmesi ile "hemen kullanım" arasındaki çelişki — KAPANDI (D-070)
 
 **Bağlam.** İki onaylı karar kayıt ekranında çelişiyor:
 - BR-ACC-001 / SECURITY §4.3: Kayıt, mevcut bir e-postada hesabın var olduğunu ifşa etmemeli.
@@ -50,6 +49,7 @@ D-045 gereği şimdilik yalnızca yerel ortam kullanılıyor. Yayına alma karar
 - Harici zamanlayıcı ihtiyacı (D-053 yerel çözümdür).
 - CI/CD (D-057).
 - Oturum token'larının veritabanında özetlenerek saklanması ve 90 günlük mutlak oturum sınırı (SECURITY §4.2 uygulama notları).
+- Kayıtta hesap varlığının dolaylı ifşası (D-070): e-posta doğrulanmadan girişi engelleme veya bilgi e-postası.
 - D-061 ile yayına ertelenen maddeler (genel hız sınırları, `legal_acceptances`, silinen hesap listesi) ve D-062 e-postaları.
 - LEGAL §9 kontrol listesi.
 
@@ -95,5 +95,6 @@ D-045 gereği şimdilik yalnızca yerel ortam kullanılıyor. Yayına alma karar
 | OQ-033 | Ek e-postalar | Kayıt denemesi bildirimi ve hesap silme onay e-postası MVP'de yok; yayına alma öncesi yeniden değerlendirilir. | D-062 |
 | OQ-034 | Ürün/UX ayrıntıları | Genel öneriler onaylandı; arayüz tasarımında tek kaynak Figma; eksik/belirsiz detayda önce ürün sahibine sorulur. | D-063 |
 | OQ-035 | Açık temada eksik iki Figma rengi | Claude temaya uygun belirledi: support-1 `#dfe3f6`, support-2 `#d6d6cf`. | D-066 |
+| OQ-036 | Kayıtta hesap varlığının gizlenmesi | Şimdilik genel mesaj + hız sınırı; kayıttan hemen sonra kullanım korunur; yayına alma öncesi yeniden değerlendirilir. | D-070 |
 
 Kapanan soruların değerlendirilen seçenekleri DECISIONS.md'deki ilgili kaydın "Alternatifler" alanında özetlenmiştir.

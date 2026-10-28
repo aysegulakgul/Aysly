@@ -1,9 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { MAILPIT_API } from './e2e-env';
-
-const PASSWORD = 'ayisigi gece 2026';
-const uniqueEmail = () => `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@ornek.test`;
+import { PASSWORD, signUp, uniqueEmail } from './helpers';
 
 type MailSummary = { ID: string; Subject: string; To: { Address: string }[] };
 
@@ -27,15 +25,6 @@ async function waitForEmail(to: string, subject: RegExp): Promise<string> {
   throw new Error(`E-posta gelmedi: ${to} ${subject}`);
 }
 
-async function signUp(page: Page, email: string) {
-  await page.goto('/sign-up');
-  await page.getByLabel('Ad').fill('E2E Kullanıcı');
-  await page.getByLabel('E-posta').fill(email);
-  await page.getByLabel('Şifre').fill(PASSWORD);
-  await page.getByRole('button', { name: 'Kayıt ol' }).click();
-  await expect(page).toHaveURL('/');
-}
-
 test.describe('Kimlik doğrulama', () => {
   test('korumalı sayfa oturumsuz kullanıcıyı girişe yönlendirir (BR-PERM-001)', async ({
     page,
@@ -50,7 +39,7 @@ test.describe('Kimlik doğrulama', () => {
   }) => {
     const email = uniqueEmail();
     await signUp(page, email);
-    await expect(page.getByText('Aysly geliştiriliyor')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /E2E/ })).toBeVisible();
     const body = await waitForEmail(email, /e-posta adresini doğrula/);
     expect(body).toContain('/api/auth/verify-email?token=');
   });

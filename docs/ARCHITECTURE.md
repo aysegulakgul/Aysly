@@ -1,6 +1,6 @@
 # Sistem Mimarisi
 
-> Durum: v0.3 · Son güncelleme: 2026-10-27 · Uygulama durumu: **Hiçbir bileşen henüz kurulmadı.** Bu belge hedef mimariyi tanımlar.
+> Durum: v0.4 · Son güncelleme: 2026-10-28 · Uygulama durumu: Modüler monolit iskeleti, kimlik, çalışma alanı, projeler (Inbox), tercihler ve denetim modülleri kuruldu (Faz 2–3). Bu belge hedef mimariyi tanımlar; henüz kurulmayan modüller ilgili fazlarda gelir.
 > Temel yığın **ONAYLI** (D-044), çalışma ortamı yalnızca yerel (D-045). Zamanlanmış işler D-053, Docker ile yerel PostgreSQL D-056, yerel Git + `pnpm verify` D-057, yardımcı kütüphaneler yalnızca gerektiğinde D-058. Teknik öneriler D-060 ile onaylı; D-061 sadeleştirmeleri geçerli.
 
 ## 1. Mimari hedefler

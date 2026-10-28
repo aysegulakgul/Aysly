@@ -3,17 +3,14 @@
     "name": "Aysly",
     "tagline": "Yapılacakları değil, düzeni yönet."
   },
-  "foundation": {
-    "title": "Aysly geliştiriliyor",
-    "description": "Altyapı hazır. Giriş, görevler ve diğer ekranlar sonraki aşamalarda eklenecek; bu sayfada henüz çalışan bir özellik yok."
-  },
   "errors": {
     "validation": "Bazı alanlar geçersiz.",
     "notFound": "Aradığın sayfa bulunamadı ya da erişimin yok.",
     "forbidden": "Bu işlem için yetkin yok.",
     "versionConflict": "Bu kayıt başka bir yerde değiştirildi.",
     "internal": "Beklenmeyen bir sorun oluştu. Tekrar dene; sorun sürerse bize şu kodu ilet.",
-    "rateLimited": "Çok fazla deneme yaptın. Lütfen biraz sonra tekrar dene."
+    "rateLimited": "Çok fazla deneme yaptın. Lütfen biraz sonra tekrar dene.",
+    "unauthenticated": "Oturumun sona erdi. Lütfen yeniden giriş yap."
   },
   "rules": {
     "BR-ACC-001": "Bu e-posta adresiyle yeni hesap açılamıyor. Hesabın varsa giriş yap ya da şifreni sıfırla."
@@ -81,5 +78,76 @@
       "too_common": "Bu şifre çok yaygın; başka bir şifre seç."
     },
     "network": "Bağlantı kurulamadı. İnternet bağlantını kontrol edip tekrar dene."
+  },
+  "shell": {
+    "mainNav": "Ana menü",
+    "bottomNav": "Alt menü",
+    "today": "Bugün",
+    "settings": "Ayarlar",
+    "menu": "Menü",
+    "personal": "Kişisel",
+    "personalSpace": "Kişisel alanın",
+    "signOut": "Çıkış yap",
+    "menuFooter": "Sadece sana ait. Her şey tek bir yerde."
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Günaydın, {name}",
+      "day": "İyi günler, {name}",
+      "evening": "İyi akşamlar, {name}",
+      "night": "İyi geceler, {name}"
+    },
+    "subtitle": "Kendine sakin bir alan aç.",
+    "emptyTitle": "Günün burada şekillenecek",
+    "emptyDescription": "Görev ekleme, Inbox ve günlük plan bir sonraki aşamada geliyor. Şimdilik ayarlardan görünümünü, dilini ve saat dilimini düzenleyebilirsin.",
+    "toSettings": "Ayarlara git"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "description": "Aysly’yi kendi ritmine göre düzenle.",
+    "categories": "Ayar kategorileri",
+    "appearance": "Görünüm",
+    "dateTime": "Tarih ve saat",
+    "saved": "Tercihlerin kaydedildi.",
+    "saveFailed": "Tercihin kaydedilemedi. Tekrar dene.",
+    "conflict": "Tercihlerin başka bir yerde değiştirildi; güncel hali gösteriliyor.",
+    "theme": {
+      "title": "Tema",
+      "description": "Kendine en rahat gelen görünümü seç.",
+      "dark": "Koyu",
+      "light": "Açık",
+      "system": "Sistem",
+      "preview": "Bugün\n\n○ Ana sayfa tasarımı\n○ Market alışverişi"
+    },
+    "density": {
+      "title": "Yoğunluk",
+      "comfortable": "Rahat",
+      "compact": "Sıkı",
+      "hint": "Rahat: 44 px satırlar. Sıkı: masaüstünde 32 px. Mobilde dokunma alanları en az 44 px kalır."
+    },
+    "language": {
+      "title": "Dil",
+      "label": "Uygulama dili",
+      "hint": "Desteklenen diller: Türkçe, English."
+    },
+    "timezone": {
+      "title": "Saat dilimi",
+      "label": "Saat dilimi",
+      "hint": "“Bugün” ve tüm gün hatırlatıcıları bu saat dilimine göre hesaplanır."
+    },
+    "formats": {
+      "title": "Biçim",
+      "dateFormat": "Tarih biçimi",
+      "timeFormat": "Saat biçimi",
+      "h24": "24 saat",
+      "h12": "12 saat",
+      "weekStart": "Hafta başlangıcı",
+      "hint": "Biçimler yalnızca görünümü değiştirir; kayıtlı verin değişmez."
+    },
+    "weekdays": {
+      "0": "Pazar",
+      "1": "Pazartesi",
+      "6": "Cumartesi"
+    }
   }
 }

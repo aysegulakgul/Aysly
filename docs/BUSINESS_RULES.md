@@ -1,6 +1,6 @@
 # Merkezi İş Kuralları
 
-> Durum: v0.3 · Son güncelleme: 2026-10-27 · Uygulama durumu: Hiçbir kural henüz uygulanmadı.
+> Durum: v0.3 · Son güncelleme: 2026-10-27 · Uygulama durumu: Faz 3 kuralları uygulanıyor; hangi kuralın kodda ve testte olduğu `node scripts/br-coverage.mjs` çıktısındadır.
 > v0.3: OQ-024..OQ-031 kararları işlendi (D-053..D-060). OQ-030 ile teknik öneriler onaylandı; "gereksiz karmaşıklık" ölçütüyle çıkarılanlar D-061 kaydındadır. OQ-033 kapandı (D-062): BR-ACC-005 için onay e-postası MVP'de yok.
 
 Bu dosya Aysly'deki iş kurallarının **tek gerçek kaynağıdır**. Diğer belgeler kuralları kimlikleriyle referans verir; kuralı yeniden tanımlamaz. Kod içinde bir kuralı uygulayan yer, yorumla kural kimliğini belirtir (ör. `// BR-TASK-004`). Testler kural kimliğini test adında taşır.
@@ -90,6 +90,7 @@ Kuralların ürettiği hata kodları [API_CONTRACTS.md §2.4](API_CONTRACTS.md) 
 - **Davranış:** E-posta kırpılır ve küçük harfe çevrilerek saklanır/karşılaştırılır (Türkçe yerel ayardan bağımsız `toLowerCase` — `İ` sorunu için `en-US` kuralları). Kayıtta mevcut e-posta ile çakışma, hesap varlığını ifşa etmeyecek şekilde ele alınır (SECURITY §4.3).
 - **Nerede:** D (normalize), DB (`UNIQUE` on normalized email).
 - **Kabul:** Given `Ali@Example.com` kayıtlı, When `ali@example.com` ile kayıt denenir, Then yeni hesap oluşmaz ve yanıt hesap varlığını açıkça söylemez.
+- **Not (D-070):** Kayıttan hemen sonra kullanım (D-040) nedeniyle e-postanın kayıtlı olduğu dolaylı olarak anlaşılabilir; bu, yayına alma kararına kadar kayıt hız sınırıyla (saatte 5) sınırlandırılır.
 
 ### BR-ACC-002 — Şifre politikası
 - **Durum:** ONAYLI (D-060)

@@ -53,7 +53,7 @@ Uygulama yalnızca bu bilgisayarda (yerel) çalışır; hosting veya ücretli se
 **İlk kurulum** (proje klasöründe, sırayla):
 1. `pnpm install` — bağımlılıkları kurar.
 2. `docker compose up -d` — PostgreSQL 17 (port 5433) ve Mailpit (e-posta yakalayıcı) başlatılır.
-3. `.env.example` dosyasını `.env` adıyla kopyala (yerel değerler hazırdır).
+3. `.env.example` dosyasını `.env` adıyla kopyala (yerel değerler hazırdır), ardından `pnpm setup:env` ile oturum imzalama anahtarını (`AUTH_SECRET`) yerelde üret. Anahtar yalnızca `.env` içinde kalır, depoya girmez.
 4. `pnpm db:migrate` — veritabanını günceller.
 5. `pnpm hooks:install` — commit öncesi hızlı kontrolleri etkinleştirir.
 6. `pnpm dev` — uygulama `http://localhost:3000` adresinde açılır.

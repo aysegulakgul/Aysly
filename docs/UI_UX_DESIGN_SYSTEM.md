@@ -1,6 +1,6 @@
 # UI/UX ve Tasarım Sistemi
 
-> Durum: v0.4 · Son güncelleme: 2026-10-27
+> Durum: v0.5 · Son güncelleme: 2026-10-28
 > **Tasarımın tek kaynağı Figma'dır (D-063).** Bu belgedeki renk, tipografi, boşluk, bileşen, kısayol ve wireframe değerleri Figma incelenmeden önce yazılmış **ön taslaktır**; Faz 2'de Figma'dan çıkarılan değerlerle değiştirilecek. Figma ile bu belge çeliştiğinde Figma geçerlidir. Figma'da olmayan bir şey bu belgeden "tasarım kararı" olarak alınmaz; önemliyse ürün sahibine sorulur. İlkeler (§1) ve erişilebilirlik hedefleri (§10, WCAG 2.2 AA) geçerliliğini korur; Figma'daki bir öğe bunlarla çelişirse sorulur. Tüm değerler tasarım token'ı olarak tanımlanır; bileşenler sabit renk/ölçü kullanmaz.
 
 
@@ -19,7 +19,7 @@ Kaynak: Figma `4:69535` (Foundations), değişkenler `4:69542` (koyu) ve `4:6956
 
 Ayrıntılar (her bileşenin ölçüleri, ekran düzenleri) ilgili ekran geliştirilirken Figma'dan okunur. §5–§11'deki hareket, durum metni ve kısayol tarifleri, Figma'da karşılığı yoksa D-065 kapsamında kullanılır.
 
-**Uygulama durumu (Faz 2):** Token'lar `src/ui/tokens.css` içinde Figma adlarına karşılık gelen CSS değişkenleri olarak tanımlı; Tailwind yalnızca bunlara bağlı (`src/app/globals.css`). Açık temada Figma'da karşılığı olmayan `palette/support-1` ve `palette/support-2` değerleri D-066 ile eklendi (`#dfe3f6`, `#d6d6cf`). Tema seçimi Faz 3'te kullanıcı tercihiyle etkinleşir. İkonlar Figma'dan değiştirilmeden indirildi (`public/icons/`). Bileşenler `src/ui/components/` altında; geliştirmede `http://localhost:3000/dev/ui` sayfasında Figma ile karşılaştırılabilir.
+**Uygulama durumu (Faz 2):** Token'lar `src/ui/tokens.css` içinde Figma adlarına karşılık gelen CSS değişkenleri olarak tanımlı; Tailwind yalnızca bunlara bağlı (`src/app/globals.css`). Açık temada Figma'da karşılığı olmayan `palette/support-1` ve `palette/support-2` değerleri D-066 ile eklendi (`#dfe3f6`, `#d6d6cf`). Tema ve yoğunluk Faz 3'ten itibaren kullanıcı tercihidir (§ Kırılım noktaları altındaki not). İkonlar Figma'dan değiştirilmeden indirildi (`public/icons/`). Bileşenler `src/ui/components/` altında; geliştirmede `http://localhost:3000/dev/ui` sayfasında Figma ile karşılaştırılabilir.
 ## 1. Tasarım ilkeleri
 1. **Sakin:** Düşük doygunluklu yüzeyler, tek vurgu rengi; renk yalnızca anlam taşıdığında (öncelik, durum, hata).
 2. **Okunabilir:** Gövde metni 15–16 px, satır yüksekliği 1,5; kontrast WCAG AA (metin ≥ 4,5:1, büyük metin ve UI ≥ 3:1).
@@ -97,7 +97,8 @@ Sabit 12 renklik palet (`slate, red, orange, amber, green, teal, cyan, blue, ind
 - **Satır yüksekliği (görev satırı):** Rahat 44 px, Sıkı 32 px (dokunmatik cihazlarda her zaman ≥ 44 px dokunma alanı).
 - **Köşe yarıçapı:** `--radius-sm: 6px` (giriş, çip), `--radius-md: 10px` (kart, düğme), `--radius-lg: 14px` (modal).
 - **Gölge:** Yalnızca katman ayrımı için: `--shadow-popover`, `--shadow-modal`. Kartlar varsayılan olarak gölgesiz, kenarlıklı.
-- **Kırılım noktaları:** `sm 640`, `md 768`, `lg 1024`, `xl 1280`. Kenar çubuğu `lg` ve üstünde sabit; altında çekmece.
+- **Kırılım noktaları:** `sm 640`, `md 768`, `lg 1024`, `xl 1280`. Kenar çubuğu `lg` ve üstünde sabit; altında Figma'daki mobil düzen: alt navigasyon ve Menü ekranı (D-071).
+- **Tema ve yoğunluk (uygulandı, Faz 3):** `<html data-theme="light|dark|system" data-density="comfortable|compact">` kullanıcı tercihinden gelir; oturum yokken `system`. Satır yüksekliği `--row-height` (Tailwind `h-row`): rahat 44 px, sıkı yalnızca `lg` ve üstünde 32 px.
 - **İçerik genişliği:** Liste sayfalarında en fazla 960 px; takvim ve board tam genişlik.
 
 ## 5. Hareket

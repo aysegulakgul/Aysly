@@ -3,17 +3,14 @@
     "name": "Aysly",
     "tagline": "Manage order, not to-dos."
   },
-  "foundation": {
-    "title": "Aysly is under construction",
-    "description": "The foundation is ready. Sign-in, tasks and other screens will be added in the next phases; nothing on this page works yet."
-  },
   "errors": {
     "validation": "Some fields are invalid.",
     "notFound": "The page you're looking for doesn't exist or you don't have access.",
     "forbidden": "You don't have permission for this action.",
     "versionConflict": "This record was changed somewhere else.",
     "internal": "Something unexpected happened. Try again; if it persists, share this code with us.",
-    "rateLimited": "Too many attempts. Please try again in a moment."
+    "rateLimited": "Too many attempts. Please try again in a moment.",
+    "unauthenticated": "Your session has ended. Please sign in again."
   },
   "rules": {
     "BR-ACC-001": "A new account can't be created with this email. If you have an account, sign in or reset your password."
@@ -81,5 +78,76 @@
       "too_common": "This password is too common; choose another one."
     },
     "network": "Could not connect. Check your internet connection and try again."
+  },
+  "shell": {
+    "mainNav": "Main menu",
+    "bottomNav": "Bottom menu",
+    "today": "Today",
+    "settings": "Settings",
+    "menu": "Menu",
+    "personal": "Personal",
+    "personalSpace": "Your personal space",
+    "signOut": "Sign out",
+    "menuFooter": "Only yours. Everything in one place."
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Good morning, {name}",
+      "day": "Good afternoon, {name}",
+      "evening": "Good evening, {name}",
+      "night": "Good night, {name}"
+    },
+    "subtitle": "Make some calm space for yourself.",
+    "emptyTitle": "Your day will take shape here",
+    "emptyDescription": "Adding tasks, the Inbox and the daily plan arrive in the next phase. For now you can adjust your appearance, language and time zone in settings.",
+    "toSettings": "Go to settings"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Tune Aysly to your own rhythm.",
+    "categories": "Settings categories",
+    "appearance": "Appearance",
+    "dateTime": "Date and time",
+    "saved": "Your preferences were saved.",
+    "saveFailed": "Your preference couldn’t be saved. Try again.",
+    "conflict": "Your preferences were changed elsewhere; showing the latest version.",
+    "theme": {
+      "title": "Theme",
+      "description": "Choose the look that feels most comfortable.",
+      "dark": "Dark",
+      "light": "Light",
+      "system": "System",
+      "preview": "Today\n\n○ Home page design\n○ Grocery shopping"
+    },
+    "density": {
+      "title": "Density",
+      "comfortable": "Comfortable",
+      "compact": "Compact",
+      "hint": "Comfortable: 44 px rows. Compact: 32 px on desktop. On mobile, touch targets stay at least 44 px."
+    },
+    "language": {
+      "title": "Language",
+      "label": "App language",
+      "hint": "Supported languages: Türkçe, English."
+    },
+    "timezone": {
+      "title": "Time zone",
+      "label": "Time zone",
+      "hint": "“Today” and all-day reminders are calculated in this time zone."
+    },
+    "formats": {
+      "title": "Formats",
+      "dateFormat": "Date format",
+      "timeFormat": "Time format",
+      "h24": "24-hour",
+      "h12": "12-hour",
+      "weekStart": "Week starts on",
+      "hint": "Formats only change how things look; your saved data stays the same."
+    },
+    "weekdays": {
+      "0": "Sunday",
+      "1": "Monday",
+      "6": "Saturday"
+    }
   }
 }

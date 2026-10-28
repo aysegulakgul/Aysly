@@ -39,6 +39,20 @@
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
+
+  /* Satır yüksekliği yoğunluk tercihine bağlıdır (Figma Ayarlar · Görünüm · Yoğunluk). */
+  --spacing-row: var(--row-height);
+}
+
+/* Rahat: 44 px satırlar. Sıkı: masaüstünde 32 px; mobilde dokunma alanları en az 44 px kalır. */
+:root {
+  --row-height: 44px;
+}
+
+@media (min-width: 1024px) {
+  [data-density='compact'] {
+    --row-height: 32px;
+  }
 }
 
 html,

@@ -1,6 +1,6 @@
 # Güvenlik, Gizlilik ve Kalite Standartları
 
-> Durum: v0.3 · Son güncelleme: 2026-10-27 · Uygulama durumu: Hiçbir kontrol henüz uygulanmadı.
+> Durum: v0.4 · Son güncelleme: 2026-10-28 · Uygulama durumu: Kimlik doğrulama, oturum çerezleri, hız sınırları, Origin kontrolü ve güvenlik başlıkları uygulandı (Faz 2–3, §4.2 notları); diğer kontroller ilgili fazlarda.
 > Çalışma ortamı şimdilik yalnızca yerel (D-045). "[MVP]" maddeleri yerelde de uygulanır; yalnızca yayında anlamlı olanlar "[YAYIN]" olarak işaretlidir (OQ-032).
 > Referans çerçeve: OWASP ASVS 4.x Seviye 2 (hedef), OWASP Top 10. Yasal ve gizlilik gereksinimleri: [LEGAL_AND_PRIVACY_REQUIREMENTS.md](LEGAL_AND_PRIVACY_REQUIREMENTS.md) (D-049).
 

@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { hashPassword } from 'better-auth/crypto';
 import { serverText } from '@/i18n/server-messages';
-import { LOCALE_COOKIE, isLocale, negotiateLocale, type Locale } from '@/i18n/config';
 import { env } from '@/shared/config/env';
 import { db } from '@/shared/db/client';
+import { requestLocale } from '@/shared/http/api-route';
 import { internalError, mapDomainError } from '@/shared/http/error-mapper';
 import { isSameOrigin } from '@/shared/http/origin';
 import { REQUEST_ID_HEADER, resolveRequestId } from '@/shared/http/request-id';
@@ -24,15 +24,6 @@ const SignUpBody = z.strictObject({
   timezone: z.string().max(100).optional(),
 });
 
-function localeOf(request: Request): Locale {
-  const cookie = request.headers
-    .get('cookie')
-    ?.split(';')
-    .map((c) => c.trim().split('='))
-    .find(([k]) => k === LOCALE_COOKIE)?.[1];
-  return isLocale(cookie) ? cookie : negotiateLocale(request.headers.get('accept-language'));
-}
-
 /**
  * Yerelde proxy yoktur; X-Forwarded-For istemci tarafından uydurulabileceği için güvenilmez ve tüm istekler
  * aynı anahtarı paylaşır. Yayına alındığında güvenilir proxy başlığı yapılandırılır (OQ-032).
@@ -43,7 +34,7 @@ function clientKey(): string {
 
 export async function handleSignUp(request: Request): Promise<Response> {
   const requestId = resolveRequestId(request.headers.get(REQUEST_ID_HEADER));
-  const locale = localeOf(request);
+  const locale = requestLocale(request.headers);
   const t = serverText(locale);
   const json = (status: number, body: unknown, headers?: HeadersInit) =>
     NextResponse.json(body, { status, headers: { [REQUEST_ID_HEADER]: requestId, ...headers } });

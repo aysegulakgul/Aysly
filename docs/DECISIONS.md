@@ -319,6 +319,24 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Bağlam: Bu alanın kullanıcıya bağlantısı silmeyi engellediği için hesap silme (BR-ACC-005) çalışamazdı; temizlik sırasında fark edildi.
 - Karar: Alan isteğe bağlı oldu ve kullanıcı silinince boşalıyor (`ON DELETE SET NULL`); migration 0002. Kullanıcı silindiğinde tüm verisinin kalktığını kanıtlayan entegrasyon testi eklendi.
 
+### D-069 — Giriş ekranlarının onayı (D-065)
+- Durum: ONAYLI · Tarih: 2026-10-28 · Karar veren: Ürün sahibi ("onaylıyorum")
+- Karar: Figma bileşenleriyle kurulan giriş, kayıt, şifremi unuttum ve şifre sıfırlama ekranları (masaüstü ve mobil) onaylandı.
+
+### D-070 — Kayıtta hesap varlığının gizlenmesi: şimdilik genel mesaj (OQ-036)
+- Durum: ONAYLI · Tarih: 2026-10-28 · Karar veren: Ürün sahibi ("onaylıyorum"; önerilen seçenek C)
+- Karar: Mevcut e-postayla kayıtta genel mesaj gösterilir ve kayıt isteği saatte 5 ile sınırlıdır. Kayıttan hemen sonra kullanım (D-040) korunur. BR-ACC-001'deki "hesap varlığını açıkça söylemez" ifadesi, yayına alma kararına kadar "dolaylı ifşa hız sınırıyla sınırlandırılır" olarak okunur.
+- Sonuçlar: Yayına alma öncesi (OQ-032) yeniden değerlendirilecek: e-posta doğrulanmadan uygulamaya girmeme veya D-062'deki bilgi e-postası.
+
+### D-071 — Menüde yalnızca çalışan bölümler; mobilde Figma düzeni (teknik/uygulama)
+- Durum: ONAYLI (ürün sahibinin "çalışmayan özelliği çalışıyormuş gibi gösterme" talimatının uygulanması) · Tarih: 2026-10-28 · Karar veren: Claude
+- Karar: Kenar çubuğu, alt navigasyon, mobil Menü ve ayar kategorilerinde yalnızca çalışan bölümler gösterilir; Inbox, Görevlerim, Takvim, Projeler, Hedefler, Notlar, Bildirimler, arama, "Görev ekle", kayıtlı görünümler, Arşiv ve Çöp kutusu ait oldukları fazda eklenir. Bugün ekranı görevler gelene kadar selamlama, tarih ve dürüst bir boş durum gösterir.
+- `lg` (1024 px) altında UI_UX'teki "çekmece" yerine Figma'daki mobil düzen (alt navigasyon + Menü ekranı) uygulanır (D-063: Figma önceliklidir).
+
+### D-072 — Ayarlar kategorisi ve çıkış düğmesinin yeri (D-065 ekranları, onay bekliyor)
+- Durum: ÖNERİ (ekranlar onaya sunuldu) · Tarih: 2026-10-28 · Karar veren: Ürün sahibi (bekleniyor)
+- Figma'da olmayan iki öğe Figma bileşenleriyle kuruldu: (1) **Çıkış yap**: masaüstünde kenar çubuğunda kullanıcı adının altında, mobilde Menü ekranında Ayarlar'ın altında, UI/NavItem görünümünde. (2) **Ayarlar · Tarih ve saat**: Görünüm ekranının düzeninde; saat dilimi, tarih biçimi, saat biçimi ve hafta başlangıcı.
+
 ---
 
 ## 5. Faz kapanış kayıtları

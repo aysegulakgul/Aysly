@@ -9,7 +9,7 @@
 |---|---|---|---|---|---|
 | 1 | Ürün analizi, mimari kararlar, dokümantasyon | **Kapandı** | — | 2026-10-27 | 2026-10-27 |
 | 2 | Proje altyapısı ve temel mimari | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
-| 3 | Kimlik doğrulama, hesap, tercihler, onboarding | **Devam ediyor** — kimlik doğrulama bölümü tamam | Giriş ekranlarının onayı (D-065); OQ-036 | 2026-10-28 | — |
+| 3 | Kimlik doğrulama, hesap, tercihler, onboarding | **Devam ediyor** — kimlik doğrulama bölümü tamam | Çıkış düğmesi ve Tarih ve saat ekranının onayı (D-072) | 2026-10-28 | — |
 | 4 | Görev yönetimi, Inbox, My Tasks, dashboard | Başlamadı | — | — | — |
 | 5 | Projeler ve görev görünümleri | Başlamadı | — | — | — |
 | 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | Başlamadı | — | — | — |
@@ -91,8 +91,8 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
 - **Kabul:** Kayıt → kişisel alan + Inbox + tercihler tek işlemde; giriş/çıkış/sıfırlama/doğrulama E2E (e-postalar yerel yakalayıcıdan okunarak); hız sınırları test edildi; numaralandırma önlemleri test edildi; ayar değişiklikleri kalıcı; arayüz TR/EN geçişi çalışıyor.
 
 - **İlerleme (2026-10-28):**
-  - **Tamam:** Veritabanı (kimlik, çalışma alanı, üyelik, Inbox, tercihler, denetim); tek işlemli kayıt (BR-WS-001, D-067); Better Auth ile giriş, çıkış, oturum, şifre sıfırlama, e-posta doğrulama; güvenlik e-postaları (D-055); hız sınırları ve Origin kontrolü; giriş, kayıt, şifremi unuttum ve şifre sıfırlama ekranları (D-065, onay bekliyor); korumalı ana sayfa.
-  - **Kalan:** Uygulama kabuğu (Figma kenar çubuğu ve alt navigasyon), Ayarlar · Görünüm (Figma) ile tema ve dil tercihleri, Profil ve Güvenlik ayarları (şifre değiştirme, oturumlar, e-posta değiştirme), çıkış düğmesi, onboarding.
+  - **Tamam:** Veritabanı (kimlik, çalışma alanı, üyelik, Inbox, tercihler, denetim); tek işlemli kayıt (BR-WS-001, D-067); Better Auth ile giriş, çıkış, oturum, şifre sıfırlama, e-posta doğrulama; güvenlik e-postaları (D-055); hız sınırları ve Origin kontrolü; giriş, kayıt, şifremi unuttum ve şifre sıfırlama ekranları (D-069 ile onaylandı); korumalı ana sayfa; uygulama kabuğu (kenar çubuğu, alt navigasyon, mobil Menü; D-071); Bugün ekranında selamlama ve boş durum; `GET/PATCH /me/preferences`; Ayarlar · Görünüm (tema, yoğunluk, dil) ve Ayarlar · Tarih ve saat; çıkış düğmesi (D-072, onay bekliyor); yetki matrisi kontrolü.
+  - **Kalan:** Profil ve Güvenlik ayarları (ad, şifre değiştirme, oturumlar, e-posta değiştirme), onboarding.
 
 ### Faz 4 — Görev yönetimi, Inbox, My Tasks, dashboard
 - **Bağımlılık:** Faz 3.

@@ -1,0 +1,13 @@
+{
+  "$comment": "TESTING_STRATEGY §5: kendi /api/v1 uç noktalarımızın yetki matrisi. Her rota ve yöntem burada olmalıdır (scripts/route-matrix.mjs). access: public = oturum gerekmez; self = yalnızca aktörün kendi kaydı (başka kullanıcının kimliği istekte yer almaz); workspace = çalışma alanı kaynakları (başka kullanıcıya 404).",
+  "routes": [
+    { "method": "POST", "path": "/api/v1/auth/sign-up", "access": "public" },
+    { "method": "GET", "path": "/api/v1/me/preferences", "access": "self" },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/me/preferences",
+      "access": "self",
+      "body": { "version": 1, "theme": "dark" }
+    }
+  ]
+}
