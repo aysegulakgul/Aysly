@@ -1,6 +1,6 @@
 # Hata Durumları ve Uç Senaryolar
 
-> Durum: v0.3 · Son güncelleme: 2026-10-27
+> Durum: v0.4 · Son güncelleme: 2026-10-28
 > Her senaryo: beklenen sistem davranışı, kullanıcı mesajı (Türkçe ana metin; çeviri anahtarı uygulamada), gerekli testler. Kural kimlikleri BUSINESS_RULES'a referanstır.
 
 ## 1. Kullanıcı mesajı ilkeleri
@@ -61,4 +61,6 @@
 | E36 | Uygulama günlerce kapalı kaldı; çöpte 30 günü dolan kayıtlar var | Açılışta bakım işi süresi dolanları kalıcı siler; işlem tamamlanana kadar bu kayıtlar geri yüklenemez | — | Entegrasyon (sahte saat) | BR-DEL-003, D-053 |
 | E37 | Hesap silme bekleme süresi uygulama kapalıyken doldu | Açılışta silme işi çalışır; hesap ve veriler kalıcı silinir | — | Entegrasyon | BR-ACC-005, D-053 |
 | E38 | PostgreSQL çalışmıyor | `/api/health/ready` 503; arayüz "Veritabanına ulaşılamıyor" sayfası; README'deki başlatma adımına yönlendirme | "Veritabanına bağlanılamadı. Veritabanı servisinin çalıştığından emin ol." | Manuel + API | ARCHITECTURE §11 |
+| E40 | Ayarlarda mevcut şifre yanlış girildi (şifre veya e-posta değiştirme) | İşlem yapılmaz; alan altında hata | "Mevcut şifre yanlış." | Birim + E2E | BR-ACC-002, BR-ACC-004 |
+| E41 | Doğrulanmamış hesapla e-posta değiştirme | `422 BR-ACC-004`; arayüz formu göstermez, önce doğrulama ister | "E-posta adresini değiştirmek için önce mevcut adresini doğrula." | Birim + E2E | BR-ACC-004, D-055 |
 | E39 | E-posta yakalayıcı (Mailpit) çalışmıyor | Güvenlik e-postası gönderimi hata verir; işlem (ör. kayıt) yine tamamlanır, e-posta yeniden gönderilebilir; hata loglanır | "Doğrulama e-postası gönderilemedi. [Tekrar gönder]" | Entegrasyon (sahte e-posta adaptörü hata verir) | BR-ACC-004 |

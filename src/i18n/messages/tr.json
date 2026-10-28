@@ -3,21 +3,228 @@
     "name": "Aysly",
     "tagline": "Yapılacakları değil, düzeni yönet."
   },
-  "foundation": {
-    "title": "Aysly geliştiriliyor",
-    "description": "Altyapı hazır. Giriş, görevler ve diğer ekranlar sonraki aşamalarda eklenecek; bu sayfada henüz çalışan bir özellik yok."
-  },
   "errors": {
     "validation": "Bazı alanlar geçersiz.",
     "notFound": "Aradığın sayfa bulunamadı ya da erişimin yok.",
     "forbidden": "Bu işlem için yetkin yok.",
     "versionConflict": "Bu kayıt başka bir yerde değiştirildi.",
-    "internal": "Beklenmeyen bir sorun oluştu. Tekrar dene; sorun sürerse bize şu kodu ilet."
+    "internal": "Beklenmeyen bir sorun oluştu. Tekrar dene; sorun sürerse bize şu kodu ilet.",
+    "rateLimited": "Çok fazla deneme yaptın. Lütfen biraz sonra tekrar dene.",
+    "unauthenticated": "Oturumun sona erdi. Lütfen yeniden giriş yap."
   },
-  "rules": {},
+  "rules": {
+    "BR-ACC-001": "Bu e-posta adresiyle yeni hesap açılamıyor. Hesabın varsa giriş yap ya da şifreni sıfırla.",
+    "BR-ACC-004": "Önce e-posta adresini doğrula."
+  },
   "ui": {
     "offline": "Bağlantı yok. Değişikliklerin kaydedilemeyebilir.",
     "undo": "Geri al",
     "loading": "Yükleniyor"
+  },
+  "email": {
+    "verify": {
+      "subject": "Aysly: e-posta adresini doğrula",
+      "body": "Merhaba {name},\n\nE-posta adresini doğrulamak için bu bağlantıyı aç (24 saat geçerli):\n{url}\n\nBu isteği sen yapmadıysan bu e-postayı yok sayabilirsin."
+    },
+    "reset": {
+      "subject": "Aysly: şifre sıfırlama",
+      "body": "Merhaba {name},\n\nŞifreni sıfırlamak için bu bağlantıyı aç (30 dakika geçerli, tek kullanımlık):\n{url}\n\nBu isteği sen yapmadıysan bu e-postayı yok sayabilirsin; şifren değişmez."
+    },
+    "passwordChanged": {
+      "subject": "Aysly: şifren değişti",
+      "body": "Merhaba {name},\n\nAysly hesabının şifresi az önce değiştirildi ve diğer cihazlardaki oturumların kapatıldı.\n\nBu değişikliği sen yapmadıysan hemen \"Şifremi unuttum\" ile şifreni sıfırla."
+    }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Giriş yap",
+      "submit": "Giriş yap",
+      "forgot": "Şifremi unuttum",
+      "noAccount": "Hesabın yok mu?",
+      "toSignUp": "Kayıt ol",
+      "invalid": "E-posta veya şifre hatalı."
+    },
+    "signUp": {
+      "title": "Hesap oluştur",
+      "submit": "Kayıt ol",
+      "hasAccount": "Zaten hesabın var mı?",
+      "toSignIn": "Giriş yap",
+      "passwordHint": "En az 10 karakter."
+    },
+    "forgot": {
+      "title": "Şifremi unuttum",
+      "description": "E-posta adresini yaz; şifreni sıfırlaman için bir bağlantı gönderelim.",
+      "submit": "Bağlantı gönder",
+      "sent": "E-posta adresin kayıtlıysa şifre sıfırlama bağlantısı gönderdik. Gelen kutunu kontrol et.",
+      "back": "Girişe dön"
+    },
+    "reset": {
+      "title": "Yeni şifre belirle",
+      "submit": "Şifreyi değiştir",
+      "done": "Şifren değişti ve tüm cihazlardaki oturumların kapatıldı. Yeni şifrenle giriş yapabilirsin.",
+      "invalidLink": "Bu bağlantı geçersiz veya süresi dolmuş. Yeni bir bağlantı iste.",
+      "requestNew": "Yeni bağlantı iste"
+    },
+    "fields": {
+      "name": "Ad",
+      "email": "E-posta",
+      "password": "Şifre",
+      "newPassword": "Yeni şifre"
+    },
+    "reasons": {
+      "required": "Bu alan zorunlu.",
+      "invalid": "Geçerli bir e-posta adresi yaz.",
+      "too_short": "Şifre en az 10 karakter olmalı.",
+      "too_long": "Bu alan çok uzun.",
+      "too_common": "Bu şifre çok yaygın; başka bir şifre seç.",
+      "incorrect": "Mevcut şifre yanlış.",
+      "same": "Bu zaten kullandığın e-posta adresi."
+    },
+    "network": "Bağlantı kurulamadı. İnternet bağlantını kontrol edip tekrar dene."
+  },
+  "shell": {
+    "mainNav": "Ana menü",
+    "bottomNav": "Alt menü",
+    "today": "Bugün",
+    "settings": "Ayarlar",
+    "menu": "Menü",
+    "personal": "Kişisel",
+    "personalSpace": "Kişisel alanın",
+    "signOut": "Çıkış yap",
+    "menuFooter": "Sadece sana ait. Her şey tek bir yerde."
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Günaydın, {name}",
+      "day": "İyi günler, {name}",
+      "evening": "İyi akşamlar, {name}",
+      "night": "İyi geceler, {name}"
+    },
+    "subtitle": "Kendine sakin bir alan aç.",
+    "emptyTitle": "Günün burada şekillenecek",
+    "emptyDescription": "Görev ekleme, Inbox ve günlük plan bir sonraki aşamada geliyor. Şimdilik ayarlardan görünümünü, dilini ve saat dilimini düzenleyebilirsin.",
+    "toSettings": "Ayarlara git"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "description": "Aysly’yi kendi ritmine göre düzenle.",
+    "categories": "Ayar kategorileri",
+    "appearance": "Görünüm",
+    "dateTime": "Tarih ve saat",
+    "saved": "Tercihlerin kaydedildi.",
+    "saveFailed": "Tercihin kaydedilemedi. Tekrar dene.",
+    "conflict": "Tercihlerin başka bir yerde değiştirildi; güncel hali gösteriliyor.",
+    "theme": {
+      "title": "Tema",
+      "description": "Kendine en rahat gelen görünümü seç.",
+      "dark": "Koyu",
+      "light": "Açık",
+      "system": "Sistem",
+      "preview": "Bugün\n\n○ Ana sayfa tasarımı\n○ Market alışverişi"
+    },
+    "density": {
+      "title": "Yoğunluk",
+      "comfortable": "Rahat",
+      "compact": "Sıkı",
+      "hint": "Rahat: 44 px satırlar. Sıkı: masaüstünde 32 px. Mobilde dokunma alanları en az 44 px kalır."
+    },
+    "language": {
+      "title": "Dil",
+      "label": "Uygulama dili",
+      "hint": "Desteklenen diller: Türkçe, English."
+    },
+    "timezone": {
+      "title": "Saat dilimi",
+      "label": "Saat dilimi",
+      "hint": "“Bugün” ve tüm gün hatırlatıcıları bu saat dilimine göre hesaplanır."
+    },
+    "formats": {
+      "title": "Biçim",
+      "dateFormat": "Tarih biçimi",
+      "timeFormat": "Saat biçimi",
+      "h24": "24 saat",
+      "h12": "12 saat",
+      "weekStart": "Hafta başlangıcı",
+      "hint": "Biçimler yalnızca görünümü değiştirir; kayıtlı verin değişmez."
+    },
+    "weekdays": {
+      "0": "Pazar",
+      "1": "Pazartesi",
+      "6": "Cumartesi"
+    },
+    "profile": "Profil",
+    "security": "Güvenlik",
+    "profileForm": {
+      "title": "Profil",
+      "name": "Ad",
+      "save": "Kaydet",
+      "saved": "Adın kaydedildi."
+    },
+    "email": {
+      "title": "E-posta",
+      "label": "E-posta adresin",
+      "verified": "Doğrulandı",
+      "unverified": "Doğrulanmadı",
+      "unverifiedHint": "Adresini doğrulamak için gelen kutundaki bağlantıyı aç.",
+      "resend": "Doğrulama e-postasını yeniden gönder",
+      "resent": "Doğrulama bağlantısını gönderdik. Gelen kutunu kontrol et.",
+      "changeTitle": "E-posta adresini değiştir",
+      "newEmail": "Yeni e-posta",
+      "currentPassword": "Mevcut şifre",
+      "submit": "Doğrulama bağlantısı gönder",
+      "sent": "Yeni adresine bir doğrulama bağlantısı gönderdik. Bağlantıyı açana kadar mevcut adresin geçerli kalır.",
+      "needsVerification": "E-posta adresini değiştirmek için önce mevcut adresini doğrula.",
+      "changed": "E-posta adresin doğrulandı."
+    },
+    "password": {
+      "title": "Şifre",
+      "current": "Mevcut şifre",
+      "new": "Yeni şifre",
+      "hint": "En az 10 karakter.",
+      "submit": "Şifreyi değiştir",
+      "done": "Şifren değişti. Diğer cihazlardaki oturumların kapatıldı."
+    },
+    "sessions": {
+      "title": "Oturumlar",
+      "description": "Hesabının açık olduğu cihazlar.",
+      "thisDevice": "Bu cihaz",
+      "lastSeen": "Son etkinlik: {date}",
+      "revoke": "Oturumu kapat",
+      "revokeOthers": "Diğer tüm oturumları kapat",
+      "onlyThis": "Başka cihazda açık oturumun yok.",
+      "unknownDevice": "Bilinmeyen cihaz",
+      "failed": "Oturum kapatılamadı. Tekrar dene."
+    },
+    "onboardingTitle": "Başlangıç rehberi",
+    "onboardingDescription": "Kullanım amacını ve başlangıç düzenini yeniden seçmek için rehberi baştan başlat.",
+    "onboardingRestart": "Rehberi yeniden başlat"
+  },
+  "onboarding": {
+    "title": "Aysly’ye hoş geldin",
+    "step": "Adım {current}/{total}",
+    "skip": "Atla",
+    "back": "Geri",
+    "next": "Devam",
+    "finish": "Bitir",
+    "failed": "Kaydedilemedi. Tekrar dene.",
+    "intents": {
+      "title": "Aysly’yi ne için kullanacaksın?",
+      "description": "Birden fazla seçebilirsin. Seçimin yalnızca başlangıç düzenini belirler; her şeyi sonradan değiştirebilirsin.",
+      "personal": "Kişisel hayatım",
+      "work": "İşim ve projelerim"
+    },
+    "samples": {
+      "title": "Örnek projeler oluşturulsun mu?",
+      "description": "Başlaman için boş projeler oluşturulur; içlerine görev eklenmez. İstediğin zaman silebilirsin.",
+      "list": "Oluşturulacak projeler: {names}",
+      "none": "Bir amaç seçmediğin için örnek proje oluşturulmayacak.",
+      "yes": "Evet, oluştur",
+      "no": "Hayır, boş başla",
+      "notice": "Projeler sayfası sonraki aşamada geliyor; projelerin orada görünecek."
+    },
+    "prefs": {
+      "title": "Temel tercihlerin",
+      "description": "Tarayıcından aldığımız ayarlar. Gerekirse değiştir; sonra Ayarlar’dan da düzenleyebilirsin."
+    }
   }
 }

@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
+import { getViewer } from './viewer';
 import './globals.css';
 
 // Figma tipografisi: Inter (4:69578). latin-ext Türkçe karakterleri içerir; yazı tipi uygulamayla birlikte sunulur.
@@ -14,10 +15,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const locale = await getLocale();
-  // Faz 2: yalnızca koyu tema (açık temada iki Figma token'ı eksik; bkz. src/ui/tokens.css). Tema tercihi Faz 3'te.
+  const [locale, viewer] = await Promise.all([getLocale(), getViewer()]);
+  // BR-PREF-001: oturum yokken ve varsayılan olarak tema sistem ayarını izler.
+  const theme = viewer?.preferences.theme ?? 'system';
+  const density = viewer?.preferences.density ?? 'comfortable';
   return (
-    <html lang={locale} data-theme="dark" className={inter.variable}>
+    <html lang={locale} data-theme={theme} data-density={density} className={inter.variable}>
       <body>
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createSqlClient } from '@/shared/db/client';
@@ -32,7 +33,10 @@ describe('veritabanı altyapısı', () => {
     const [row] = await sql<
       { count: number }[]
     >`select count(*)::int as count from drizzle.__drizzle_migrations`;
-    expect(row?.count).toBe(1);
+    const journal = JSON.parse(readFileSync('drizzle/meta/_journal.json', 'utf8')) as {
+      entries: unknown[];
+    };
+    expect(row?.count).toBe(journal.entries.length);
   });
 
   it('oturum saat dilimi UTC (DATA_MODEL §6)', async () => {

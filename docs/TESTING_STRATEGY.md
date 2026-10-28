@@ -1,6 +1,6 @@
 # Test Stratejisi ve Kabul Kriterleri
 
-> Durum: v0.3 · Son güncelleme: 2026-10-27 · Uygulama durumu: Test altyapısı kurulmadı (Faz 2).
+> Durum: v0.4 · Son güncelleme: 2026-10-28 · Uygulama durumu: Test altyapısı kuruldu (Faz 2); birim, entegrasyon, tarayıcı testleri ve yetki matrisi kontrolü `pnpm verify` içinde çalışıyor.
 > Araçlar: Vitest ve Playwright (D-044). Testing Library, Testcontainers (Docker, D-056), axe-core, fast-check onaylı ama yalnızca ihtiyaç duyulduğunda eklenir (D-058). Kapsam hedefleri D-060 ile onaylı.
 
 ## 1. İlkeler
@@ -109,7 +109,7 @@ Her uç nokta için tablo tabanlı test üretilir:
 | Başka kullanıcı, kendi `workspaceId`'si + hedef kaynağın `id`'si | 404 |
 | (Faz 10) Her rol | ROLES_AND_PERMISSIONS §6.2 tablosuna göre |
 
-Yeni bir uç nokta bu matrise eklenmeden iş tamamlanmış sayılmaz (`pnpm verify`, route listesini matrisle karşılaştırır).
+Yeni bir uç nokta bu matrise eklenmeden iş tamamlanmış sayılmaz. Matris `tests/authorization-matrix.json` dosyasındadır; `pnpm verify` içindeki "Yetki matrisi" adımı (`scripts/route-matrix.mjs`) `src/app/api/v1` rotalarını matrisle karşılaştırır, `tests/e2e/authorization.spec.ts` oturumsuz satırları sınar. `/me/*` uç noktaları istekte kullanıcı kimliği almaz; "başka kullanıcı" satırı yerine aktörün yalnızca kendi kaydını değiştirdiği entegrasyon testiyle kanıtlanır (BR-PREF-002).
 
 ## 6. Kabul kriterleri (Given/When/Then) — kritik gereksinimler
 
@@ -191,6 +191,8 @@ flowchart LR
 **Gerçek PostgreSQL ile test:** Testcontainers, Docker Desktop üzerinde her test koşusunda geçici bir veritabanı açar (D-056). Böylece gerçek kullanıcı verisi içeren veritabanına asla dokunulmaz.
 
 Başarısız test "flaky" ise devre dışı bırakılmaz; karantinaya alınıp hemen düzeltilir ve faz raporunda belirtilir.
+
+**Tarayıcı testlerinin ortamı (Faz 3):** Playwright, ayrı bir uygulama örneğini 3100 portunda ve ayrı derleme klasörüyle (`.next-e2e`) başlatır. Her çalıştırmada sıfırdan kurulan `aysly_e2e` veritabanını kullanır, böylece geliştirme veritabanına dokunmaz. E-postalar Mailpit API'sinden okunur. Testlerde kimlik doğrulama hız sınırı kapalıdır (`AUTH_RATE_LIMIT_ENABLED=false`); sınırın kendisi entegrasyon testiyle kanıtlanır.
 
 ## 9. Tamamlanma tanımı (test açısından)
 Bir değişiklik şu koşullarla tamamdır: ilgili BR testleri yazıldı/güncellendi; yetki matrisi güncel; `pnpm verify` tamamen yeşil (gerçekten çalıştırıldı); düzeltilen hata için regresyon testi var; yeni E2E akışı gerekiyorsa eklendi.

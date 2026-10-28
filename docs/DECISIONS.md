@@ -1,6 +1,6 @@
 # Karar Kaydı (Decision Log)
 
-> Durum: v0.5 · Son güncelleme: 2026-10-28
+> Durum: v0.6 · Son güncelleme: 2026-10-28
 
 Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar silinmez; değiştirilen karar `YERİNE GEÇİLDİ (D-yyy)` olarak işaretlenir ve yeni kayıt açılır.
 
@@ -298,7 +298,7 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Alternatif: Ekranların önce Figma'ya eklenmesi — Faz 3'ü bekleteceği için seçilmedi.
 - Sonuçlar: FIGMA_INVENTORY §4, IMPLEMENTATION_PLAN Faz 3–8.
 
----
+## 4c. Faz 2–3 sırasında alınan kararlar (2026-10-28)
 
 ### D-066 — Açık temadaki eksik iki renk (OQ-035)
 - Durum: ONAYLI · Tarih: 2026-10-28 · Karar veren: Ürün sahibi ("eksik rengi temaya uygun şekilde sen ekle")
@@ -308,9 +308,53 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Öneri: Figma'nın tek kaynak kalması için bu iki değer Figma'daki açık temaya da eklenebilir.
 - Sonuçlar: `src/ui/tokens.css`, UI_UX_DESIGN_SYSTEM §0; tema tercihi Faz 3'te etkinleşir.
 
+### D-067 — Kayıt işlemi kendi use case'imizde, oturumlar Better Auth'ta (teknik)
+- Durum: ONAYLI (teknik uygulama; onaylı BR-WS-001'i karşılamak için) · Tarih: 2026-10-28 · Karar veren: Claude (CLAUDE.md §5.5)
+- Bağlam: Better Auth'un kayıt sonrası kancaları, kullanıcı kaydı veritabanına işlendikten sonra çalışıyor. Bu yüzden "kullanıcı + kişisel alan + Inbox + tercihler tek işlemde" (BR-WS-001) Better Auth'un kendi kayıt uç noktasıyla sağlanamıyor.
+- Karar: Kayıt `POST /api/v1/auth/sign-up` üzerinden `registerUser` use case'iyle tek veritabanı işleminde yapılır. Şifre, Better Auth'un özetleme fonksiyonuyla (scrypt) özetlenir. Better Auth'un kayıt uç noktası kapalıdır (`disableSignUp`). Giriş, çıkış, oturumlar, şifre sıfırlama ve e-posta doğrulama Better Auth'tadır (`/api/auth/*`).
+- Sonuçlar: Ürün davranışı değişmedi. Entegrasyon testi, işlemin ortasındaki bir hatada hiçbir kaydın kalmadığını kanıtlıyor.
+
+### D-068 — `projects.created_by` kullanıcı silinince boşalır (teknik)
+- Durum: ONAYLI (teknik) · Tarih: 2026-10-28 · Karar veren: Claude
+- Bağlam: Bu alanın kullanıcıya bağlantısı silmeyi engellediği için hesap silme (BR-ACC-005) çalışamazdı; temizlik sırasında fark edildi.
+- Karar: Alan isteğe bağlı oldu ve kullanıcı silinince boşalıyor (`ON DELETE SET NULL`); migration 0002. Kullanıcı silindiğinde tüm verisinin kalktığını kanıtlayan entegrasyon testi eklendi.
+
+### D-069 — Giriş ekranlarının onayı (D-065)
+- Durum: ONAYLI · Tarih: 2026-10-28 · Karar veren: Ürün sahibi ("onaylıyorum")
+- Karar: Figma bileşenleriyle kurulan giriş, kayıt, şifremi unuttum ve şifre sıfırlama ekranları (masaüstü ve mobil) onaylandı.
+
+### D-070 — Kayıtta hesap varlığının gizlenmesi: şimdilik genel mesaj (OQ-036)
+- Durum: ONAYLI · Tarih: 2026-10-28 · Karar veren: Ürün sahibi ("onaylıyorum"; önerilen seçenek C)
+- Karar: Mevcut e-postayla kayıtta genel mesaj gösterilir ve kayıt isteği saatte 5 ile sınırlıdır. Kayıttan hemen sonra kullanım (D-040) korunur. BR-ACC-001'deki "hesap varlığını açıkça söylemez" ifadesi, yayına alma kararına kadar "dolaylı ifşa hız sınırıyla sınırlandırılır" olarak okunur.
+- Sonuçlar: Yayına alma öncesi (OQ-032) yeniden değerlendirilecek: e-posta doğrulanmadan uygulamaya girmeme veya D-062'deki bilgi e-postası.
+
+### D-071 — Menüde yalnızca çalışan bölümler; mobilde Figma düzeni (teknik/uygulama)
+- Durum: ONAYLI (ürün sahibinin "çalışmayan özelliği çalışıyormuş gibi gösterme" talimatının uygulanması) · Tarih: 2026-10-28 · Karar veren: Claude
+- Karar: Kenar çubuğu, alt navigasyon, mobil Menü ve ayar kategorilerinde yalnızca çalışan bölümler gösterilir; Inbox, Görevlerim, Takvim, Projeler, Hedefler, Notlar, Bildirimler, arama, "Görev ekle", kayıtlı görünümler, Arşiv ve Çöp kutusu ait oldukları fazda eklenir. Bugün ekranı görevler gelene kadar selamlama, tarih ve dürüst bir boş durum gösterir.
+- `lg` (1024 px) altında UI_UX'teki "çekmece" yerine Figma'daki mobil düzen (alt navigasyon + Menü ekranı) uygulanır (D-063: Figma önceliklidir).
+
+### D-072 — Ayarlar · Tarih ve saat ekranı ve çıkış düğmesinin yeri (D-065 ekranları)
+- Durum: ONAYLI · Tarih: 2026-10-28 · Karar veren: Ürün sahibi ("onaylıyorum")
+- Figma'da olmayan iki öğe Figma bileşenleriyle kuruldu: (1) **Çıkış yap**: masaüstünde kenar çubuğunda kullanıcı adının altında, mobilde Menü ekranında Ayarlar'ın altında, UI/NavItem görünümünde. (2) **Ayarlar · Tarih ve saat**: Görünüm ekranının düzeninde; saat dilimi, tarih biçimi, saat biçimi ve hafta başlangıcı.
+
+### D-073 — Hesap işlemleri kendi /me uç noktalarımızda (teknik, güvenlik)
+- Durum: ONAYLI (teknik; onaylı kuralları karşılamak için) · Tarih: 2026-10-28 · Karar veren: Claude (CLAUDE.md §5.5)
+- Bağlam: Better Auth'un hazır yolları üç noktada kurallarımızın gerisinde kalıyordu: oturum listesi oturum token'larını tarayıcıya döndürüyor (SECURITY §4.2); şifre değiştirme yaygın şifre listesini uygulamıyor (BR-ACC-002) ve "diğer oturumları kapat" seçimini istemciye bırakıyor (BR-ACC-006); kullanıcı güncelleme ad kuralını uygulamıyor.
+- Karar: API_CONTRACTS §3'teki `/api/v1/me*` uç noktaları uygulandı; kurallar identity modülünün application katmanında, kütüphane yalnızca adaptör olarak (`better-auth-credentials.ts`) kullanılıyor. Better Auth'un ilgili yolları HTTP'ye kapatıldı (`disabledPaths`). E-posta değiştirmede yeni adrese doğrulama bağlantısı gider, doğrulanınca adres değişir; eski adrese ek e-posta gönderilmez (D-055, D-062).
+- Sonuçlar: Ürün davranışı değişmedi. E2E testi kapalı yolların 404 döndüğünü doğruluyor.
+
+### D-074 — Onboarding Faz 3'te tamamıyla (OQ-037)
+- Durum: ONAYLI · Tarih: 2026-10-28 · Karar veren: Ürün sahibi ("B seçeneği ile devam edelim")
+- Karar: Üç adımlı onboarding Faz 3'te kuruldu: amaç seçimi, örnek projeler, temel tercihlerin onayı. Yanıtlar, başlangıç dashboard düzeni ve örnek projeler kaydedilir.
+- Sonuçlar: Örnek projeler proje sayfaları gelene kadar (Faz 5) görünmez; onboarding bunu kullanıcıya açıkça söyler. Dashboard düzeni Faz 4'teki widget'larla birlikte görünür hale gelir. "İlk adımlar" kontrol listesi görevlerle birlikte Faz 4'te.
+- Uygulama ayrıntıları (Claude, §5.5): "Atla" sayısı tutulur; bir kez atlanan rehber yalnızca atlamadan sonra açılan bir oturumda ("sonraki giriş") bir kez daha önerilir, ikinci atlamadan sonra önerilmez. Yeniden başlatma Ayarlar · Profil'deki "Başlangıç rehberi" panelinden yapılır. Örnek projeler bir kez oluşturulur; rehber yeniden başlatılsa da tekrar oluşturulmaz.
+
+---
+
 ## 5. Faz kapanış kayıtları
 
 | Faz | Kapanış tarihi | Onaylayan | Not |
 |---|---|---|---|
 | Faz 1 — Analiz ve dokümantasyon | 2026-10-27 | Ürün sahibi ("Artık geliştirme aşamasına geçelim") | OQ-001..OQ-034 kapandı (D-030..D-063). Açık: yalnızca OQ-032 (yayına alma, ertelendi). |
 | Faz 2 — Proje altyapısı | 2026-10-28 | Ürün sahibi ("onaylıyorum") | `pnpm verify` 12/12 yeşil; sapmalar IMPLEMENTATION_PLAN Faz 2 Sonuç bölümünde. `feat/faz-2-altyapi` → `main`. |
+| Faz 3 — Kimlik, hesap, tercihler, onboarding | 2026-10-28 | Ürün sahibi ("Faz 3'ü kapatıp 4'e geçelim") | `pnpm verify` 13/13 yeşil. Onboarding ekranı (D-065) ürün sahibinin görsel incelemesine sunuldu; değişiklik istenirse Faz 4 içinde yapılır. `feat/faz-3-kimlik` → `main`. |

@@ -6,12 +6,30 @@ const ICONS = {
   'wifi-off': 20,
   plus: 18,
   inbox: 32,
+  moon: 24,
 } as const;
 
 export type IconName = keyof typeof ICONS;
 
-export function Icon({ name }: { name: IconName }) {
+/**
+ * `tone="primary"`: Figma'da ikon rengi `action/primary` değişkenine bağlıysa SVG dosyası maske olarak kullanılır;
+ * böylece açık ve koyu temada token rengini alır (dosya değiştirilmez).
+ */
+export function Icon({ name, tone }: { name: IconName; tone?: 'primary' }) {
   const size = ICONS[name];
+  if (tone === 'primary') {
+    return (
+      <span
+        aria-hidden="true"
+        className="shrink-0 bg-primary"
+        style={{
+          width: size,
+          height: size,
+          mask: `url(/icons/${name}.svg) center / contain no-repeat`,
+        }}
+      />
+    );
+  }
   return (
     <img
       src={`/icons/${name}.svg`}

@@ -22,6 +22,38 @@ Bu dosya, **ürün sahibinin kararını bekleyen** konuların tek kaynağıdır.
 | OQ-032 | Yayına alma (hosting, alan adı, e-posta sağlayıcı, hata izleme, yedekleme) | Yayın kararı (MVP sonrası) | Şimdi karar gerekmiyor | AÇIK (ertelendi) |
 
 
+### OQ-037 — Onboarding'in zamanlaması — KAPANDI (D-074: seçenek B)
+
+**Bağlam.** Plan onboarding'i Faz 3'e koyuyor (ONBOARDING §2–3). Ancak onboarding'in somut sonuçları sonraki fazlardaki özelliklere bağlı:
+- Adım 2 "örnek projeler" (Ev, İş, Sağlık…): proje sayfaları Faz 5'te geliyor; Faz 3'te oluşturulan projeler Faz 5'e kadar hiçbir yerde görünmez.
+- Amaca göre dashboard widget sırası: widget'lar Faz 4'te geliyor.
+- "İlk adımlar" kontrol listesi ve "60 saniyede ilk görev" hedefi: görevler Faz 4'te geliyor.
+- Figma'da onboarding ekranı yok (D-065: Claude kurar, onaya sunulur).
+
+| Seçenek | Sonuç |
+|---|---|
+| A. Onboarding'i Faz 5 sonuna taşı | Projeler, görevler ve widget'lar çalışırken kurulur; her adımın sonucu hemen görünür. Faz 3 onboarding olmadan kapanır. **Önerilen.** |
+| B. Faz 3'te tamamını kur | Yanıtlar ve örnek projeler kaydedilir ama Faz 4–5'e kadar görünmez; "çalışmayan özelliği çalışıyormuş gibi gösterme" talimatıyla çelişme riski. |
+| C. Faz 3'te adım 1 ve 3, örnek projeler Faz 5'te | Akış iki parçaya bölünür; daha önce onboarding'i bitirenlere Faz 5'te ek bir soru gerekir. |
+
+### OQ-036 — Kayıtta hesap varlığının gizlenmesi ile "hemen kullanım" arasındaki çelişki — KAPANDI (D-070)
+
+**Bağlam.** İki onaylı karar kayıt ekranında çelişiyor:
+- BR-ACC-001 / SECURITY §4.3: Kayıt, mevcut bir e-postada hesabın var olduğunu ifşa etmemeli.
+- D-040: Kullanıcı kayıttan hemen sonra uygulamayı kullanabilmeli (kayıt olur olmaz oturum açılır).
+
+Yeni e-postada kullanıcı hemen uygulamaya girer. Mevcut e-postada ise giremez (başkasının hesabına oturum açılamaz). Bu fark, ekrandaki mesaj ne olursa olsun, e-postanın kayıtlı olduğunu dolaylı olarak gösterir. Ayrıca D-062 ile "biri bu adresle kayıt olmaya çalıştı" e-postası MVP'den çıktı.
+
+**Şu anki uygulama (geçici):** Mevcut e-postada kayıt reddedilir ve şu mesaj gösterilir: "Bu e-posta adresiyle yeni hesap açılamıyor. Hesabın varsa giriş yap ya da şifreni sıfırla." Kayıt isteği saatte 5 ile sınırlı.
+
+| Seçenek | Sonuç |
+|---|---|
+| A. Mevcut davranış (genel mesaj + hız sınırı) | Yaygın yaklaşım; e-posta varlığı dolaylı olarak anlaşılabilir. Yerel, tek kullanıcılı ortamda pratik risk yok. |
+| B. Kayıttan sonra e-posta doğrulanmadan uygulamaya girilemez | Hesap varlığı tamamen gizlenir; D-040 değişir (kullanıcı önce e-postasını doğrular). |
+| C. A şimdi, yayına alma öncesi B veya D-062'deki bilgi e-postasıyla yeniden değerlendirme | Önerilen |
+
+**Öneri:** C. BR-ACC-001'in "hesap varlığını açıkça söylemez" ifadesi, yayına alma kararına kadar "dolaylı ifşa hız sınırıyla sınırlandırılır" olarak okunur.
+
 ### OQ-032 — Yayına alma (ertelendi)
 
 D-045 gereği şimdilik yalnızca yerel ortam kullanılıyor. Yayına alma kararı verildiğinde şu konular birlikte ele alınacak:
@@ -30,6 +62,8 @@ D-045 gereği şimdilik yalnızca yerel ortam kullanılıyor. Yayına alma karar
 - HTTPS ve güvenlik başlıkları.
 - Harici zamanlayıcı ihtiyacı (D-053 yerel çözümdür).
 - CI/CD (D-057).
+- Oturum token'larının veritabanında özetlenerek saklanması ve 90 günlük mutlak oturum sınırı (SECURITY §4.2 uygulama notları).
+- Kayıtta hesap varlığının dolaylı ifşası (D-070): e-posta doğrulanmadan girişi engelleme veya bilgi e-postası.
 - D-061 ile yayına ertelenen maddeler (genel hız sınırları, `legal_acceptances`, silinen hesap listesi) ve D-062 e-postaları.
 - LEGAL §9 kontrol listesi.
 
@@ -75,5 +109,7 @@ D-045 gereği şimdilik yalnızca yerel ortam kullanılıyor. Yayına alma karar
 | OQ-033 | Ek e-postalar | Kayıt denemesi bildirimi ve hesap silme onay e-postası MVP'de yok; yayına alma öncesi yeniden değerlendirilir. | D-062 |
 | OQ-034 | Ürün/UX ayrıntıları | Genel öneriler onaylandı; arayüz tasarımında tek kaynak Figma; eksik/belirsiz detayda önce ürün sahibine sorulur. | D-063 |
 | OQ-035 | Açık temada eksik iki Figma rengi | Claude temaya uygun belirledi: support-1 `#dfe3f6`, support-2 `#d6d6cf`. | D-066 |
+| OQ-036 | Kayıtta hesap varlığının gizlenmesi | Şimdilik genel mesaj + hız sınırı; kayıttan hemen sonra kullanım korunur; yayına alma öncesi yeniden değerlendirilir. | D-070 |
+| OQ-037 | Onboarding zamanlaması | Faz 3'te tamamıyla; örnek projeler Faz 5'te görünür hale gelir. | D-074 |
 
 Kapanan soruların değerlendirilen seçenekleri DECISIONS.md'deki ilgili kaydın "Alternatifler" alanında özetlenmiştir.

@@ -10,6 +10,7 @@ const steps = [
   ['Tip kontrolü', 'pnpm', ['typecheck']],
   ['Mimari kurallar', 'pnpm', ['arch']],
   ['İş kuralı izlenebilirliği', 'node', ['scripts/br-coverage.mjs']],
+  ['Yetki matrisi', 'node', ['scripts/route-matrix.mjs']],
   ['Birim testleri', 'pnpm', ['test']],
   ['Migration kontrolü', 'pnpm', ['db:check']],
   ['Entegrasyon testleri', 'pnpm', ['test:integration']],

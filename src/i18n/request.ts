@@ -1,16 +1,25 @@
 import { cookies, headers } from 'next/headers';
 import { getRequestConfig } from 'next-intl/server';
-import { LOCALE_COOKIE, isLocale, negotiateLocale } from './config';
+import { getCurrentUser } from '@/modules/identity';
+import { findUserLocale } from '@/modules/preferences';
+import { db } from '@/shared/db/client';
+import { LOCALE_COOKIE, isLocale, negotiateLocale, type Locale } from './config';
 
 /**
- * Dil seçimi: önce kullanıcının seçtiği dil (çerez; Faz 3'te kullanıcı tercihinden), yoksa tarayıcı dili.
+ * Dil seçimi: oturum açıksa kullanıcının dil tercihi (BR-PREF-002), değilse dil çerezi, o da yoksa tarayıcı dili.
  * URL'de dil öneki kullanılmaz.
  */
-export default getRequestConfig(async () => {
+async function resolveLocale(): Promise<Locale> {
+  const user = await getCurrentUser();
+  if (user) return findUserLocale(db(), user.id);
   const cookieLocale = (await cookies()).get(LOCALE_COOKIE)?.value;
-  const locale = isLocale(cookieLocale)
+  return isLocale(cookieLocale)
     ? cookieLocale
     : negotiateLocale((await headers()).get('accept-language'));
+}
+
+export default getRequestConfig(async () => {
+  const locale = await resolveLocale();
   return {
     locale,
     messages: (await import(`./messages/${locale}.json`)).default,

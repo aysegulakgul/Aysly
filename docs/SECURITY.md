@@ -1,6 +1,6 @@
 # Güvenlik, Gizlilik ve Kalite Standartları
 
-> Durum: v0.3 · Son güncelleme: 2026-10-27 · Uygulama durumu: Hiçbir kontrol henüz uygulanmadı.
+> Durum: v0.4 · Son güncelleme: 2026-10-28 · Uygulama durumu: Kimlik doğrulama, oturum çerezleri, hız sınırları, Origin kontrolü ve güvenlik başlıkları uygulandı (Faz 2–3, §4.2 notları); diğer kontroller ilgili fazlarda.
 > Çalışma ortamı şimdilik yalnızca yerel (D-045). "[MVP]" maddeleri yerelde de uygulanır; yalnızca yayında anlamlı olanlar "[YAYIN]" olarak işaretlidir (OQ-032).
 > Referans çerçeve: OWASP ASVS 4.x Seviye 2 (hedef), OWASP Top 10. Yasal ve gizlilik gereksinimleri: [LEGAL_AND_PRIVACY_REQUIREMENTS.md](LEGAL_AND_PRIVACY_REQUIREMENTS.md) (D-049).
 
@@ -41,6 +41,15 @@ Her madde **[MVP]** (lansman öncesi zorunlu) veya **[SONRA]** olarak işaretlid
 - Sunucu tarafı oturum, rastgele ≥ 128 bit token; veritabanında yalnızca hash'i.
 - Çerez: `HttpOnly; SameSite=Lax; Path=/`; `Secure` ve `__Host-` öneki [YAYIN]da zorunlu. Yerelde `http://localhost` kullanıldığı için bu iki ayar ortama göre yapılandırılır (ARCHITECTURE §12.3).
 - Süreler ve geçersiz kılma: BR-ACC-006. Girişte oturum kimliği yenilenir (session fixation önlemi).
+
+**Uygulama notları (Faz 3):**
+- Oturum çerezi `aysly.session_token`: HttpOnly, SameSite=Lax, 30 gün kayan süre (BR-ACC-006). Secure ve `__Host-` öneki yalnızca üretimde. E2E testiyle doğrulandı.
+- **Bilinen sapma:** Better Auth oturum token'ını veritabanında açık metin olarak saklar; §4.2 ise yalnızca özetinin saklanmasını öngörür. Çerezdeki değer imzalıdır; veritabanına erişen biri oturumları kullanabilir. Yerel, tek kullanıcılı ortamda kabul edilebilir; yayına alma öncesi ele alınacak (OQ-032 listesine eklendi).
+- **90 günlük mutlak oturum sınırı** Better Auth'ta yerleşik değil; şu an yalnızca 30 günlük kayan süre uygulanıyor. Yayına alma öncesi ele alınacak.
+- Origin kontrolü: Better Auth uç noktalarında kütüphanenin kendi kontrolü (`trustedOrigins`), kayıt uç noktasında `shared/http/origin.ts`.
+- Kayıt hız sınırında `X-Forwarded-For` başlığına güvenilmez; yerelde proxy olmadığından tüm istekler tek anahtarı paylaşır.
+- Oturum listesi (`GET /me/sessions`) yalnızca kimlik, tarih ve tarayıcı bilgisini döner; oturum token'ı hiçbir yanıtta yer almaz. Better Auth'un token döndüren oturum listeleme yolu ve doğrulama kurallarımızı atlayabilecek hesap yolları dışarıya kapalıdır (D-073).
+- Şifre değiştirme 5/saat, e-posta değiştirme 3/saat (kullanıcı başına); şifre değişince diğer tüm oturumlar her zaman kapanır (istemci bunu seçemez).
 
 ### 4.3. Hesap numaralandırmayı önleme
 - Giriş hatası genel mesaj; şifre sıfırlama her zaman aynı yanıt; kayıt, mevcut e-postada genel yanıt (mevcut sahibe bilgi e-postası MVP'de yok, D-062).

@@ -58,8 +58,25 @@ module.exports = {
       severity: 'error',
       comment:
         'Bir modül başka bir modüle yalnızca onun index.ts dosyası üzerinden erişir (ARCHITECTURE §4.2).',
-      from: { path: '^src/modules/([^/]+)/' },
+      from: {
+        path: '^src/modules/([^/]+)/',
+        pathNot: '^src/modules/[^/]+/infrastructure/schema\\.ts$',
+      },
       to: { path: '^src/modules/(?!$1/)[^/]+/(?!index\\.ts$)' },
+    },
+    {
+      name: 'schema-to-schema-only',
+      severity: 'error',
+      comment:
+        'İstisna yalnızca tablo tanımları arasındaki yabancı anahtarlar içindir: schema.ts başka bir modülün yalnızca schema.ts dosyasını içe aktarabilir.',
+      from: { path: '^src/modules/([^/]+)/infrastructure/schema\\.ts$' },
+      to: {
+        path: '^src/modules/(?!$1/)[^/]+/',
+        pathNot: [
+          '^src/modules/[^/]+/infrastructure/schema\\.ts$',
+          '^src/modules/[^/]+/index\\.ts$',
+        ],
+      },
     },
     {
       name: 'tests-not-imported',

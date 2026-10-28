@@ -3,10 +3,12 @@
  * Koyu: 4:69542 · Açık: 4:69560. Değer değiştirmek için önce Figma güncellenir.
  *
  * Açık temadaki palette/support-1 ve palette/support-2 Figma'da yoktu; değerler D-066 ile eklendi.
- * Tema seçimi (açık/koyu/sistem) Faz 3'te kullanıcı tercihiyle etkinleşir; o zamana kadar koyu tema kullanılır.
+ * Tema kullanıcı tercihidir (BR-PREF-001, varsayılan "system"): <html data-theme="light|dark|system">.
+ * "system" işletim sisteminin açık/koyu ayarını izler; açık değerler aşağıda iki kez yer alır, birlikte güncellenmelidir.
  */
 :root,
-[data-theme='dark'] {
+[data-theme='dark'],
+[data-theme='system'] {
   --bg-page: #111318;
   --surface: #181b22;
   --surface-muted: #1f232c;
@@ -43,4 +45,26 @@
   --support-1: #dfe3f6;
   --support-2: #d6d6cf;
   color-scheme: light;
+}
+
+@media (prefers-color-scheme: light) {
+  [data-theme='system'] {
+    --bg-page: #fafaf8;
+    --surface: #ffffff;
+    --surface-muted: #f2f2ee;
+    --border: #e3e3dd;
+    --text: #1c1e24;
+    --text-secondary: #5d6270;
+    --primary: #3346b8;
+    --on-primary: #ffffff;
+    --moonlight: #c98a1b;
+    --success: #1f7a4d;
+    --warning: #9a5b00;
+    --danger: #b42318;
+    --info: #2563a8;
+    /* Figma'da açık tema karşılığı olmayan iki değer; ürün sahibinin isteğiyle temaya uygun belirlendi (D-066). */
+    --support-1: #dfe3f6;
+    --support-2: #d6d6cf;
+    color-scheme: light;
+  }
 }

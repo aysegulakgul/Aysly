@@ -1,6 +1,7 @@
 # bağımlılıklar ve derleme çıktıları
 node_modules/
 .next/
+.next-e2e/
 out/
 dist/
 *.tsbuildinfo

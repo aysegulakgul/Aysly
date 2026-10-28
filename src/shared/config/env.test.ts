@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { parseEnv } from './env';
 
-const valid = { DATABASE_URL: 'postgres://u:p@127.0.0.1:5433/aysly' };
+const valid = {
+  DATABASE_URL: 'postgres://u:p@127.0.0.1:5433/aysly',
+  AUTH_SECRET: 'x'.repeat(32),
+};
 
 describe('ortam değişkenleri (ARCHITECTURE §12.2)', () => {
   it('geçerli değerleri varsayılanlarla tamamlar', () => {
@@ -27,5 +30,11 @@ describe('ortam değişkenleri (ARCHITECTURE §12.2)', () => {
 
   it('SCHEDULER_ENABLED=false ile zamanlayıcı kapatılabilir', () => {
     expect(parseEnv({ ...valid, SCHEDULER_ENABLED: 'false' }).SCHEDULER_ENABLED).toBe(false);
+  });
+});
+
+describe('AUTH_SECRET', () => {
+  it('32 karakterden kısa anahtarla başlamaz', () => {
+    expect(() => parseEnv({ ...valid, AUTH_SECRET: 'kisa' })).toThrow(/AUTH_SECRET/);
   });
 });

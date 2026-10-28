@@ -1,6 +1,6 @@
 # API Sözleşmeleri
 
-> Durum: v0.3 · Son güncelleme: 2026-10-27 · Uygulama durumu: Hiçbir uç nokta uygulanmadı.
+> Durum: v0.4 · Son güncelleme: 2026-10-28 · Uygulama durumu: Faz 3 — kayıt (§3), Better Auth kimlik uç noktaları (§3) ve `GET/PATCH /me/preferences` (§4) uygulandı; diğerleri ilgili fazlarda.
 > Yaklaşım: Sürümlü REST, JSON (D-013, ONAYLI — D-060). Bu belge, Zod şemaları yazıldıktan sonra şemalarla tutarlı tutulur; ileride OpenAPI belgesi şemalardan otomatik üretilir.
 
 ## 1. İçindekiler
@@ -105,7 +105,9 @@ Kimlik doğrulama kütüphanesi kendi uç noktalarını `/api/auth/*` altında s
 | POST | `/me/deletion` | Hesap silme talebi | `{ currentPassword }` | `202 { scheduledFor }` | BR-ACC-005 (D-036) | 3/gün |
 | DELETE | `/me/deletion` | Silme talebini iptal | — | `204` | BR-ACC-005 | — |
 
-Hesap varlığını ifşa etmeme: `sign-up` mevcut e-postada da kullanıcıya genel bir yanıt verir ve hesap varlığını ifşa etmez (SECURITY §4.3). Mevcut hesap sahibine bilgi e-postası MVP'de gönderilmez; yayına alma öncesi yeniden değerlendirilir (D-062). Geliştirme ortamında tüm e-postalar yerel yakalayıcıda kalır (D-037, D-045).
+**Uygulanan yollar (Faz 3, D-067):** Kayıt `POST /api/v1/auth/sign-up` (gövde: `{ name, email, password, timezone? }`; dil, çerezden veya tarayıcı dilinden). Giriş, çıkış, sıfırlama ve doğrulama Better Auth uç noktalarıdır: `POST /api/auth/sign-in/email`, `POST /api/auth/sign-out`, `GET /api/auth/get-session`, `POST /api/auth/request-password-reset`, `GET /api/auth/reset-password/:token`, `POST /api/auth/reset-password`, `GET /api/auth/verify-email`, `POST /api/auth/send-verification-email`. Profil, şifre, e-posta ve oturum işlemleri yukarıdaki tablodaki kendi `/api/v1/me*` uç noktalarımızdır (uygulandı: `PATCH /me`, `POST /me/password`, `POST /me/email`, `GET /me/sessions`, `DELETE /me/sessions?others=true`, `DELETE /me/sessions/{id}`; D-073). Better Auth'un kayıt, kullanıcı güncelleme, şifre değiştirme, şifre doğrulama, e-posta değiştirme, oturum listeleme/kapatma ve kullanıcı silme yolları dışarıya kapalıdır (404). Yanlış mevcut şifre `400 VALIDATION_FAILED` (`field: currentPassword, reason: incorrect`); doğrulanmamış hesapta e-posta değiştirme `422` (`rule: BR-ACC-004`). Hata gövdeleri Better Auth biçimindedir (`{ code, message }`); kendi uç noktalarımız §2.4 biçimini kullanır.
+
+Hesap varlığını ifşa etmeme: `sign-up` mevcut e-postada da kullanıcıya genel bir yanıt verir ve hesap varlığını ifşa etmez (SECURITY §4.3). Mevcut hesap sahibine bilgi e-postası MVP'de gönderilmez; yayına alma öncesi yeniden değerlendirilir (D-062). Mevcut e-postada genel mesaj verilir; dolaylı ifşa hız sınırıyla sınırlandırılır (D-070). Geliştirme ortamında tüm e-postalar yerel yakalayıcıda kalır (D-037, D-045).
 
 ## 4. Çalışma alanı ve tercihler
 
@@ -115,9 +117,12 @@ Hesap varlığını ifşa etmeme: `sign-up` mevcut e-postada da kullanıcıya ge
 | GET | `/workspaces/{ws}` | Alan bilgisi + aktörün rolü | 404 kuralı |
 | PATCH | `/workspaces/{ws}` | Ad değiştirme | `workspace.update` |
 | GET | `/me/preferences` | Tercihler | |
-| PATCH | `/me/preferences` | Kısmi güncelleme | `version` zorunlu; JSON alanları Zod şemalı; geçersiz saat dilimi → 400 |
+| PATCH | `/me/preferences` | Kısmi güncelleme | `version` zorunlu; JSON alanları Zod şemalı; geçersiz saat dilimi → 400. **Uygulandı (Faz 3):** alanlar `locale, timezone, theme, density, dateFormat, timeFormat, weekStart`; diğer alanlar ilgili fazlarda eklenir. Yanıt `{ data: { …tercihler, version } }`; `locale` değişince `aysly_locale` çerezi de güncellenir. |
 | POST | `/me/onboarding` | Onboarding yanıtı | `{ intents: ('personal'|'work')[], createSamples: boolean }` → başlangıç projeleri (ONBOARDING §3) |
-| POST | `/me/onboarding/skip` | Atla | |
+| POST | `/me/onboarding/skip` | Atla | Atlama sayısını artırır (ONBOARDING §2) |
+| POST | `/me/onboarding/restart` | Ayarlar'dan yeniden başlatma | Örnek projeler yeniden oluşturulmaz (D-074) |
+
+**Uygulandı (Faz 3):** `POST /me/onboarding` (`intents` boş olabilir: varsayılan düzen), `/skip`, `/restart`; yanıt `{ data: onboardingDurumu }`.
 
 Üye yönetimi uç noktaları (`/workspaces/{ws}/members`, `/invitations`) Faz 10'da tanımlanacak.
 

@@ -1,6 +1,6 @@
 # Veri Modeli
 
-> Durum: v0.3 · Son güncelleme: 2026-10-27 · Uygulama durumu: Şema oluşturulmadı, migration yok.
+> Durum: v0.4 · Son güncelleme: 2026-10-28 · Uygulama durumu: Migration 0000–0002 uygulandı (§7.1); diğer tablolar ilgili fazlarda.
 > PostgreSQL + Drizzle ONAYLI (D-044); Docker Desktop üzerinde yerel (D-056). Alan ayrıntıları ve sınırlar D-060 ile onaylı; D-061 sadeleştirmeleri uygulanmıştır.
 > Veritabanı: PostgreSQL 16+ (ONAYLI, D-044). Bu belgedeki alanlar **hedef şemadır**; açık sorulara bağlı alanlar işaretlenmiştir.
 
@@ -122,7 +122,7 @@ Kısıt: Her aktif alanda en az bir `owner` (uygulama kuralı + test; Faz 10).
 | all_day_reminder_time | time | Z | `09:00` | BR-REM-001 |
 | dashboard_layout | jsonb | Z | varsayılan liste | BR-DASH-001; Zod şemalı, `{v:1, widgets:[{id, visible}]}` |
 | notification_settings | jsonb | Z | varsayılan | BR-NOTIF-004; MVP: `{v:1, reminder:{inApp:true}}` — yalnızca uygulama içi (D-037). E-posta kanalı ve günlük özet eklenirse şema `v:2` olur. |
-| onboarding | jsonb | Z | `{}` | `{v:1, intents:[], completedAt, skippedAt, checklist:{...}}` |
+| onboarding | jsonb | Z | `{v:1}` | `{v:1, status:'pending'|'completed', intents:[], skips, lastSkippedAt?, completedAt?, samplesCreated}` (Zod şeması: `preferences/domain/onboarding.ts`; eksik alanlar varsayılanla okunur). "İlk adımlar" kontrol listesi Faz 4'te eklenir. |
 | version | int | Z | 1 | |
 | updated_at | timestamptz | Z | | |
 
@@ -141,7 +141,7 @@ JSONB alanları her zaman sürümlü bir Zod şemasıyla okunur/yazılır; okuna
 | icon | text | İ | İzinli simge adı |
 | status | text | Z | `active/on_hold/completed` (BR-PROJ-002) |
 | position | text | Z | Kenar çubuğu sıralaması (fractional index) |
-| created_by | uuid | Z | FK → users |
+| created_by | uuid | İ | FK → users, `ON DELETE SET NULL` (D-068) |
 | archived_at, deleted_at | timestamptz | İ | |
 | deleted_batch_id | uuid | İ | |
 | version | int | Z | |
@@ -325,8 +325,10 @@ Ayrıntı: ARCHITECTURE §12.4. Ek kurallar:
 | No | Dosya | İçerik | Faz |
 |---|---|---|---|
 | 0000 | `drizzle/0000_extensions.sql` | `unaccent`, `pg_trgm` uzantıları | 2 |
+| 0001 | `drizzle/0001_identity_workspaces.sql` | `users`, `auth_sessions`, `auth_accounts`, `auth_verifications`, `auth_rate_limits`, `workspaces`, `workspace_memberships`, `projects`, `user_preferences`, `audit_events` | 3 |
+| 0002 | `drizzle/0002_projects_created_by_set_null.sql` | `projects.created_by` isteğe bağlı, kullanıcı silinince boşalır (D-068) | 3 |
 
-Faz 3'ün ilk migration'ı: `users` ve kimlik doğrulama tabloları, `workspaces`, `workspace_memberships`, `user_preferences`, `idempotency_keys`, `audit_events`.
+Notlar: `idempotency_keys` ilk oluşturma uç noktalarıyla birlikte Faz 4'te eklenecek. Kimlik tablolarının alan adları Better Auth'un beklediği adlardır (`users.email_verified` boolean; DATA_MODEL §3.1'deki `email_verified_at` yerine). Hız sınırı sayaçları `auth_rate_limits` tablosunda tutulur.
 ## 8. Başlangıç ve test verileri
 - **Sistem verisi:** Yok (roller kodda sabit, D-014). Inbox projesi kullanıcı kaydında oluşturulur.
 - **Onboarding örnek verisi:** Kullanıcının seçimine göre (ONBOARDING §3) oluşturulur, `onboarding_sample` etiketiyle değil, normal kayıt olarak; kullanıcı silebilir. Örnek içerik oluşturma isteğe bağlıdır (onboarding: Figma tasarımı esas, D-063).

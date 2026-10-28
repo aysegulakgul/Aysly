@@ -3,21 +3,228 @@
     "name": "Aysly",
     "tagline": "Manage order, not to-dos."
   },
-  "foundation": {
-    "title": "Aysly is under construction",
-    "description": "The foundation is ready. Sign-in, tasks and other screens will be added in the next phases; nothing on this page works yet."
-  },
   "errors": {
     "validation": "Some fields are invalid.",
     "notFound": "The page you're looking for doesn't exist or you don't have access.",
     "forbidden": "You don't have permission for this action.",
     "versionConflict": "This record was changed somewhere else.",
-    "internal": "Something unexpected happened. Try again; if it persists, share this code with us."
+    "internal": "Something unexpected happened. Try again; if it persists, share this code with us.",
+    "rateLimited": "Too many attempts. Please try again in a moment.",
+    "unauthenticated": "Your session has ended. Please sign in again."
   },
-  "rules": {},
+  "rules": {
+    "BR-ACC-001": "A new account can't be created with this email. If you have an account, sign in or reset your password.",
+    "BR-ACC-004": "Verify your email address first."
+  },
   "ui": {
     "offline": "No connection. Your changes may not be saved.",
     "undo": "Undo",
     "loading": "Loading"
+  },
+  "email": {
+    "verify": {
+      "subject": "Aysly: verify your email address",
+      "body": "Hi {name},\n\nOpen this link to verify your email address (valid for 24 hours):\n{url}\n\nIf you didn't request this, you can ignore this email."
+    },
+    "reset": {
+      "subject": "Aysly: reset your password",
+      "body": "Hi {name},\n\nOpen this link to reset your password (valid for 30 minutes, single use):\n{url}\n\nIf you didn't request this, you can ignore this email; your password won't change."
+    },
+    "passwordChanged": {
+      "subject": "Aysly: your password was changed",
+      "body": "Hi {name},\n\nThe password for your Aysly account was just changed and your sessions on other devices were signed out.\n\nIf you didn't make this change, reset your password right away with \"Forgot password\"."
+    }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Sign in",
+      "submit": "Sign in",
+      "forgot": "Forgot password",
+      "noAccount": "Don't have an account?",
+      "toSignUp": "Sign up",
+      "invalid": "Incorrect email or password."
+    },
+    "signUp": {
+      "title": "Create account",
+      "submit": "Sign up",
+      "hasAccount": "Already have an account?",
+      "toSignIn": "Sign in",
+      "passwordHint": "At least 10 characters."
+    },
+    "forgot": {
+      "title": "Forgot password",
+      "description": "Enter your email address and we'll send you a link to reset your password.",
+      "submit": "Send link",
+      "sent": "If your email is registered, we've sent a password reset link. Check your inbox.",
+      "back": "Back to sign in"
+    },
+    "reset": {
+      "title": "Set a new password",
+      "submit": "Change password",
+      "done": "Your password was changed and you were signed out on all devices. You can now sign in with your new password.",
+      "invalidLink": "This link is invalid or has expired. Request a new one.",
+      "requestNew": "Request a new link"
+    },
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "newPassword": "New password"
+    },
+    "reasons": {
+      "required": "This field is required.",
+      "invalid": "Enter a valid email address.",
+      "too_short": "Password must be at least 10 characters.",
+      "too_long": "This field is too long.",
+      "too_common": "This password is too common; choose another one.",
+      "incorrect": "Current password is incorrect.",
+      "same": "This is already your email address."
+    },
+    "network": "Could not connect. Check your internet connection and try again."
+  },
+  "shell": {
+    "mainNav": "Main menu",
+    "bottomNav": "Bottom menu",
+    "today": "Today",
+    "settings": "Settings",
+    "menu": "Menu",
+    "personal": "Personal",
+    "personalSpace": "Your personal space",
+    "signOut": "Sign out",
+    "menuFooter": "Only yours. Everything in one place."
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Good morning, {name}",
+      "day": "Good afternoon, {name}",
+      "evening": "Good evening, {name}",
+      "night": "Good night, {name}"
+    },
+    "subtitle": "Make some calm space for yourself.",
+    "emptyTitle": "Your day will take shape here",
+    "emptyDescription": "Adding tasks, the Inbox and the daily plan arrive in the next phase. For now you can adjust your appearance, language and time zone in settings.",
+    "toSettings": "Go to settings"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Tune Aysly to your own rhythm.",
+    "categories": "Settings categories",
+    "appearance": "Appearance",
+    "dateTime": "Date and time",
+    "saved": "Your preferences were saved.",
+    "saveFailed": "Your preference couldn’t be saved. Try again.",
+    "conflict": "Your preferences were changed elsewhere; showing the latest version.",
+    "theme": {
+      "title": "Theme",
+      "description": "Choose the look that feels most comfortable.",
+      "dark": "Dark",
+      "light": "Light",
+      "system": "System",
+      "preview": "Today\n\n○ Home page design\n○ Grocery shopping"
+    },
+    "density": {
+      "title": "Density",
+      "comfortable": "Comfortable",
+      "compact": "Compact",
+      "hint": "Comfortable: 44 px rows. Compact: 32 px on desktop. On mobile, touch targets stay at least 44 px."
+    },
+    "language": {
+      "title": "Language",
+      "label": "App language",
+      "hint": "Supported languages: Türkçe, English."
+    },
+    "timezone": {
+      "title": "Time zone",
+      "label": "Time zone",
+      "hint": "“Today” and all-day reminders are calculated in this time zone."
+    },
+    "formats": {
+      "title": "Formats",
+      "dateFormat": "Date format",
+      "timeFormat": "Time format",
+      "h24": "24-hour",
+      "h12": "12-hour",
+      "weekStart": "Week starts on",
+      "hint": "Formats only change how things look; your saved data stays the same."
+    },
+    "weekdays": {
+      "0": "Sunday",
+      "1": "Monday",
+      "6": "Saturday"
+    },
+    "profile": "Profile",
+    "security": "Security",
+    "profileForm": {
+      "title": "Profile",
+      "name": "Name",
+      "save": "Save",
+      "saved": "Your name was saved."
+    },
+    "email": {
+      "title": "Email",
+      "label": "Your email address",
+      "verified": "Verified",
+      "unverified": "Not verified",
+      "unverifiedHint": "Open the link in your inbox to verify your address.",
+      "resend": "Resend verification email",
+      "resent": "We sent a verification link. Check your inbox.",
+      "changeTitle": "Change email address",
+      "newEmail": "New email",
+      "currentPassword": "Current password",
+      "submit": "Send verification link",
+      "sent": "We sent a verification link to your new address. Your current address stays active until you open it.",
+      "needsVerification": "Verify your current address before changing it.",
+      "changed": "Your email address was verified."
+    },
+    "password": {
+      "title": "Password",
+      "current": "Current password",
+      "new": "New password",
+      "hint": "At least 10 characters.",
+      "submit": "Change password",
+      "done": "Your password changed. Sessions on your other devices were signed out."
+    },
+    "sessions": {
+      "title": "Sessions",
+      "description": "Devices where your account is signed in.",
+      "thisDevice": "This device",
+      "lastSeen": "Last active: {date}",
+      "revoke": "Sign out session",
+      "revokeOthers": "Sign out all other sessions",
+      "onlyThis": "You have no open sessions on other devices.",
+      "unknownDevice": "Unknown device",
+      "failed": "The session couldn’t be signed out. Try again."
+    },
+    "onboardingTitle": "Getting started guide",
+    "onboardingDescription": "Restart the guide to choose your purpose and starting layout again.",
+    "onboardingRestart": "Restart guide"
+  },
+  "onboarding": {
+    "title": "Welcome to Aysly",
+    "step": "Step {current}/{total}",
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Continue",
+    "finish": "Finish",
+    "failed": "Couldn’t save. Try again.",
+    "intents": {
+      "title": "What will you use Aysly for?",
+      "description": "You can choose more than one. Your choice only sets the starting layout; you can change everything later.",
+      "personal": "My personal life",
+      "work": "My work and projects"
+    },
+    "samples": {
+      "title": "Create sample projects?",
+      "description": "Empty projects are created to help you start; no tasks are added. You can delete them anytime.",
+      "list": "Projects to create: {names}",
+      "none": "You didn’t choose a purpose, so no sample projects will be created.",
+      "yes": "Yes, create them",
+      "no": "No, start empty",
+      "notice": "The projects page arrives in a later phase; your projects will appear there."
+    },
+    "prefs": {
+      "title": "Your basic preferences",
+      "description": "Taken from your browser. Change them if needed; you can also edit them later in Settings."
+    }
   }
 }

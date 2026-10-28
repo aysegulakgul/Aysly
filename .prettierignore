@@ -1,5 +1,6 @@
 node_modules
 .next
+.next-e2e
 pnpm-lock.yaml
 drizzle/meta
 playwright-report
