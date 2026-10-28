@@ -10,11 +10,14 @@
     "versionConflict": "This record was changed somewhere else.",
     "internal": "Something unexpected happened. Try again; if it persists, share this code with us.",
     "rateLimited": "Too many attempts. Please try again in a moment.",
-    "unauthenticated": "Your session has ended. Please sign in again."
+    "unauthenticated": "Your session has ended. Please sign in again.",
+    "idempotencyReused": "This request key was already used for a different request."
   },
   "rules": {
     "BR-ACC-001": "A new account can't be created with this email. If you have an account, sign in or reset your password.",
-    "BR-ACC-004": "Verify your email address first."
+    "BR-ACC-004": "Verify your email address first.",
+    "BR-PROJ-004": "Tasks can’t be added to an archived project. Unarchive the project first.",
+    "BR-DEL-002": "Archived items are read-only. Unarchive to change them."
   },
   "ui": {
     "offline": "No connection. Your changes may not be saved.",
@@ -78,7 +81,9 @@
       "too_long": "This field is too long.",
       "too_common": "This password is too common; choose another one.",
       "incorrect": "Current password is incorrect.",
-      "same": "This is already your email address."
+      "same": "This is already your email address.",
+      "after_due_date": "Start date can’t be after the due date.",
+      "use_complete_or_reopen": "Use complete or reopen to change this."
     },
     "network": "Could not connect. Check your internet connection and try again."
   },

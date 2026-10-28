@@ -83,6 +83,59 @@
       "path": "/api/v1/me/onboarding/restart",
       "access": "self",
       "body": {}
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/[ws]/tasks",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tasks"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/tasks",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tasks",
+      "body": {
+        "title": "x"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/[ws]/tasks/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tasks/01900000-0000-7000-8000-000000000002"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/workspaces/[ws]/tasks/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tasks/01900000-0000-7000-8000-000000000002",
+      "body": {
+        "version": 1
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/tasks/[id]/complete",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tasks/01900000-0000-7000-8000-000000000002/complete",
+      "body": {
+        "version": 1
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/tasks/[id]/reopen",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tasks/01900000-0000-7000-8000-000000000002/reopen",
+      "body": {
+        "version": 1
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces",
+      "access": "self"
     }
   ]
 }

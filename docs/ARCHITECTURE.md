@@ -97,7 +97,7 @@ Bu tablodaki paketler onaylıdır ama **baştan kurulmaz**. Her paket, onu gerek
 
 | İhtiyaç | Önerilen | Not |
 |---|---|---|
-| Tarih/saat dilimi | `date-fns` + `@date-fns/tz` | Tüm dönüşümler `shared/time` modülünde; doğrudan `new Date()` aritmetiği yasak |
+| Tarih/saat dilimi | Yerleşik `Intl` API (Faz 4, D-076; `date-fns` gerekmedi) | Yerel saat ↔ mutlak an dönüşümü ve yaz saati kuralları `modules/tasks/domain/due.ts` içinde, testli (BR-DATE-001/006); domain'de `new Date()` ile şimdiki zaman alınmaz (Clock) |
 | Tekrar kuralları | `rrule`, `modules/tasks/domain/recurrence` arkasında | Saf fonksiyonla sarılır, kendi testleri |
 | Sıralama anahtarı | `fractional-indexing` | BR-TASK-006 |
 | i18n | `next-intl` | D-038 |

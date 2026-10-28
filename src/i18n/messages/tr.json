@@ -10,11 +10,14 @@
     "versionConflict": "Bu kayıt başka bir yerde değiştirildi.",
     "internal": "Beklenmeyen bir sorun oluştu. Tekrar dene; sorun sürerse bize şu kodu ilet.",
     "rateLimited": "Çok fazla deneme yaptın. Lütfen biraz sonra tekrar dene.",
-    "unauthenticated": "Oturumun sona erdi. Lütfen yeniden giriş yap."
+    "unauthenticated": "Oturumun sona erdi. Lütfen yeniden giriş yap.",
+    "idempotencyReused": "Bu istek anahtarı farklı bir istekle zaten kullanıldı."
   },
   "rules": {
     "BR-ACC-001": "Bu e-posta adresiyle yeni hesap açılamıyor. Hesabın varsa giriş yap ya da şifreni sıfırla.",
-    "BR-ACC-004": "Önce e-posta adresini doğrula."
+    "BR-ACC-004": "Önce e-posta adresini doğrula.",
+    "BR-PROJ-004": "Arşivlenmiş projeye görev eklenemez. Önce projeyi arşivden çıkar.",
+    "BR-DEL-002": "Arşivdeki kayıt salt okunurdur. Değiştirmek için önce arşivden çıkar."
   },
   "ui": {
     "offline": "Bağlantı yok. Değişikliklerin kaydedilemeyebilir.",
@@ -78,7 +81,9 @@
       "too_long": "Bu alan çok uzun.",
       "too_common": "Bu şifre çok yaygın; başka bir şifre seç.",
       "incorrect": "Mevcut şifre yanlış.",
-      "same": "Bu zaten kullandığın e-posta adresi."
+      "same": "Bu zaten kullandığın e-posta adresi.",
+      "after_due_date": "Başlangıç tarihi son tarihten sonra olamaz.",
+      "use_complete_or_reopen": "Tamamlamak veya yeniden açmak için ilgili işlemi kullan."
     },
     "network": "Bağlantı kurulamadı. İnternet bağlantını kontrol edip tekrar dene."
   },

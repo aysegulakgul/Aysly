@@ -4,6 +4,7 @@ import { createMemoryEmailSender, type EmailSender } from '@/shared/email/email-
 import { createSmtpEmailSender } from '@/shared/email/smtp-email-sender';
 import { createPgAdvisoryLock } from '@/shared/jobs/pg-advisory-lock';
 import { createInProcessScheduler, type Scheduler } from '@/shared/jobs/scheduler';
+import { idempotencyCleanupJob } from '@/shared/http/idempotency';
 import { logger } from '@/shared/observability/logger';
 
 /**
@@ -28,10 +29,13 @@ export function getEmailSender(): EmailSender {
 
 let scheduler: Scheduler | undefined;
 /**
- * Bakım işleri (D-053). Faz 2'de kayıtlı iş yoktur; çöp temizliği Faz 4'te, hesap silme Faz 8'de,
- * bildirim ve idempotency temizliği ilgili fazlarda buraya kaydedilir.
+ * Bakım işleri (D-053). Kayıtlı: idempotency temizliği (D-019). Çöp temizliği Faz 4'ün 4. bölümünde,
+ * hesap silme Faz 8'de, bildirim temizliği Faz 6'da buraya kaydedilir.
  */
 export function getScheduler(): Scheduler {
-  scheduler ??= createInProcessScheduler(createPgAdvisoryLock(sqlClientInstance()), logger());
+  if (!scheduler) {
+    scheduler = createInProcessScheduler(createPgAdvisoryLock(sqlClientInstance()), logger());
+    scheduler.register(idempotencyCleanupJob());
+  }
   return scheduler;
 }

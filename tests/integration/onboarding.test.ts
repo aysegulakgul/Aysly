@@ -73,8 +73,8 @@ describe('onboarding (veritabanı)', () => {
     });
     expect(await projectsOf(userId)).toEqual([
       { name: 'Inbox', kind: 'inbox', position: 'a0', description: null },
-      { name: 'Ev', kind: 'standard', position: 'a0001', description: null },
-      { name: 'İş', kind: 'standard', position: 'a0002', description: null },
+      { name: 'Ev', kind: 'standard', position: 'a1', description: null },
+      { name: 'İş', kind: 'standard', position: 'a2', description: null },
     ]);
     expect(await projectsOf(other)).toHaveLength(1); // başka kullanıcı etkilenmez
 

@@ -354,6 +354,14 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Bağlam: Faz 3 kapanışında tarayıcı testleri aralıklı olarak toplu başarısız oldu. Geliştirme modunda sayfa saniyede bir yeniden yükleniyor, formlar JavaScript bağlanmadan gönderiliyordu. Proje OneDrive klasöründe olduğundan dosya izleyicisinin tetiklenmesi muhtemel neden; kesin tetikleyici bulunamadı.
 - Karar: Playwright uygulamanın üretim derlemesini başlatır (anlık yeniden yükleme yok; testler 2,7 dakikadan yaklaşık 1 dakikaya indi). `useSecureCookies` artık `NODE_ENV` yerine uygulama adresinin HTTPS olmasına bağlı; yayında adres HTTPS olacağından davranış değişmez. `/dev/ui` erişilebilirlik testi "üretimde kapalı" testiyle değiştirildi.
 
+### D-076 — Görev tablosu ve idempotency uygulama ayrıntıları (teknik)
+- Durum: ONAYLI (teknik, CLAUDE.md §5.5) · Tarih: 2026-10-28 · Karar veren: Claude
+- Kolonlar: Tekrar kolonları (Faz 6) ve arama vektörü (Faz 7) ilgili fazların migration'larıyla eklenir (CLAUDE.md §2.11: kullanılmayan kolon yok). `tasks.created_by`/`completed_by` isteğe bağlı ve `ON DELETE SET NULL` (D-068 ile aynı gerekçe).
+- Idempotency (D-019): Anahtar satırı görevle aynı veritabanı işleminde yazılır. Aynı anahtarlı eşzamanlı ikinci istek birincinin bitmesini birincil anahtar kilidinde bekler ve kaydedilmiş yanıtı döner. 2xx olmayan yanıtlar saklanmaz (işlem geri alınır). Başlık zorunludur. Temizlik işi saatlik (D-053).
+- Yetkilendirme: `WorkspaceScope` yalnızca üyelik çözümleyicisiyle üretilir; `authorize(scope, izin)` her use case'te çağrılır; MVP'de `owner` tüm izinlere sahiptir (ROLES_AND_PERMISSIONS §6.1, tablo tabanlı test).
+- Tarih/saat: ARCHITECTURE §3'teki `date-fns` + `@date-fns/tz` yerine yerleşik `Intl` API kullanıldı; yeni paket gerekmedi, yaz saati kuralları (BR-DATE-006) testlerle doğrulandı. İleride tarih aritmetiği karmaşıklaşırsa (takvim, tekrar) paket önerisi yeniden değerlendirilir.
+- Sıralama: `fractional-indexing` paketi eklendi (ARCHITECTURE §3 teknoloji tablosunda onaylı, D-058). Onboarding örnek projelerinin konumları da bu paketle üretilir.
+
 ---
 
 ## 5. Faz kapanış kayıtları

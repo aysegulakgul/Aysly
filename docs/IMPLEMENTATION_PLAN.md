@@ -10,7 +10,7 @@
 | 1 | Ürün analizi, mimari kararlar, dokümantasyon | **Kapandı** | — | 2026-10-27 | 2026-10-27 |
 | 2 | Proje altyapısı ve temel mimari | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
 | 3 | Kimlik doğrulama, hesap, tercihler, onboarding | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
-| 4 | Görev yönetimi, Inbox, My Tasks, dashboard | **Devam ediyor** — planlama | — | 2026-10-28 | — |
+| 4 | Görev yönetimi, Inbox, My Tasks, dashboard | **Devam ediyor** — 1. bölüm (veri modeli, görev çekirdeği) tamam | — | 2026-10-28 | — |
 | 5 | Projeler ve görev görünümleri | Başlamadı | — | — | — |
 | 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | Başlamadı | — | — | — |
 | 7 | Notlar, hedefler, arama | Başlamadı | Not editörü paketi seçimi (Faz 7 başında sunulur) | — | — |
@@ -100,6 +100,10 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
 - **Bağımlılık:** Faz 3.
 - **Kapsam:** FR-TASK-01..09, FR-INBOX-01..03, FR-DASH-01..05 (+ 06..08 P1), etiketler, alt görevler (D-032), durumlar (D-041), görev arşivi (salt okunur, D-043) / çöp / geri yükleme, 30 günlük çöp temizliği (D-035), tarih modeli (BR-DATE-001..005; DST testleri), idempotency, eşzamanlılık, hızlı ekleme, görev detay paneli, temel klavye kısayolları, "İlk adımlar" listesi. Faz sonunda TanStack Query ihtiyacı değerlendirilir (ARCHITECTURE §3.7); gerekiyorsa gerekçeyle onaya sunulur.
 - **Kabul:** AC-01, AC-02, AC-03, AC-07, AC-09 E2E'de geçer; ilgili BR testleri tam; 1.000 görevli seed ile liste p95 < 300 ms (yerel ölçüm).
+
+- **İlerleme (2026-10-28):**
+  - **1. bölüm (tamam):** Migration 0003 (`tasks`, `idempotency_keys`); `WorkspaceScope` + `authorize`; görev oluşturma, okuma, güncelleme, tamamlama, yeniden açma, liste; tarih modeli ve yaz saati (BR-DATE-001/002/006); sürüm çakışması (BR-TASK-010); idempotency (BR-TASK-007) ve temizlik işi; `GET /workspaces`.
+  - **Sıradaki:** 2) Inbox ve hızlı ekleme ekranı; 3) Görevlerim ve görev detayı, alt görevler, etiketler; 4) arşiv, çöp, toplu işlemler; 5) Bugün ekranı bölümleri, Yaklaşanlar, İlk adımlar, kısayollar; 6) performans ölçümü.
 
 ### Faz 5 — Projeler ve görev görünümleri
 - **Bağımlılık:** Faz 4.

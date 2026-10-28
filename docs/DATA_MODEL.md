@@ -195,6 +195,8 @@ CHECK (due_time IS NULL OR (due_date IS NOT NULL AND timezone IS NOT NULL AND du
 CHECK (recurrence_rule IS NULL OR (due_date IS NOT NULL AND parent_task_id IS NULL))
 CHECK (parent_task_id IS NULL OR parent_task_id <> id)
 ```
+**Uygulama notu (Faz 4, D-076):** `recurrence_*` kolonları Faz 6'da, `search_vector` ve arama indeksleri Faz 7'de eklenir. `created_by` ve `completed_by` isteğe bağlıdır ve kullanıcı silinince boşalır (D-068 ile aynı ilke). Bileşik yabancı anahtarlar: `(workspace_id, project_id)` → projects, `(workspace_id, parent_task_id)` → tasks.
+
 Tek seviye alt görev (BR-SUB-001) ve ebeveynle aynı proje (BR-SUB-002) uygulama katmanında zorunludur ve testlerle korunur; veritabanı trigger'ı kullanılmaz (D-061).
 
 İndeksler (hepsi `WHERE deleted_at IS NULL` kısmi):
@@ -327,6 +329,7 @@ Ayrıntı: ARCHITECTURE §12.4. Ek kurallar:
 | 0000 | `drizzle/0000_extensions.sql` | `unaccent`, `pg_trgm` uzantıları | 2 |
 | 0001 | `drizzle/0001_identity_workspaces.sql` | `users`, `auth_sessions`, `auth_accounts`, `auth_verifications`, `auth_rate_limits`, `workspaces`, `workspace_memberships`, `projects`, `user_preferences`, `audit_events` | 3 |
 | 0002 | `drizzle/0002_projects_created_by_set_null.sql` | `projects.created_by` isteğe bağlı, kullanıcı silinince boşalır (D-068) | 3 |
+| 0003 | `drizzle/0003_tasks_idempotency.sql` | `tasks` (tekrar ve arama kolonları hariç; D-076), `idempotency_keys` | 4 |
 
 Notlar: `idempotency_keys` ilk oluşturma uç noktalarıyla birlikte Faz 4'te eklenecek. Kimlik tablolarının alan adları Better Auth'un beklediği adlardır (`users.email_verified` boolean; DATA_MODEL §3.1'deki `email_verified_at` yerine). Hız sınırı sayaçları `auth_rate_limits` tablosunda tutulur.
 ## 8. Başlangıç ve test verileri

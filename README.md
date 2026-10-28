@@ -8,11 +8,11 @@ Aysly; görevleri, projeleri, günlük planı, notları ve hedefleri tek, sakin 
 
 | | |
 |---|---|
-| Mevcut faz | **Faz 4 — Görevler, Inbox, My Tasks, dashboard** (planlanıyor) |
+| Mevcut faz | **Faz 4 — Görevler, Inbox, My Tasks, dashboard** (devam ediyor) |
 | Uygulama kodu | Altyapı ve temel bileşenler var; kullanıcıya açık özellik henüz yok |
 | Çalışma ortamı | Yalnızca yerel bilgisayar; hosting ve ücretli servis yok |
 | Teknoloji | Next.js, TypeScript, PostgreSQL, Drizzle, Better Auth |
-| Sonraki adım | Faz 4 planının onayı |
+| Sonraki adım | Faz 4, 2. bölüm: Inbox ve hızlı ekleme |
 
 Ayrıntılı durum: [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 

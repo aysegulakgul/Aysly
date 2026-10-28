@@ -172,6 +172,8 @@ Hesap varlığını ifşa etmeme: `sign-up` mevcut e-postada da kullanıcıya ge
 | DELETE | `/workspaces/{ws}/tasks/{id}?scope=this|series` | Çöpe at | `task.delete` | BR-DEL-*, BR-SUB-004, BR-REC-006 |
 | POST | `/workspaces/{ws}/tasks/bulk` | Toplu işlem | işlem başına izin | BR-TASK-008 |
 
+**Uygulandı (Faz 4, 1. bölüm):** `GET/POST /workspaces/{ws}/tasks`, `GET/PATCH /workspaces/{ws}/tasks/{id}`, `POST …/complete`, `POST …/reopen`; ayrıca `GET /workspaces`. Oluşturma gövdesinde şimdilik `title, description, projectId, priority, startDate, due` desteklenir; `parentTaskId`, etiketler, hatırlatıcılar, tekrar ve `position` ilgili bölümlerde eklenir (o zamana kadar bilinmeyen alan olarak 400). Liste şimdilik `projectId` ve `status` filtrelerini destekler; üst düzey, arşivsiz görevler, `position` sırasıyla. `Idempotency-Key` başlığı zorunludur (yoksa 400). Yanıt nesnesinde `tags`, `subtaskCount`, `reminders`, `recurrence` henüz yoktur.
+
 ### 6.2. Liste sorgusu (`TaskFilter` v1)
 
 | Parametre | Tür | Örnek | Not |
