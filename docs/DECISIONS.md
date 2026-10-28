@@ -393,6 +393,13 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Kısayollar (UI_UX §11): Q, G D/I/M/U, J/K ve ↑/↓, Enter, Ctrl/⌘+Enter, T/M/L (detay panelinde ilgili alana odaklanır), Del, Ctrl/⌘+Z (açık "Geri al" bildiriminde), ?. Ctrl/⌘+K (arama, Faz 7) ile G C / G P (Takvim, Projeler) ilgili fazlarda. Rehber penceresi Figma'da yok (D-065).
 - "Bugün" sunucuda kullanıcının saat diliminde hesaplanır (BR-DASH-002); kenar çubuğunda Bugün ve Yaklaşanlar sayıları.
 
+### D-081 — Faz 4 sonu değerlendirmeleri: TanStack Query gerekmedi; AC-02 ve test sunucusu (teknik)
+- Durum: ONAYLI (teknik, CLAUDE.md §5.5; ARCHITECTURE §3.7 değerlendirmesi) · Tarih: 2026-10-28 · Karar veren: Claude
+- TanStack Query: **eklenmedi.** Sunucu bileşenleri + `src/client` tipli istemci + değişiklik sonrası `router.refresh()` ve iyimser yerel durum (tamamlama, gizleme) yeterli; 1.000 görevle liste sorguları p95 ≈ 90 ms (sınır 300 ms). Takvim ve pano sürükle-bırak (Faz 5–6) yeniden değerlendirme noktasıdır.
+- AC-02 ("2 görev seçilip Ev'e taşınır"): çoklu seçim ve toplu işlemler (BR-TASK-008) planda Faz 5'te olduğundan Faz 4 kabul testinde iki görev tek tek taşındı; ölçülen sonuç aynı (Inbox sayacı, proje içeriği, korunan tarih ve etiketler). Çoklu seçimli sürüm Faz 5 kabulüne eklendi.
+- AC-09: sunucu saati tarayıcı testinde değiştirilemediği için sınır (23:30 / 00:01) domain birim testiyle doğrulandı.
+- Test sunucusu `--keepAliveTimeout 70000` ile başlatılır: test istemcisinin kapanmış bağlantıyı yeniden kullanmasından doğan aralıklı `ECONNRESET` giderildi.
+
 ---
 
 ## 5. Faz kapanış kayıtları

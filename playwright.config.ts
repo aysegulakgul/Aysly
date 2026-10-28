@@ -26,8 +26,9 @@ export default defineConfig({
   ],
   webServer: {
     // Üretim derlemesi: geliştirme modunun anlık yeniden yüklemesi (HMR) testleri kararsızlaştırıyordu;
+    // uzun keep-alive, test istemcisinin kapanmış bağlantıyı yeniden kullanmasını (ECONNRESET) önler.
     // derlenmiş sayfalar ayrıca daha hızlı açılır. Derleme ayrı klasöre (.next-e2e) yapılır.
-    command: `pnpm next build && pnpm next start -p ${E2E_PORT}`,
+    command: `pnpm next build && pnpm next start -p ${E2E_PORT} --keepAliveTimeout 70000`,
     url: `${E2E_BASE_URL}/api/health`,
     env: E2E_SERVER_ENV,
     reuseExistingServer: false,

@@ -10,7 +10,7 @@
 | 1 | Ürün analizi, mimari kararlar, dokümantasyon | **Kapandı** | — | 2026-10-27 | 2026-10-27 |
 | 2 | Proje altyapısı ve temel mimari | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
 | 3 | Kimlik doğrulama, hesap, tercihler, onboarding | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
-| 4 | Görev yönetimi, Inbox, My Tasks, dashboard | **Devam ediyor** — 1–5. bölüm tamam; kapanış ölçümü kaldı | — | 2026-10-28 | — |
+| 4 | Görev yönetimi, Inbox, My Tasks, dashboard | **Tamamlandı — kapanış onayı bekliyor** | Ürün sahibinin faz kapanış onayı; Figma'da olmayan ekranların onayı (D-065) | 2026-10-28 | — |
 | 5 | Projeler ve görev görünümleri | Başlamadı | — | — | — |
 | 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | Başlamadı | — | — | — |
 | 7 | Notlar, hedefler, arama | Başlamadı | Not editörü paketi seçimi (Faz 7 başında sunulur) | — | — |
@@ -107,12 +107,13 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
   - **3. bölüm (tamam):** Migration 0004 (`tags`, `task_tags`); alt görevler (BR-SUB-001/002/003/005), etiketler (BR-TAG-001/003), taşıma (BR-INBOX-002) ve ayırma; Görevlerim (BR-INBOX-004, BR-DATE-003/004); görev detay paneli (sürüm çakışmasında otomatik yeniden uygulama veya seçim, BR-TASK-010); Inbox satırında "Projeye taşı" ve mobilde "Tarih ver"; kenar çubuğu ve mobil Menü'de Görevlerim (D-078).
   - **4. bölüm (tamam):** Görev arşivleme ve arşivden çıkarma (BR-DEL-002, BR-SUB-004), çöpe taşıma ve silme grupları (BR-DEL-001/006), geri yükleme (BR-DEL-004), kalıcı silme (BR-DEL-005), 30 günlük temizlik işi (BR-DEL-003, D-035, D-053), çöpteki/arşivdeki kayda doğrudan erişim bandı (BR-DEL-007) (D-079). Toplu işlemler ve Arşiv/Çöp sayfaları plan gereği Faz 5'te.
   - **5. bölüm (tamam):** Bugün bölümleri (FR-DASH-01..04, 08; BR-DASH-001/002), Yaklaşanlar, İlk adımlar (ONBOARDING §4), temel klavye kısayolları ve rehber (D-080).
-  - **Sıradaki:** 6) performans ölçümü ve kapanış.
+  - **6. bölüm (tamam):** Faz 4 kabul testleri (AC-01, AC-02, AC-03, AC-07 tarayıcıda; AC-09 domain testinde), 1.000 görevle performans ölçümü (`tests/integration/performance.test.ts`: Inbox, Görevlerim ve Bugün bölümleri p95 ≈ 90 ms, sınır 300 ms), TanStack Query değerlendirmesi (eklenmedi) (D-081).
+- **Sonuç (2026-10-28):** Faz 4 kapsamı tamam; `pnpm verify` 13/13 yeşil. Plan gereği Faz 5'e kalanlar: toplu işlemler ve çoklu seçim (BR-TASK-008; AC-02'nin seçimli sürümü), Arşiv/Çöp kutusu sayfaları, proje yönetimi, pano, kayıtlı görünümler, etiket yönetimi (BR-TAG-002). Faz 6–7'ye kalanlar: hatırlatıcı, tekrar, takvim, arama, notlar, hedefler ve ilgili Bugün bölümleri.
 
 ### Faz 5 — Projeler ve görev görünümleri
 - **Bağımlılık:** Faz 4.
 - **Kapsam:** FR-PROJ-01..06 (silmede proje + görevler birlikte çöpe, D-031), FR-VIEW-01..02, 04..08; board sürükle-bırak; toplu işlemler (BR-TASK-008); kayıtlı görünümler (filtre + sıralama, D-051); arşiv ve çöp sayfaları.
-- **Kabul:** AC-06; görünüm geçişinde filtre korunumu E2E; toplu işlem atomikliği; proje ilerlemesi doğru.
+- **Kabul:** AC-06; AC-02 çoklu seçimle (D-081); görünüm geçişinde filtre korunumu E2E; toplu işlem atomikliği; proje ilerlemesi doğru.
 
 ### Faz 6 — Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler
 - **Bağımlılık:** Faz 5.

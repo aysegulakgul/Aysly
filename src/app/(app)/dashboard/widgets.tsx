@@ -101,18 +101,29 @@ export function DashboardWidgets({
   };
 
   const total = AVAILABLE_WIDGETS.reduce((n, id) => n + data[id].length, 0);
+  // Son görev tamamlansa da "Geri al" bildirimi kaybolmaz (BR-TASK-004).
   if (total === 0) {
     return (
-      <Panel>
-        <EmptyState
-          icon={<Icon name="inbox" />}
-          title={t('noTasksTitle')}
-          description={t('noTasksDescription')}
-        />
-      </Panel>
+      <>
+        {completion.ui}
+        <Panel>
+          <EmptyState
+            icon={<Icon name="inbox" />}
+            title={t('noTasksTitle')}
+            description={t('noTasksDescription')}
+          />
+        </Panel>
+      </>
     );
   }
-  if (order.length === 0) return <p className="text-sm text-text-secondary">{t('allHidden')}</p>;
+  if (order.length === 0) {
+    return (
+      <>
+        {completion.ui}
+        <p className="text-sm text-text-secondary">{t('allHidden')}</p>
+      </>
+    );
+  }
 
   return (
     <>

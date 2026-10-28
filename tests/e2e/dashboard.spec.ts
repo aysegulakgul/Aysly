@@ -71,6 +71,8 @@ test.describe('Bugün ekranı', () => {
       .locator('label', { has: page.getByRole('checkbox', { name: 'Öncelikli' }) })
       .click();
     await dialog.getByRole('button', { name: 'Kaydet' }).click();
+    // Pencere yalnızca kayıt başarılı olunca kapanır; açıkken sayfanın geri kalanı erişilebilirlik ağacında gizlidir.
+    await expect(dialog).toBeHidden();
     const heading = (name: string) => page.getByRole('heading', { level: 2, name, exact: true });
     await expect(heading('Öncelikli')).toHaveCount(0);
     await page.reload();
