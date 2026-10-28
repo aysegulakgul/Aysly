@@ -52,6 +52,8 @@ export type TaskRepository = {
     parentTaskId: string | null,
   ): Promise<string | null>;
   list(scope: WorkspaceScope, filter: TaskListFilter): Promise<Task[]>;
+  /** Projedeki açık, arşivlenmemiş, çöpte olmayan üst düzey görev sayısı. */
+  countOpen(scope: WorkspaceScope, projectId: string): Promise<number>;
 };
 
 /** Görevin bağlanacağı proje bilgisi (projects modülünden). */

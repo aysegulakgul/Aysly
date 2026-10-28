@@ -44,7 +44,7 @@ test.describe('Uygulama kabuğu ve ayarlar', () => {
       : page.getByRole('navigation', { name: 'Ana menü' });
     await expect(nav.getByRole('link', { name: 'Bugün' })).toHaveAttribute('aria-current', 'page');
     // Henüz yapılmamış bölümler menüde yer almaz.
-    for (const missing of ['Inbox', 'Görevlerim', 'Takvim', 'Projeler', 'Hedefler', 'Notlar']) {
+    for (const missing of ['Görevlerim', 'Takvim', 'Projeler', 'Hedefler', 'Notlar']) {
       await expect(page.getByRole('link', { name: missing })).toHaveCount(0);
     }
   });

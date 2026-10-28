@@ -96,7 +96,11 @@
     "personal": "Kişisel",
     "personalSpace": "Kişisel alanın",
     "signOut": "Çıkış yap",
-    "menuFooter": "Sadece sana ait. Her şey tek bir yerde."
+    "menuFooter": "Sadece sana ait. Her şey tek bir yerde.",
+    "inbox": "Inbox",
+    "addTask": "Görev ekle",
+    "add": "Ekle",
+    "inboxCount": "{count} açık görev"
   },
   "dashboard": {
     "greeting": {
@@ -106,9 +110,9 @@
       "night": "İyi geceler, {name}"
     },
     "subtitle": "Kendine sakin bir alan aç.",
-    "emptyTitle": "Günün burada şekillenecek",
-    "emptyDescription": "Görev ekleme, Inbox ve günlük plan bir sonraki aşamada geliyor. Şimdilik ayarlardan görünümünü, dilini ve saat dilimini düzenleyebilirsin.",
-    "toSettings": "Ayarlara git"
+    "emptyTitle": "Bugün bölümleri yakında burada",
+    "emptyDescription": "Eklediğin görevler Inbox’ta. Bugün, Geciken ve Yaklaşan bölümleri sonraki adımda bu sayfaya gelecek.",
+    "toInbox": "Inbox’a git"
   },
   "settings": {
     "title": "Ayarlar",
@@ -230,6 +234,54 @@
     "prefs": {
       "title": "Temel tercihlerin",
       "description": "Tarayıcından aldığımız ayarlar. Gerekirse değiştir; sonra Ayarlar’dan da düzenleyebilirsin."
+    }
+  },
+  "tasks": {
+    "quickAdd": {
+      "label": "Hızlı ekle",
+      "placeholder": "Aklında ne var?",
+      "titleLabel": "Görev başlığı",
+      "target": "Inbox",
+      "hint": "Bir proje seçmediğinde görev Inbox’a eklenir.",
+      "keys": "Enter ile ekle · Esc ile temizle",
+      "submit": "Görev ekle",
+      "failed": "Kaydedilemedi. Metnin burada, tekrar deneyebilirsin.",
+      "kept": "Başlık ve seçtiğin alanlar korundu.",
+      "retry": "Tekrar dene",
+      "added": "Görev Inbox’a eklendi."
+    },
+    "date": {
+      "button": "Tarih",
+      "title": "Tarih seç",
+      "today": "Bugün",
+      "tomorrow": "Yarın",
+      "nextWeek": "Gelecek hafta",
+      "prevMonth": "Önceki ay",
+      "nextMonth": "Sonraki ay",
+      "time": "Saat",
+      "timezone": "Saat dilimi",
+      "clear": "Tarihi kaldır",
+      "apply": "Uygula"
+    },
+    "priority": {
+      "0": "Yok",
+      "1": "Düşük",
+      "2": "Orta",
+      "3": "Yüksek",
+      "button": "Öncelik"
+    },
+    "row": {
+      "complete": "Tamamla: {title}",
+      "noDate": "Tarihsiz"
+    },
+    "completed": "Görev tamamlandı.",
+    "completeFailed": "Görev tamamlanamadı. Tekrar dene.",
+    "inbox": {
+      "title": "Inbox",
+      "subtitle": "Önce yakala, sonra yerini bul. {count, plural, =0 {Açık görev yok.} other {# açık görev.}}",
+      "group": "İşlenecekler",
+      "emptyTitle": "Inbox boş",
+      "emptyDescription": "Aklına geleni hızlı eklemeyle buraya yaz; sonra yerini bul."
     }
   }
 }

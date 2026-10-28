@@ -362,6 +362,14 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Tarih/saat: ARCHITECTURE §3'teki `date-fns` + `@date-fns/tz` yerine yerleşik `Intl` API kullanıldı; yeni paket gerekmedi, yaz saati kuralları (BR-DATE-006) testlerle doğrulandı. İleride tarih aritmetiği karmaşıklaşırsa (takvim, tekrar) paket önerisi yeniden değerlendirilir.
 - Sıralama: `fractional-indexing` paketi eklendi (ARCHITECTURE §3 teknoloji tablosunda onaylı, D-058). Onboarding örnek projelerinin konumları da bu paketle üretilir.
 
+### D-077 — Inbox ve hızlı ekleme uygulama ayrıntıları (teknik/uygulama)
+- Durum: ONAYLI (teknik; D-071 ilkesi) · Tarih: 2026-10-28 · Karar veren: Claude
+- Inbox ekranı Figma 4:66650 / 4:68036, hızlı ekleme ve tarih seçici Figma akış çerçevelerine (4:69297, 4:69319, 4:69362) göre kuruldu.
+- Henüz çalışmayan öğeler gösterilmez (D-071): "Seç" (toplu işlem), satırdaki "Projeye taşı" ve "Tarih ver", hızlı eklemedeki "Etiket" ve proje seçimi Faz 4'ün 3–4. bölümlerinde ve Faz 5'te gelir. O zamana kadar hızlı eklemenin hedefi yalnızca yazı olarak "Inbox"tur. Figma'daki "Tarih vermek görevi Inbox'tan çıkarmaz… projeye taşı" alt notu da taşıma gelince eklenecek.
+- Hızlı ekleme kartı odak kaybında kapanmaz (yalnızca Esc veya başarılı eklemeyle). Kapanması altındaki listeyi kaydırıyor, tıklamalar yanlış hedefe düşüyordu.
+- Kayıt hatasında "Tekrar dene" aynı idempotency anahtarıyla gönderir (BR-TASK-007): yanıtı kaybolan istek tekrarlansa da tek görev oluşur (E2E ile doğrulandı).
+- Açılır pencereler için yığında onaylı Radix UI'dan `@radix-ui/react-popover` eklendi.
+
 ---
 
 ## 5. Faz kapanış kayıtları

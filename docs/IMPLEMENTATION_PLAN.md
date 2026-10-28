@@ -10,7 +10,7 @@
 | 1 | Ürün analizi, mimari kararlar, dokümantasyon | **Kapandı** | — | 2026-10-27 | 2026-10-27 |
 | 2 | Proje altyapısı ve temel mimari | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
 | 3 | Kimlik doğrulama, hesap, tercihler, onboarding | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
-| 4 | Görev yönetimi, Inbox, My Tasks, dashboard | **Devam ediyor** — 1. bölüm (veri modeli, görev çekirdeği) tamam | — | 2026-10-28 | — |
+| 4 | Görev yönetimi, Inbox, My Tasks, dashboard | **Devam ediyor** — 1–2. bölüm tamam (görev çekirdeği, Inbox ve hızlı ekleme) | — | 2026-10-28 | — |
 | 5 | Projeler ve görev görünümleri | Başlamadı | — | — | — |
 | 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | Başlamadı | — | — | — |
 | 7 | Notlar, hedefler, arama | Başlamadı | Not editörü paketi seçimi (Faz 7 başında sunulur) | — | — |
@@ -103,7 +103,8 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
 
 - **İlerleme (2026-10-28):**
   - **1. bölüm (tamam):** Migration 0003 (`tasks`, `idempotency_keys`); `WorkspaceScope` + `authorize`; görev oluşturma, okuma, güncelleme, tamamlama, yeniden açma, liste; tarih modeli ve yaz saati (BR-DATE-001/002/006); sürüm çakışması (BR-TASK-010); idempotency (BR-TASK-007) ve temizlik işi; `GET /workspaces`.
-  - **Sıradaki:** 2) Inbox ve hızlı ekleme ekranı; 3) Görevlerim ve görev detayı, alt görevler, etiketler; 4) arşiv, çöp, toplu işlemler; 5) Bugün ekranı bölümleri, Yaklaşanlar, İlk adımlar, kısayollar; 6) performans ölçümü.
+  - **2. bölüm (tamam):** Inbox ekranı; hızlı ekleme (tarih seçici, öncelik, hata ve tekrar dene); tamamlama ve 5 sn "Geri al"; kenar çubuğunda Inbox sayacı (BR-INBOX-003) ve "Görev ekle"; alt menüde Inbox ve Ekle; Bugün sayfasında hızlı ekleme (BR-INBOX-001) (D-077).
+  - **Sıradaki:** 3) Görevlerim ve görev detayı, alt görevler, etiketler; 4) arşiv, çöp, toplu işlemler; 5) Bugün ekranı bölümleri, Yaklaşanlar, İlk adımlar, kısayollar; 6) performans ölçümü.
 
 ### Faz 5 — Projeler ve görev görünümleri
 - **Bağımlılık:** Faz 4.

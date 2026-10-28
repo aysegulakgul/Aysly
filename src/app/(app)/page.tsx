@@ -6,7 +6,8 @@ import { Icon } from '@/ui/components/icon';
 import { Panel } from '@/ui/components/panel';
 import { getSessionStartedAt } from '@/modules/identity';
 import { findOnboardingOffer } from '@/modules/preferences';
-import { getViewer } from '../viewer';
+import { getPersonalScope, getViewer } from '../viewer';
+import { QuickCapture } from './tasks/quick-capture';
 import { PageFrame } from './page-frame';
 import { dayPart, firstName, longDate } from './time-display';
 
@@ -23,6 +24,7 @@ export default async function TodayPage() {
   ]);
   if (!viewer) return null; // düzen oturumsuz isteği zaten yönlendirir
   // ONBOARDING §2: kayıttan sonra ve (bir kez atlandıysa) sonraki girişte rehber önerilir.
+  const scope = await getPersonalScope();
   const startedAt = await getSessionStartedAt();
   if (startedAt && (await findOnboardingOffer(viewer.user.id, startedAt))) redirect('/onboarding');
   const now = new Date();
@@ -37,14 +39,25 @@ export default async function TodayPage() {
           {`${longDate(now, locale, timezone, true)} · ${t('subtitle')}`}
         </p>
       </div>
+      {/* BR-INBOX-001: bağlamsız hızlı ekleme Inbox'a ekler (Figma 4:66533). */}
+      {scope ? (
+        <QuickCapture
+          context={{
+            workspaceId: scope.workspaceId,
+            timezone,
+            weekStart: viewer.preferences.weekStart,
+            timeFormat: viewer.preferences.timeFormat,
+          }}
+        />
+      ) : null}
       <Panel>
         <EmptyState
           icon={<Icon name="inbox" />}
           title={t('emptyTitle')}
           description={t('emptyDescription')}
           action={
-            <Link href="/settings" className="text-sm font-medium text-primary underline">
-              {t('toSettings')}
+            <Link href="/inbox" className="text-sm font-medium text-primary underline">
+              {t('toInbox')}
             </Link>
           }
         />

@@ -3,7 +3,14 @@ import type { WorkspaceScope } from '@/modules/workspaces';
 import { fixedClock } from '@/shared/kernel/clock';
 import type { Task } from '../domain/task';
 import type { ProjectRef, TaskRepository } from './ports';
-import { completeTask, createTask, reopenTask, updateTask, type TaskDeps } from './tasks';
+import {
+  completeTask,
+  createTask,
+  inboxBadge,
+  reopenTask,
+  updateTask,
+  type TaskDeps,
+} from './tasks';
 
 const scope = { userId: 'u1', workspaceId: 'w1', role: 'owner' } as WorkspaceScope;
 const INBOX: ProjectRef = { id: 'inbox', kind: 'inbox', archived: false };
@@ -56,6 +63,16 @@ function setup(projects: ProjectRef[] = []) {
         .sort()
         .at(-1) ?? null,
     list: async () => [...rows.values()],
+    countOpen: async (s, projectId) =>
+      [...rows.values()].filter(
+        (t) =>
+          t.workspaceId === s.workspaceId &&
+          t.projectId === projectId &&
+          t.status !== 'done' &&
+          !t.archivedAt &&
+          !t.deletedAt &&
+          !t.parentTaskId,
+      ).length,
   };
   const deps: TaskDeps = {
     tasks: repo,
@@ -197,5 +214,17 @@ describe('tamamlama', () => {
     expect(value(await completeTask(deps, scope, t.id, { version: 2 })).version).toBe(2);
     const reopened = value(await reopenTask(deps, scope, t.id, { version: 2 }));
     expect(reopened).toMatchObject({ status: 'todo', completedAt: null, completedBy: null });
+  });
+});
+
+describe('inboxBadge', () => {
+  it('BR-INBOX-003: Inbox’taki açık, arşivlenmemiş üst düzey görevler sayılır', async () => {
+    const { deps, rows } = setup();
+    const a = value(await createTask(deps, scope, { title: 'A' }));
+    value(await createTask(deps, scope, { title: 'B' }));
+    const c = value(await createTask(deps, scope, { title: 'C' }));
+    value(await completeTask(deps, scope, a.id, { version: 1 }));
+    rows.set(c.id, { ...rows.get(c.id)!, archivedAt: deps.clock.now() });
+    expect(await inboxBadge(deps, scope)).toEqual({ ok: true, value: 1 });
   });
 });

@@ -96,7 +96,11 @@
     "personal": "Personal",
     "personalSpace": "Your personal space",
     "signOut": "Sign out",
-    "menuFooter": "Only yours. Everything in one place."
+    "menuFooter": "Only yours. Everything in one place.",
+    "inbox": "Inbox",
+    "addTask": "Add task",
+    "add": "Add",
+    "inboxCount": "{count} open tasks"
   },
   "dashboard": {
     "greeting": {
@@ -106,9 +110,9 @@
       "night": "Good night, {name}"
     },
     "subtitle": "Make some calm space for yourself.",
-    "emptyTitle": "Your day will take shape here",
-    "emptyDescription": "Adding tasks, the Inbox and the daily plan arrive in the next phase. For now you can adjust your appearance, language and time zone in settings.",
-    "toSettings": "Go to settings"
+    "emptyTitle": "Today’s sections are coming here soon",
+    "emptyDescription": "Tasks you add are in the Inbox. Today, Overdue and Upcoming sections arrive on this page in the next step.",
+    "toInbox": "Go to Inbox"
   },
   "settings": {
     "title": "Settings",
@@ -230,6 +234,54 @@
     "prefs": {
       "title": "Your basic preferences",
       "description": "Taken from your browser. Change them if needed; you can also edit them later in Settings."
+    }
+  },
+  "tasks": {
+    "quickAdd": {
+      "label": "Quick add",
+      "placeholder": "What’s on your mind?",
+      "titleLabel": "Task title",
+      "target": "Inbox",
+      "hint": "If you don’t pick a project, the task goes to the Inbox.",
+      "keys": "Enter to add · Esc to clear",
+      "submit": "Add task",
+      "failed": "Couldn’t save. Your text is still here; you can try again.",
+      "kept": "Your title and chosen fields were kept.",
+      "retry": "Try again",
+      "added": "Task added to the Inbox."
+    },
+    "date": {
+      "button": "Date",
+      "title": "Pick a date",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "nextWeek": "Next week",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "time": "Time",
+      "timezone": "Time zone",
+      "clear": "Remove date",
+      "apply": "Apply"
+    },
+    "priority": {
+      "0": "None",
+      "1": "Low",
+      "2": "Medium",
+      "3": "High",
+      "button": "Priority"
+    },
+    "row": {
+      "complete": "Complete: {title}",
+      "noDate": "No date"
+    },
+    "completed": "Task completed.",
+    "completeFailed": "The task couldn’t be completed. Try again.",
+    "inbox": {
+      "title": "Inbox",
+      "subtitle": "Capture first, find its place later. {count, plural, =0 {No open tasks.} one {# open task.} other {# open tasks.}}",
+      "group": "To process",
+      "emptyTitle": "Inbox is empty",
+      "emptyDescription": "Jot down whatever comes to mind with quick add; find its place later."
     }
   }
 }

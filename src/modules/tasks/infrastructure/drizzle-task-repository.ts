@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
 import type { WorkspaceScope } from '@/modules/workspaces';
 import type { DbExecutor } from '@/shared/db/client';
 import { isUuid } from '@/shared/kernel/id';
@@ -131,6 +131,22 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
         )
         .orderBy(asc(tasks.position), asc(tasks.id));
       return rows.map(toTask);
+    },
+
+    async countOpen(scope, projectId) {
+      const [row] = await db
+        .select({ n: count() })
+        .from(tasks)
+        .where(
+          and(
+            inScope(scope),
+            eq(tasks.projectId, projectId),
+            isNull(tasks.archivedAt),
+            isNull(tasks.parentTaskId),
+            ne(tasks.status, 'done'),
+          ),
+        );
+      return row?.n ?? 0;
     },
   };
 }

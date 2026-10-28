@@ -7,3 +7,4 @@ export {
   postReopen,
   postTask,
 } from './http/task-handlers';
+export { findInboxCount, findInboxTasks, type TaskView } from './http/task-queries';

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { getViewer } from '../viewer';
+import { findInboxCount } from '@/modules/tasks';
+import { getPersonalScope, getViewer } from '../viewer';
 import { MobileNavigation, Sidebar } from './navigation';
 
 /**
@@ -9,11 +10,12 @@ import { MobileNavigation, Sidebar } from './navigation';
  * Yalnızca çalışan bölümler gösterilir; diğer menü öğeleri ait oldukları fazda eklenir.
  */
 export default async function AppLayout({ children }: { children: ReactNode }) {
-  const viewer = await getViewer();
-  if (!viewer) redirect('/sign-in');
+  const [viewer, scope] = await Promise.all([getViewer(), getPersonalScope()]);
+  if (!viewer || !scope) redirect('/sign-in');
+  const inboxCount = await findInboxCount(scope);
   return (
     <div className="flex min-h-dvh">
-      <Sidebar userName={viewer.user.name} />
+      <Sidebar userName={viewer.user.name} inboxCount={inboxCount} />
       <div className="flex min-w-0 flex-1 flex-col pb-[84px] lg:pb-0">{children}</div>
       <MobileNavigation />
     </div>

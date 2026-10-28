@@ -205,6 +205,17 @@ export async function getTask(
   return task ? ok(task) : err(notFound());
 }
 
+/** BR-INBOX-003: Inbox rozeti = Inbox'taki açık, arşivlenmemiş, çöpte olmayan üst düzey görev sayısı. */
+export async function inboxBadge(
+  deps: TaskDeps,
+  scope: WorkspaceScope,
+): Promise<Result<number, DomainError>> {
+  const allowed = authorize(scope, 'task.read');
+  if (!allowed.ok) return allowed;
+  const inbox = await deps.projects.inbox(scope);
+  return ok(await deps.tasks.countOpen(scope, inbox.id));
+}
+
 /** Liste (API_CONTRACTS §6.2, ilk sürüm): proje ve durum filtresi; varsayılan açık durumlar. */
 export async function listTasks(
   deps: TaskDeps,
