@@ -8,11 +8,11 @@ Aysly; görevleri, projeleri, günlük planı, notları ve hedefleri tek, sakin 
 
 | | |
 |---|---|
-| Mevcut faz | **Faz 4 — Görevler, Inbox, My Tasks, dashboard** (tamamlandı, kapanış onayı bekliyor) |
+| Mevcut faz | **Faz 5 — Projeler ve görev görünümleri** (başlamadı; Faz 1–4 kapandı) |
 | Uygulama kodu | Hesap, onboarding, tercihler ve görev yönetimi çalışıyor (aşağıdaki "Özellikler") |
 | Çalışma ortamı | Yalnızca yerel bilgisayar; hosting ve ücretli servis yok |
 | Teknoloji | Next.js, TypeScript, PostgreSQL, Drizzle, Better Auth |
-| Sonraki adım | Faz 4 kapanış onayı, ardından Faz 5 (projeler ve görünümler) |
+| Sonraki adım | Faz 5: projeler, pano, toplu işlemler, kayıtlı görünümler |
 
 Ayrıntılı durum: [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 

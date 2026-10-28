@@ -10,7 +10,7 @@
 | 1 | Ürün analizi, mimari kararlar, dokümantasyon | **Kapandı** | — | 2026-10-27 | 2026-10-27 |
 | 2 | Proje altyapısı ve temel mimari | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
 | 3 | Kimlik doğrulama, hesap, tercihler, onboarding | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
-| 4 | Görev yönetimi, Inbox, My Tasks, dashboard | **Tamamlandı — kapanış onayı bekliyor** | Ürün sahibinin faz kapanış onayı; Figma'da olmayan ekranların onayı (D-065) | 2026-10-28 | — |
+| 4 | Görev yönetimi, Inbox, My Tasks, dashboard | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
 | 5 | Projeler ve görev görünümleri | Başlamadı | — | — | — |
 | 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | Başlamadı | — | — | — |
 | 7 | Notlar, hedefler, arama | Başlamadı | Not editörü paketi seçimi (Faz 7 başında sunulur) | — | — |
