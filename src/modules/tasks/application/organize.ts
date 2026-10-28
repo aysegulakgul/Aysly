@@ -110,10 +110,14 @@ export async function getTaskDetail(
   deps: TaskDeps,
   scope: WorkspaceScope,
   id: string,
+  options: { includeDeleted?: boolean } = {},
 ): Promise<Result<TaskSummary & { subtaskList: TaskSummary[] }, DomainError>> {
   const allowed = authorize(scope, 'task.read');
   if (!allowed.ok) return allowed;
-  const task = await deps.tasks.findById(scope, id);
+  // BR-DEL-007: çöpteki kayıt yalnızca açıkça istendiğinde döner (arayüz "çöp kutusunda" ekranı için).
+  const task = options.includeDeleted
+    ? await deps.tasks.findAny(scope, id)
+    : await deps.tasks.findById(scope, id);
   if (!task) return err(notFound());
   const project = await deps.projects.find(scope, task.projectId);
   const projects = new Map(project ? [[project.id, project]] : []);

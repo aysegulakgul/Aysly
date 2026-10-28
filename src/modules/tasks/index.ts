@@ -1,5 +1,11 @@
 /** tasks modülünün dışa açık yüzü (ARCHITECTURE §4.2). */
 export {
+  deleteOneTask,
+  deleteTrash,
+  getTrash,
+  postArchive,
+  postRestore,
+  postUnarchive,
   getMyTasks,
   getOneTask,
   getTasks,
@@ -20,3 +26,4 @@ export {
   type TaskView,
 } from './http/task-queries';
 export { DUE_GROUPS, type DueGroup } from './domain/schedule';
+export { purgeExpiredTasks } from './infrastructure/drizzle-task-repository';

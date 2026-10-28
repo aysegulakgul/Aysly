@@ -305,10 +305,10 @@ pg-boss kullanılmaz (D-044). Aşağıdaki işler **use case** olarak yazılır 
 | İş | Tetikleyici (D-053) | Kural | Güvenlik önlemi |
 |---|---|---|---|
 | `reminders.materializeDue` | İstek anında: kullanıcının bildirim sayacı/listesi sorgulanırken (istemci ~60 sn'de bir yoklar) | BR-REM-005 | Koşullu güncelleme + `dedupe_key` → tek bildirim |
-| `trash.purgeExpired` | Uygulama içinde periyodik (saatte bir) + uygulama açılışında | BR-DEL-003 | Idempotent; PostgreSQL advisory lock ile aynı anda tek çalışma |
+| `trash.purge` (uygulandı, Faz 4) | Uygulama içinde periyodik (saatte bir) + uygulama açılışında | BR-DEL-003 | Idempotent; PostgreSQL advisory lock ile aynı anda tek çalışma |
 | `accounts.purgeDeleted` | Aynı | BR-ACC-005 | Idempotent; her adım loglanır |
 | `notifications.cleanup` | Aynı (günde bir) | BR-NOTIF-003 | — |
-| `idempotency.cleanup` | Aynı | D-019 | — |
+| `idempotency.cleanup` (uygulandı, Faz 4) | Aynı | D-019 | — |
 
 Zamanlayıcı gerektirmeyen, istek içinde yapılan işler:
 - Tekrarlayan görevin sonraki örneği — tamamlama ile aynı işlemde (D-033).

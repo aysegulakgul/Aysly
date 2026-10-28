@@ -79,6 +79,29 @@ export type TaskRepository = {
     projectId: string,
     now: Date,
   ): Promise<void>;
+  /** Çöpteki görev dahil (BR-DEL-007: durum sorgusu ve geri yükleme için). */
+  findAny(scope: WorkspaceScope, id: string): Promise<Task | null>;
+  /** BR-DEL-002 / BR-SUB-004: arşivleme ve arşivden çıkarma; sürüm artar. */
+  setArchived(
+    scope: WorkspaceScope,
+    ids: readonly string[],
+    archivedAt: Date | null,
+    now: Date,
+  ): Promise<number>;
+  /** Alt görevlerden ebeveynle aynı anda arşivlenenler (birlikte arşivden çıkarılır). */
+  subtasksArchivedWith(
+    scope: WorkspaceScope,
+    parentId: string,
+    archivedAt: Date,
+  ): Promise<string[]>;
+  /** BR-DEL-006: tek eylemde çöpe atılanlar aynı grup kimliğini alır. */
+  trash(scope: WorkspaceScope, ids: readonly string[], batchId: string, now: Date): Promise<number>;
+  /** BR-DEL-004: geri yükleme; sürüm artar. */
+  restore(scope: WorkspaceScope, ids: readonly string[], now: Date): Promise<number>;
+  batchMembers(scope: WorkspaceScope, batchId: string): Promise<Task[]>;
+  listTrash(scope: WorkspaceScope): Promise<Task[]>;
+  /** BR-DEL-005: yalnızca çöpteki kayıtlar kalıcı silinir; grup verilmezse tüm çöp. */
+  purge(scope: WorkspaceScope, batchId: string | null): Promise<number>;
 };
 
 /** Etiket bağlantıları (tags modülünden). */

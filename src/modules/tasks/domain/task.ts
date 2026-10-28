@@ -27,6 +27,8 @@ export type Task = {
   createdBy: string | null;
   archivedAt: Date | null;
   deletedAt: Date | null;
+  /** BR-DEL-006: tek eylemde çöpe atılan kayıtların grup kimliği. */
+  deletedBatchId: string | null;
   version: number;
   createdAt: Date;
   updatedAt: Date;

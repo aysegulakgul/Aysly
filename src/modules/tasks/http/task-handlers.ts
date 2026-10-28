@@ -26,6 +26,14 @@ import {
   updateTask,
   type TaskDeps,
 } from '../application/tasks';
+import {
+  archiveTask,
+  deleteTask,
+  listTrash,
+  purgeTrash,
+  restoreFromTrash,
+  unarchiveTask,
+} from '../application/lifecycle';
 import { todayIn } from '../domain/schedule';
 import { TASK_STATUSES, type Task } from '../domain/task';
 import { createDrizzleTaskRepository } from '../infrastructure/drizzle-task-repository';
@@ -183,7 +191,10 @@ export const getTasks = (ctx: ApiContext) =>
 
 export const getOneTask = (ctx: ApiContext) =>
   withScope(ctx, async (scope) => {
-    const result = await getTaskDetail(taskDeps(db()), scope, ctx.params.id ?? '');
+    const includeDeleted = new URL(ctx.request.url).searchParams.get('includeDeleted') === 'true';
+    const result = await getTaskDetail(taskDeps(db()), scope, ctx.params.id ?? '', {
+      includeDeleted,
+    });
     if (!result.ok) return fail(ctx, result.error);
     return ctx.json(200, {
       data: {
@@ -250,4 +261,72 @@ export const getMyTasks = (ctx: ApiContext) =>
     return ctx.json(200, {
       data: result.value.map(({ group, items }) => ({ group, tasks: items.map(toSummaryJson) })),
     });
+  });
+
+const ConfirmBody = z.strictObject({ confirm: z.literal(true) });
+const RestoreBody = z.union([
+  z.strictObject({ batchId: z.string().max(100) }),
+  z.strictObject({ id: z.string().max(100), restoreParent: z.boolean().optional() }),
+]);
+
+export const postArchive = (ctx: ApiContext) =>
+  withScope(ctx, async (scope) => {
+    const body = await ctx.parse(VersionBody);
+    if (!body.ok) return body.response;
+    return reply(
+      ctx,
+      await inTransaction((deps) => archiveTask(deps, scope, ctx.params.id ?? '', body.data)),
+    );
+  });
+
+export const postUnarchive = (ctx: ApiContext) =>
+  withScope(ctx, async (scope) => {
+    const body = await ctx.parse(VersionBody);
+    if (!body.ok) return body.response;
+    return reply(
+      ctx,
+      await inTransaction((deps) => unarchiveTask(deps, scope, ctx.params.id ?? '', body.data)),
+    );
+  });
+
+/** DELETE /tasks/{id}: çöpe taşır (BR-DEL-001/006); yanıt `{ batchId, affected }`. */
+export const deleteOneTask = (ctx: ApiContext) =>
+  withScope(ctx, async (scope) => {
+    const result = await inTransaction((deps) => deleteTask(deps, scope, ctx.params.id ?? ''));
+    return result.ok ? ctx.json(200, { data: result.value }) : fail(ctx, result.error);
+  });
+
+/** GET /trash: silme grupları (API_CONTRACTS §13). */
+export const getTrash = (ctx: ApiContext) =>
+  withScope(ctx, async (scope) => {
+    const result = await listTrash(taskDeps(db()), scope);
+    if (!result.ok) return fail(ctx, result.error);
+    return ctx.json(200, {
+      data: result.value.map((g) => ({
+        ...g,
+        deletedAt: g.deletedAt.toISOString(),
+        purgeAt: g.purgeAt.toISOString(),
+      })),
+    });
+  });
+
+/** POST /trash/restore: `{ batchId }` veya `{ id, restoreParent? }` (BR-DEL-004, BR-SUB-004). */
+export const postRestore = (ctx: ApiContext) =>
+  withScope(ctx, async (scope) => {
+    const body = await ctx.parse(RestoreBody);
+    if (!body.ok) return body.response;
+    const result = await inTransaction((deps) => restoreFromTrash(deps, scope, body.data));
+    return result.ok ? ctx.json(200, { data: result.value }) : fail(ctx, result.error);
+  });
+
+/** DELETE /trash (çöpü boşalt) ve DELETE /trash/{batchId}: kalıcı silme, `{ confirm: true }` zorunlu (BR-DEL-005). */
+export const deleteTrash = (ctx: ApiContext) =>
+  withScope(ctx, async (scope) => {
+    const body = await ctx.parse(ConfirmBody);
+    if (!body.ok) return body.response;
+    const result = await purgeTrash(taskDeps(db()), scope, {
+      batchId: ctx.params.batchId ?? null,
+      confirm: body.data.confirm,
+    });
+    return result.ok ? ctx.json(200, { data: result.value }) : fail(ctx, result.error);
   });

@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState, type KeyboardEvent } from 'react';
-import { apiPatch, apiPost, type ApiResult } from '@/client/api';
+import { apiDelete, apiPatch, apiPost, type ApiResult } from '@/client/api';
 import type { TaskDetailView, TaskView } from '@/modules/tasks';
 import { Button } from '@/ui/components/button';
 import { Chip } from '@/ui/components/chip';
 import { Banner } from '@/ui/components/feedback';
-import { Popover } from '@/ui/components/popover';
+import { Popover, PopoverClose } from '@/ui/components/popover';
 import { cn } from '@/ui/cn';
 import { DatePickerPanel } from './date-picker';
 import { longDay, offsetLabel, shortTime } from './dates';
@@ -122,7 +122,10 @@ export function TaskDetailPanel({
       className="fixed inset-0 z-30 flex flex-col overflow-y-auto bg-surface p-5 lg:inset-auto lg:top-4 lg:right-4 lg:bottom-4 lg:w-[432px] lg:rounded-md lg:border lg:border-border"
     >
       <div className="flex items-center justify-between">
-        <p className="text-sm text-text-secondary">{t('detail.label')}</p>
+        <p className="flex-1 text-sm text-text-secondary">{t('detail.label')}</p>
+        {detail && !detail.deletedAt && !detail.archivedAt ? (
+          <LifecycleMenu detail={detail} context={context} />
+        ) : null}
         {close}
       </div>
       {detail ? (
@@ -147,6 +150,7 @@ function DetailBody({ detail, context }: { detail: TaskDetailView; context: Task
   const [subtask, setSubtask] = useState('');
   const [dateOpen, setDateOpen] = useState(false);
   const done = detail.status === 'done';
+  const readOnly = detail.archivedAt !== null || detail.deletedAt !== null;
   const projectNames = context.projects.map((p) => p.id);
   const subtasksDone = detail.subtasks.filter((s) => s.status === 'done').length;
 
@@ -176,262 +180,371 @@ function DetailBody({ detail, context }: { detail: TaskDetailView; context: Task
 
   return (
     <div className="flex flex-col gap-4 pt-2">
-      {detail.parentTaskId ? (
-        <Button
-          variant="ghost"
-          className="self-start text-sm"
-          onClick={async () => {
-            await apiPost(`${url}/detach`, { version: detail.version });
-            router.refresh();
-          }}
-        >
-          {t('detail.detach')}
-        </Button>
-      ) : null}
-      <div className="flex items-center gap-3">
-        <span aria-hidden="true" className={cn('text-xl', done ? 'text-success' : 'text-primary')}>
-          {done ? '✓' : detail.status === 'in_progress' ? '◐' : '○'}
-        </span>
-        <input
-          aria-label={t('detail.title')}
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          onBlur={() => title !== detail.title && void save({ title })}
-          maxLength={500}
-          className="min-w-0 flex-1 bg-transparent text-xl font-semibold text-text"
-        />
-      </div>
-      {done ? (
-        <Button
-          className="self-start"
-          onClick={async () => {
-            await apiPost(`${url}/reopen`, { version: detail.version });
-            router.refresh();
-          }}
-        >
-          {t('detail.reopen')}
-        </Button>
-      ) : (
-        <Button
-          variant="primary"
-          className="self-start"
-          icon={<span aria-hidden="true">✓</span>}
-          onClick={() => completion.complete(detail)}
-        >
-          {t('detail.complete')}
-        </Button>
-      )}
-      {completion.ui}
-      {status === 'conflict' ? (
-        <div className="flex flex-col gap-2">
-          <Banner>{t('detail.conflict')}</Banner>
-          <div className="flex gap-2">
-            <Button onClick={() => void keepMine()}>{t('detail.keepMine')}</Button>
-            <Button variant="ghost" onClick={takeTheirs}>
-              {t('detail.takeTheirs')}
-            </Button>
-          </div>
+      <LifecycleBand detail={detail} context={context} />
+      {/* BR-DEL-002 / BR-DEL-007: arşivdeki ve çöpteki görev salt okunurdur. */}
+      <fieldset disabled={readOnly} className="flex min-w-0 flex-col gap-4 disabled:opacity-80">
+        {detail.parentTaskId ? (
+          <Button
+            variant="ghost"
+            className="self-start text-sm"
+            onClick={async () => {
+              await apiPost(`${url}/detach`, { version: detail.version });
+              router.refresh();
+            }}
+          >
+            {t('detail.detach')}
+          </Button>
+        ) : null}
+        <div className="flex items-center gap-3">
+          <span
+            aria-hidden="true"
+            className={cn('text-xl', done ? 'text-success' : 'text-primary')}
+          >
+            {done ? '✓' : detail.status === 'in_progress' ? '◐' : '○'}
+          </span>
+          <input
+            aria-label={t('detail.title')}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onBlur={() => title !== detail.title && void save({ title })}
+            maxLength={500}
+            className="min-w-0 flex-1 bg-transparent text-xl font-semibold text-text"
+          />
         </div>
-      ) : status === 'failed' ? (
-        <Banner>{t('detail.saveFailed')}</Banner>
-      ) : null}
+        {done ? (
+          <Button
+            className="self-start"
+            onClick={async () => {
+              await apiPost(`${url}/reopen`, { version: detail.version });
+              router.refresh();
+            }}
+          >
+            {t('detail.reopen')}
+          </Button>
+        ) : (
+          <Button
+            variant="primary"
+            className="self-start"
+            icon={<span aria-hidden="true">✓</span>}
+            onClick={() => completion.complete(detail)}
+          >
+            {t('detail.complete')}
+          </Button>
+        )}
+        {completion.ui}
+        {status === 'conflict' ? (
+          <div className="flex flex-col gap-2">
+            <Banner>{t('detail.conflict')}</Banner>
+            <div className="flex gap-2">
+              <Button onClick={() => void keepMine()}>{t('detail.keepMine')}</Button>
+              <Button variant="ghost" onClick={takeTheirs}>
+                {t('detail.takeTheirs')}
+              </Button>
+            </div>
+          </div>
+        ) : status === 'failed' ? (
+          <Banner>{t('detail.saveFailed')}</Banner>
+        ) : null}
 
-      <div className="flex flex-col border-b border-border pb-3">
-        {detail.parentTaskId ? null : (
-          <Field label={t('detail.project')}>
+        <div className="flex flex-col border-b border-border pb-3">
+          {detail.parentTaskId ? null : (
+            <Field label={t('detail.project')}>
+              <select
+                aria-label={t('detail.project')}
+                value={projectNames.includes(detail.projectId) ? detail.projectId : ''}
+                disabled={done}
+                onChange={async (e) => {
+                  await apiPost(`${url}/move`, {
+                    version: detail.version,
+                    projectId: e.target.value,
+                  });
+                  router.refresh();
+                }}
+                className={selectClass}
+              >
+                {context.projects.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          )}
+          <Field label={t('detail.status')}>
+            {done ? (
+              <p className="px-2 text-sm text-text">{t('detail.statuses.done')}</p>
+            ) : (
+              <select
+                aria-label={t('detail.status')}
+                value={detail.status}
+                onChange={(e) => void save({ status: e.target.value })}
+                className={selectClass}
+              >
+                <option value="todo">{t('detail.statuses.todo')}</option>
+                <option value="in_progress">{t('detail.statuses.in_progress')}</option>
+              </select>
+            )}
+          </Field>
+          <Field label={t('detail.priority')}>
             <select
-              aria-label={t('detail.project')}
-              value={projectNames.includes(detail.projectId) ? detail.projectId : ''}
-              disabled={done}
-              onChange={async (e) => {
-                await apiPost(`${url}/move`, {
-                  version: detail.version,
-                  projectId: e.target.value,
-                });
-                router.refresh();
-              }}
+              aria-label={t('detail.priority')}
+              value={detail.priority}
+              onChange={(e) => void save({ priority: Number(e.target.value) })}
               className={selectClass}
             >
-              {context.projects.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
+              {[0, 1, 2, 3].map((p) => (
+                <option key={p} value={p}>
+                  {p > 0 ? `⚑ ${t(`priority.${p}`)}` : t('priority.0')}
                 </option>
               ))}
             </select>
           </Field>
-        )}
-        <Field label={t('detail.status')}>
-          {done ? (
-            <p className="px-2 text-sm text-text">{t('detail.statuses.done')}</p>
-          ) : (
-            <select
-              aria-label={t('detail.status')}
-              value={detail.status}
-              onChange={(e) => void save({ status: e.target.value })}
+          <Field label={t('detail.start')}>
+            <input
+              type="date"
+              aria-label={t('detail.start')}
+              value={detail.startDate ?? ''}
+              onChange={(e) => void save({ startDate: e.target.value || null })}
               className={selectClass}
-            >
-              <option value="todo">{t('detail.statuses.todo')}</option>
-              <option value="in_progress">{t('detail.statuses.in_progress')}</option>
-            </select>
-          )}
-        </Field>
-        <Field label={t('detail.priority')}>
-          <select
-            aria-label={t('detail.priority')}
-            value={detail.priority}
-            onChange={(e) => void save({ priority: Number(e.target.value) })}
-            className={selectClass}
-          >
-            {[0, 1, 2, 3].map((p) => (
-              <option key={p} value={p}>
-                {p > 0 ? `⚑ ${t(`priority.${p}`)}` : t('priority.0')}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field label={t('detail.start')}>
-          <input
-            type="date"
-            aria-label={t('detail.start')}
-            value={detail.startDate ?? ''}
-            onChange={(e) => void save({ startDate: e.target.value || null })}
-            className={selectClass}
-          />
-        </Field>
-        <Field label={t('detail.due')}>
-          <Popover
-            label={t('date.title')}
-            open={dateOpen}
-            onOpenChange={setDateOpen}
-            trigger={
-              <button type="button" className={cn(selectClass, 'text-left')}>
-                {dueText}
-              </button>
-            }
-          >
-            <DatePickerPanel
-              value={detail.due}
-              timezone={context.timezone}
-              weekStart={context.weekStart}
-              onApply={(due) => {
-                setDateOpen(false);
-                void save({ due });
-              }}
             />
-          </Popover>
-        </Field>
-        {detail.due?.timezone ? (
-          <p className="text-xs text-text-secondary">
-            {`${detail.due.timezone} · ${offsetLabel(detail.due.timezone, new Date())}`}
-          </p>
-        ) : null}
-        <Field label={t('detail.tags')}>
-          <div className="flex flex-wrap items-center gap-1 px-2 py-1">
-            {detail.tags.map((tag) => (
-              <button
-                key={tag.id}
-                type="button"
-                aria-label={t('detail.removeTag', { tag: tag.name })}
-                onClick={() =>
-                  void save({
-                    tagNames: detail.tags.filter((x) => x.id !== tag.id).map((x) => x.name),
-                  })
-                }
-              >
-                <Chip>{`#${tag.name} ×`}</Chip>
-              </button>
-            ))}
-            <input
-              aria-label={t('detail.tags')}
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={onTagKey}
-              placeholder={t('detail.tagsPlaceholder')}
-              className="min-h-9 min-w-[140px] flex-1 bg-transparent text-sm text-text placeholder:text-text-secondary"
-            />
-          </div>
-        </Field>
-      </div>
-
-      <section className="flex flex-col gap-2 border-b border-border pb-4">
-        <h3 className="text-base font-semibold text-text">{t('detail.description')}</h3>
-        <textarea
-          aria-label={t('detail.description')}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          onBlur={() =>
-            description !== (detail.description ?? '') &&
-            void save({ description: description || null })
-          }
-          placeholder={t('detail.descriptionPlaceholder')}
-          rows={4}
-          className="w-full resize-y rounded-sm bg-transparent p-2 text-base whitespace-pre-wrap text-text placeholder:text-text-secondary hover:bg-surface-muted"
-        />
-      </section>
-
-      {detail.parentTaskId ? null : (
-        <section className="flex flex-col gap-1 border-b border-border pb-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold text-text">{t('detail.subtasks')}</h3>
-            {detail.subtasks.length ? (
-              <Chip>{`${subtasksDone}/${detail.subtasks.length}`}</Chip>
-            ) : null}
-          </div>
-          <ul className="flex flex-col">
-            {detail.subtasks.map((s) => (
-              <li key={s.id} className="flex min-h-11 items-center gap-3 px-2">
-                <button
-                  type="button"
-                  aria-label={
-                    s.status === 'done' ? t('detail.reopen') : t('row.complete', { title: s.title })
-                  }
-                  onClick={async () => {
-                    await apiPost(
-                      `/api/v1/workspaces/${context.workspaceId}/tasks/${s.id}/${s.status === 'done' ? 'reopen' : 'complete'}`,
-                      {
-                        version: s.version,
-                      },
-                    );
-                    router.refresh();
-                  }}
-                  className={cn(
-                    'text-base',
-                    s.status === 'done' ? 'text-success' : 'text-text-secondary',
-                  )}
-                >
-                  <span aria-hidden="true">{s.status === 'done' ? '✓' : '○'}</span>
+          </Field>
+          <Field label={t('detail.due')}>
+            <Popover
+              label={t('date.title')}
+              open={dateOpen}
+              onOpenChange={setDateOpen}
+              trigger={
+                <button type="button" className={cn(selectClass, 'text-left')}>
+                  {dueText}
                 </button>
-                <Link
-                  href={`${pathname}?task=${s.id}` as never}
-                  scroll={false}
-                  className="min-w-0 flex-1 truncate text-base text-text"
+              }
+            >
+              <DatePickerPanel
+                value={detail.due}
+                timezone={context.timezone}
+                weekStart={context.weekStart}
+                onApply={(due) => {
+                  setDateOpen(false);
+                  void save({ due });
+                }}
+              />
+            </Popover>
+          </Field>
+          {detail.due?.timezone ? (
+            <p className="text-xs text-text-secondary">
+              {`${detail.due.timezone} · ${offsetLabel(detail.due.timezone, new Date())}`}
+            </p>
+          ) : null}
+          <Field label={t('detail.tags')}>
+            <div className="flex flex-wrap items-center gap-1 px-2 py-1">
+              {detail.tags.map((tag) => (
+                <button
+                  key={tag.id}
+                  type="button"
+                  aria-label={t('detail.removeTag', { tag: tag.name })}
+                  onClick={() =>
+                    void save({
+                      tagNames: detail.tags.filter((x) => x.id !== tag.id).map((x) => x.name),
+                    })
+                  }
                 >
-                  {s.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <div className="flex min-h-11 items-center gap-3 px-2">
-            <span aria-hidden="true" className="text-primary">
-              +
-            </span>
-            <input
-              aria-label={t('detail.addSubtask')}
-              value={subtask}
-              onChange={(e) => setSubtask(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && void addSubtask()}
-              placeholder={t('detail.addSubtask')}
-              maxLength={500}
-              className="min-w-0 flex-1 bg-transparent text-base text-text placeholder:text-text-secondary"
-            />
-          </div>
-        </section>
-      )}
+                  <Chip>{`#${tag.name} ×`}</Chip>
+                </button>
+              ))}
+              <input
+                aria-label={t('detail.tags')}
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={onTagKey}
+                placeholder={t('detail.tagsPlaceholder')}
+                className="min-h-9 min-w-[140px] flex-1 bg-transparent text-sm text-text placeholder:text-text-secondary"
+              />
+            </div>
+          </Field>
+        </div>
 
+        <section className="flex flex-col gap-2 border-b border-border pb-4">
+          <h3 className="text-base font-semibold text-text">{t('detail.description')}</h3>
+          <textarea
+            aria-label={t('detail.description')}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            onBlur={() =>
+              description !== (detail.description ?? '') &&
+              void save({ description: description || null })
+            }
+            placeholder={t('detail.descriptionPlaceholder')}
+            rows={4}
+            className="w-full resize-y rounded-sm bg-transparent p-2 text-base whitespace-pre-wrap text-text placeholder:text-text-secondary hover:bg-surface-muted"
+          />
+        </section>
+
+        {detail.parentTaskId ? null : (
+          <section className="flex flex-col gap-1 border-b border-border pb-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-semibold text-text">{t('detail.subtasks')}</h3>
+              {detail.subtasks.length ? (
+                <Chip>{`${subtasksDone}/${detail.subtasks.length}`}</Chip>
+              ) : null}
+            </div>
+            <ul className="flex flex-col">
+              {detail.subtasks.map((s) => (
+                <li key={s.id} className="flex min-h-11 items-center gap-3 px-2">
+                  <button
+                    type="button"
+                    aria-label={
+                      s.status === 'done'
+                        ? t('detail.reopen')
+                        : t('row.complete', { title: s.title })
+                    }
+                    onClick={async () => {
+                      await apiPost(
+                        `/api/v1/workspaces/${context.workspaceId}/tasks/${s.id}/${s.status === 'done' ? 'reopen' : 'complete'}`,
+                        {
+                          version: s.version,
+                        },
+                      );
+                      router.refresh();
+                    }}
+                    className={cn(
+                      'text-base',
+                      s.status === 'done' ? 'text-success' : 'text-text-secondary',
+                    )}
+                  >
+                    <span aria-hidden="true">{s.status === 'done' ? '✓' : '○'}</span>
+                  </button>
+                  <Link
+                    href={`${pathname}?task=${s.id}` as never}
+                    scroll={false}
+                    className="min-w-0 flex-1 truncate text-base text-text"
+                  >
+                    {s.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="flex min-h-11 items-center gap-3 px-2">
+              <span aria-hidden="true" className="text-primary">
+                +
+              </span>
+              <input
+                aria-label={t('detail.addSubtask')}
+                value={subtask}
+                onChange={(e) => setSubtask(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && void addSubtask()}
+                placeholder={t('detail.addSubtask')}
+                maxLength={500}
+                className="min-w-0 flex-1 bg-transparent text-base text-text placeholder:text-text-secondary"
+              />
+            </div>
+          </section>
+        )}
+      </fieldset>
       <p role="status" aria-live="polite" className="text-xs text-text-secondary">
         {status === 'saved' ? `✓ ${t('detail.saved')} · ` : ''}
         {t('detail.footer', { date: longDay(detail.createdAt.slice(0, 10), locale) })}
       </p>
     </div>
   );
+}
+
+const DAY = 86_400_000;
+
+/** Figma'da yok (D-065): Figma UI/Popover ve UI/Button ile "…" menüsü — Arşivle, Çöpe taşı. */
+function LifecycleMenu({ detail, context }: { detail: TaskDetailView; context: TaskUiContext }) {
+  const t = useTranslations('tasks.detail');
+  const router = useRouter();
+  const url = `/api/v1/workspaces/${context.workspaceId}/tasks/${detail.id}` as const;
+  return (
+    <Popover
+      label={t('more')}
+      trigger={
+        <button
+          type="button"
+          aria-label={t('more')}
+          className="flex size-11 items-center justify-center rounded-sm text-xl text-text-secondary"
+        >
+          <span aria-hidden="true">⋯</span>
+        </button>
+      }
+    >
+      <div className="flex flex-col">
+        <PopoverClose asChild>
+          <button
+            type="button"
+            className="flex min-h-11 items-center rounded-sm px-3 text-left text-sm text-text"
+            onClick={async () => {
+              await apiPost(`${url}/archive`, { version: detail.version });
+              router.refresh();
+            }}
+          >
+            {t('archive')}
+          </button>
+        </PopoverClose>
+        <PopoverClose asChild>
+          <button
+            type="button"
+            className="flex min-h-11 items-center rounded-sm px-3 text-left text-sm text-danger"
+            onClick={async () => {
+              await apiDelete(url);
+              router.refresh();
+            }}
+          >
+            {t('delete')}
+          </button>
+        </PopoverClose>
+        <p className="max-w-[240px] px-3 pt-2 text-xs text-text-secondary">{t('deleteConfirm')}</p>
+      </div>
+    </Popover>
+  );
+}
+
+/** Arşivdeki/çöpteki görev bandı (BR-DEL-007): "Arşivden çıkar" veya kalan günle "Geri yükle". */
+function LifecycleBand({ detail, context }: { detail: TaskDetailView; context: TaskUiContext }) {
+  const t = useTranslations('tasks.detail');
+  const router = useRouter();
+  const [failed, setFailed] = useState(false);
+  const [now] = useState(() => Date.now());
+  const base = `/api/v1/workspaces/${context.workspaceId}` as const;
+  if (detail.deletedAt) {
+    const days = Math.max(0, Math.ceil((Date.parse(detail.deletedAt) + 30 * DAY - now) / DAY));
+    return (
+      <div className="flex flex-col gap-2">
+        <Banner>{t('deletedBand', { days })}</Banner>
+        {days > 0 ? (
+          <Button
+            className="self-start"
+            onClick={async () => {
+              const result = await apiPost(`${base}/trash/restore`, {
+                id: detail.id,
+                restoreParent: true,
+              });
+              if (!result.ok) setFailed(true);
+              router.refresh();
+            }}
+          >
+            {t('restore')}
+          </Button>
+        ) : null}
+        {failed ? <p className="text-sm text-danger">{t('restoreFailed')}</p> : null}
+      </div>
+    );
+  }
+  if (detail.archivedAt) {
+    return (
+      <div className="flex flex-col gap-2">
+        <Banner>{t('archivedBand')}</Banner>
+        <Button
+          className="self-start"
+          onClick={async () => {
+            await apiPost(`${base}/tasks/${detail.id}/unarchive`, { version: detail.version });
+            router.refresh();
+          }}
+        >
+          {t('unarchive')}
+        </Button>
+      </div>
+    );
+  }
+  return null;
 }

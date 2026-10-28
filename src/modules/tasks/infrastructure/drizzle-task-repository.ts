@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNotNull, isNull, lt, ne, sql } from 'drizzle-orm';
 import type { WorkspaceScope } from '@/modules/workspaces';
 import type { DbExecutor } from '@/shared/db/client';
 import { isUuid } from '@/shared/kernel/id';
@@ -34,6 +34,7 @@ function toTask(row: Row): Task {
     createdBy: row.createdBy,
     archivedAt: row.archivedAt,
     deletedAt: row.deletedAt,
+    deletedBatchId: row.deletedBatchId,
     version: row.version,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
@@ -226,5 +227,123 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
         .set({ projectId, version: sql`${tasks.version} + 1`, updatedAt: now })
         .where(and(eq(tasks.workspaceId, scope.workspaceId), eq(tasks.parentTaskId, parentId)));
     },
+
+    async findAny(scope, id) {
+      if (!isUuid(id)) return null;
+      const [row] = await db
+        .select()
+        .from(tasks)
+        .where(and(eq(tasks.workspaceId, scope.workspaceId), eq(tasks.id, id)))
+        .limit(1);
+      return row ? toTask(row) : null;
+    },
+
+    async setArchived(scope, ids, archivedAt, now) {
+      if (ids.length === 0) return 0;
+      const rows = await db
+        .update(tasks)
+        .set({ archivedAt, version: sql`${tasks.version} + 1`, updatedAt: now })
+        .where(and(inScope(scope), inArray(tasks.id, [...ids])))
+        .returning({ id: tasks.id });
+      return rows.length;
+    },
+
+    async subtasksArchivedWith(scope, parentId, archivedAt) {
+      const rows = await db
+        .select({ id: tasks.id })
+        .from(tasks)
+        .where(
+          and(inScope(scope), eq(tasks.parentTaskId, parentId), eq(tasks.archivedAt, archivedAt)),
+        );
+      return rows.map((r) => r.id);
+    },
+
+    async trash(scope, ids, batchId, now) {
+      if (ids.length === 0) return 0;
+      const rows = await db
+        .update(tasks)
+        .set({
+          deletedAt: now,
+          deletedBatchId: batchId,
+          version: sql`${tasks.version} + 1`,
+          updatedAt: now,
+        })
+        .where(and(inScope(scope), inArray(tasks.id, [...ids])))
+        .returning({ id: tasks.id });
+      return rows.length;
+    },
+
+    async restore(scope, ids, now) {
+      if (ids.length === 0) return 0;
+      const rows = await db
+        .update(tasks)
+        .set({
+          deletedAt: null,
+          deletedBatchId: null,
+          version: sql`${tasks.version} + 1`,
+          updatedAt: now,
+        })
+        .where(
+          and(
+            eq(tasks.workspaceId, scope.workspaceId),
+            inArray(tasks.id, [...ids]),
+            isNotNull(tasks.deletedAt),
+          ),
+        )
+        .returning({ id: tasks.id });
+      return rows.length;
+    },
+
+    async batchMembers(scope, batchId) {
+      if (!isUuid(batchId)) return [];
+      const rows = await db
+        .select()
+        .from(tasks)
+        .where(
+          and(
+            eq(tasks.workspaceId, scope.workspaceId),
+            eq(tasks.deletedBatchId, batchId),
+            isNotNull(tasks.deletedAt),
+          ),
+        );
+      return rows.map(toTask);
+    },
+
+    async listTrash(scope) {
+      const rows = await db
+        .select()
+        .from(tasks)
+        .where(and(eq(tasks.workspaceId, scope.workspaceId), isNotNull(tasks.deletedAt)))
+        .orderBy(desc(tasks.deletedAt));
+      return rows.map(toTask);
+    },
+
+    async purge(scope, batchId) {
+      if (batchId !== null && !isUuid(batchId)) return 0;
+      // Alt görevler ebeveyn bağlantısıyla (ON DELETE CASCADE) birlikte silinir (BR-DEL-005).
+      const rows = await db
+        .delete(tasks)
+        .where(
+          and(
+            eq(tasks.workspaceId, scope.workspaceId),
+            isNotNull(tasks.deletedAt),
+            batchId ? eq(tasks.deletedBatchId, batchId) : undefined,
+          ),
+        )
+        .returning({ id: tasks.id });
+      return rows.length;
+    },
   };
+}
+
+/**
+ * BR-DEL-003 / D-053: süresi dolan silme gruplarının kalıcı silinmesi (tüm çalışma alanları; sistem işi).
+ * İdempotenttir: tekrar çalıştırıldığında silinecek kayıt kalmaz.
+ */
+export async function purgeExpiredTasks(db: DbExecutor, before: Date): Promise<number> {
+  const rows = await db
+    .delete(tasks)
+    .where(and(isNotNull(tasks.deletedAt), lt(tasks.deletedAt, before)))
+    .returning({ id: tasks.id });
+  return rows.length;
 }

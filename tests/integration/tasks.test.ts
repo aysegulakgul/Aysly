@@ -3,7 +3,9 @@ import { NextResponse } from 'next/server';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { registerUser } from '@/modules/identity/application/register-user';
 import { createDrizzleRegistrationStore } from '@/modules/identity/infrastructure/drizzle-registration-store';
+import { deleteTask, purgeTrash } from '@/modules/tasks/application/lifecycle';
 import { moveTask, myTasks } from '@/modules/tasks/application/organize';
+import { purgeExpiredTasks } from '@/modules/tasks/infrastructure/drizzle-task-repository';
 import { completeTask, createTask, getTask, updateTask } from '@/modules/tasks/application/tasks';
 import { completeOnboarding } from '@/modules/preferences/application/onboarding';
 import { createDrizzleOnboardingStore } from '@/modules/preferences/infrastructure/drizzle-onboarding-store';
@@ -278,3 +280,38 @@ async function completeOnboardingWithProject(userId: string) {
   );
   await client`delete from projects where kind = 'standard' and name <> 'Ev'`;
 }
+
+describe('çöp kutusu (veritabanı)', () => {
+  it('BR-DEL-003: temizlik işi yalnızca 30 günü dolan grupları kalıcı siler; alt görevler de gider', async () => {
+    const { scope } = await newUser('a@ornek.test');
+    const old = await createTask(deps(), scope, { title: 'Eski' });
+    const fresh = await createTask(deps(), scope, { title: 'Yeni' });
+    if (!old.ok || !fresh.ok) throw new Error('oluşturulamadı');
+    await createTask(deps(), scope, { title: 'Eski alt', parentTaskId: old.value.id });
+    await database.transaction((tx) => deleteTask({ ...taskDeps(tx), clock }, scope, old.value.id));
+    await database.transaction((tx) =>
+      deleteTask({ ...taskDeps(tx), clock }, scope, fresh.value.id),
+    );
+    await client`update tasks set deleted_at = now() - interval '31 days' where title like 'Eski%'`;
+    expect(await purgeExpiredTasks(database, new Date(Date.now() - 30 * 86_400_000))).toBe(2);
+    const rows = await client<{ title: string }[]>`select title from tasks`;
+    expect(rows.map((r) => r.title)).toEqual(['Yeni']);
+  });
+
+  it('BR-DEL-005: kalıcı silme yalnızca çöptekileri ve yalnızca kendi alanında siler', async () => {
+    const a = await newUser('a@ornek.test');
+    const b = await newUser('b@ornek.test');
+    const active = await createTask(deps(), a.scope, { title: 'Aktif' });
+    const gone = await createTask(deps(), a.scope, { title: 'Çöpte' });
+    const theirs = await createTask(deps(), b.scope, { title: 'B çöpte' });
+    if (!active.ok || !gone.ok || !theirs.ok) throw new Error('oluşturulamadı');
+    await deleteTask(deps(), a.scope, gone.value.id);
+    await deleteTask(deps(), b.scope, theirs.value.id);
+    expect(await purgeTrash(deps(), a.scope, { batchId: null, confirm: true })).toEqual({
+      ok: true,
+      value: { purged: 1 },
+    });
+    const rows = await client<{ title: string }[]>`select title from tasks order by title`;
+    expect(rows.map((r) => r.title)).toEqual(['Aktif', 'B çöpte']);
+  });
+});

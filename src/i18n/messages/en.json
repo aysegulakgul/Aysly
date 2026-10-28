@@ -21,7 +21,9 @@
     "BR-SUB-001": "A subtask can’t have its own subtasks.",
     "BR-SUB-002": "A subtask can’t be moved on its own. Turn it into a standalone task first.",
     "BR-SUB-005": "A task can have at most 100 subtasks.",
-    "BR-TAG-003": "A task can have at most 20 tags and a workspace at most 500."
+    "BR-TAG-003": "A task can have at most 20 tags and a workspace at most 500.",
+    "BR-DEL-003": "The 30-day trash period is over; this item can’t be restored.",
+    "BR-SUB-004": "A subtask whose parent is in the trash must be restored together with its parent."
   },
   "ui": {
     "offline": "No connection. Your changes may not be saved.",
@@ -352,7 +354,16 @@
       "conflict": "This task was changed somewhere else.",
       "keepMine": "Apply mine",
       "takeTheirs": "Take the latest",
-      "notFound": "The task doesn’t exist or you don’t have access."
+      "notFound": "The task doesn’t exist or you don’t have access.",
+      "more": "More actions",
+      "archive": "Archive",
+      "unarchive": "Unarchive",
+      "delete": "Move to trash",
+      "archivedBand": "This task is archived. Unarchive it to edit.",
+      "deletedBand": "This task is in the trash. {days, plural, =0 {About to be deleted; it can’t be restored.} one {You can restore it within # day.} other {You can restore it within # days.}}",
+      "restore": "Restore",
+      "restoreFailed": "Couldn’t restore.",
+      "deleteConfirm": "The task and its subtasks will move to the trash. You can restore them within 30 days."
     },
     "completeDialog": {
       "title": "Complete the subtasks too?",

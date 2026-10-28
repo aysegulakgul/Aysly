@@ -173,6 +173,63 @@
       "path": "/api/v1/workspaces/[ws]/tags",
       "access": "workspace",
       "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tags"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/tasks/[id]/archive",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tasks/01900000-0000-7000-8000-000000000002/archive",
+      "body": {
+        "version": 1
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/tasks/[id]/unarchive",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tasks/01900000-0000-7000-8000-000000000002/unarchive",
+      "body": {
+        "version": 1
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/workspaces/[ws]/tasks/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tasks/01900000-0000-7000-8000-000000000002"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/[ws]/trash",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/trash"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/workspaces/[ws]/trash",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/trash",
+      "body": {
+        "confirm": true
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/trash/restore",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/trash/restore",
+      "body": {
+        "batchId": "x"
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/workspaces/[ws]/trash/[batchId]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/trash/01900000-0000-7000-8000-000000000003",
+      "body": {
+        "confirm": true
+      }
     }
   ]
 }

@@ -378,6 +378,13 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Alt görevli görev tamamlanırken Figma "Görevi tamamla" (4:69469) penceresi çıkar (BR-SUB-003). İşlem ve alt görevlerin tamamlanması tek veritabanı işleminde; taşımada da alt görevler aynı işlemde taşınır.
 - Yeni paket: `@radix-ui/react-dialog` (yığında onaylı Radix). Figma'dan `chevron-down` ikonu indirildi.
 
+### D-079 — Arşiv ve çöp kutusu: Faz 4 kapsamı (teknik/uygulama)
+- Durum: ONAYLI (teknik; IMPLEMENTATION_PLAN faz sınırına uyum) · Tarih: 2026-10-28 · Karar veren: Claude
+- Plan, toplu işlemleri (BR-TASK-008) ve Arşiv/Çöp kutusu sayfalarını Faz 5'e koyar. Faz 4'te görev arşivleme, çöpe taşıma, geri yükleme, kalıcı silme API'leri ve 30 günlük temizlik işi (`trash.purge`, saatlik ve açılışta, D-053) uygulandı.
+- Arayüz (D-065, Figma'da yok): görev detayında "⋯" menüsü (Arşivle / Çöpe taşı). Arşivdeki veya çöpteki göreve gidilince salt okunur bant ve "Arşivden çıkar" / "Geri yükle" (kalan gün ile) gösterilir (BR-DEL-007). Çöpe taşıma sonrası panelde görünen bu bant "geri al" görevini görür.
+- Geri yükleme: ebeveyn tek başına geri yüklenince aynı gruptaki alt görevler de döner; ebeveyni çöpteki alt görev ebeveyniyle geri yüklenir (BR-SUB-004). Projesi artık yoksa görev Inbox'a döner; proje çöpü Faz 5'te geldiğinde "projeyi de geri yükle" seçimi eklenecek (BR-DEL-004).
+- Çöpe taşıma sürüm kontrolü yapmaz (tüm kaydı hedefler, geri alınabilir); arşivleme yapar.
+
 ---
 
 ## 5. Faz kapanış kayıtları

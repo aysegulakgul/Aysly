@@ -42,7 +42,8 @@ export async function findTaskDetail(
   scope: WorkspaceScope,
   id: string,
 ): Promise<TaskDetailView | null> {
-  const result = await getTaskDetail(taskDeps(db()), scope, id);
+  // BR-DEL-007: çöpteki göreve doğrudan gidilirse "çöp kutusunda" bandıyla gösterilir.
+  const result = await getTaskDetail(taskDeps(db()), scope, id, { includeDeleted: true });
   return result.ok
     ? { ...toSummaryJson(result.value), subtasks: result.value.subtaskList.map(toSummaryJson) }
     : null;

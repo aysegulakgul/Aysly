@@ -176,6 +176,8 @@ Hesap varlığını ifşa etmeme: `sign-up` mevcut e-postada da kullanıcıya ge
 
 **Uygulandı (Faz 4, 3. bölüm):** Oluşturmada `parentTaskId` ve `tagNames`; `PATCH` gövdesinde `tagNames` (görevin etiket kümesini verilen adlarla **değiştirir**; boş dizi tüm etiketleri kaldırır); `POST …/complete` gövdesinde `completeSubtasks`; `POST …/move` (`{ version, projectId }`, sıra hedefin sonu; sıra içi taşıma Faz 5'te), `POST …/detach`; `GET /workspaces/{ws}/my-tasks` (`[{ group: overdue|today|tomorrow|thisWeek|later|none, tasks }]`); `GET /workspaces/{ws}/projects` (salt okunur ilk sürüm: `{ id, name, kind }`, Inbox ilk); `GET /workspaces/{ws}/tags`. Liste ve detay yanıtlarında `project { id, name, kind }`, `tags`, `subtaskCount { total, done }`; detayda ayrıca `subtasks`. Etiket yönetimi uç noktaları (`POST/PATCH/DELETE /tags`, BR-TAG-002) henüz yok.
 
+**Uygulandı (Faz 4, 4. bölüm):** `POST …/archive`, `POST …/unarchive` (`{ version }`; alt görevler birlikte), `DELETE /workspaces/{ws}/tasks/{id}` (çöpe taşır; `{ data: { batchId, affected } }`), `GET /workspaces/{ws}/tasks/{id}?includeDeleted=true`, `GET /trash`, `POST /trash/restore`, `DELETE /trash/{batchId}` ve `DELETE /trash` (`{ confirm: true }`). Çöp kutusu şimdilik yalnızca görevleri içerir (proje çöpü Faz 5). Toplu işlem (`POST /tasks/bulk`) ve `GET /archive` Faz 5'te.
+
 ### 6.2. Liste sorgusu (`TaskFilter` v1)
 
 | Parametre | Tür | Örnek | Not |
