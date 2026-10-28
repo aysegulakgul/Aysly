@@ -194,6 +194,37 @@
       "onlyThis": "Başka cihazda açık oturumun yok.",
       "unknownDevice": "Bilinmeyen cihaz",
       "failed": "Oturum kapatılamadı. Tekrar dene."
+    },
+    "onboardingTitle": "Başlangıç rehberi",
+    "onboardingDescription": "Kullanım amacını ve başlangıç düzenini yeniden seçmek için rehberi baştan başlat.",
+    "onboardingRestart": "Rehberi yeniden başlat"
+  },
+  "onboarding": {
+    "title": "Aysly’ye hoş geldin",
+    "step": "Adım {current}/{total}",
+    "skip": "Atla",
+    "back": "Geri",
+    "next": "Devam",
+    "finish": "Bitir",
+    "failed": "Kaydedilemedi. Tekrar dene.",
+    "intents": {
+      "title": "Aysly’yi ne için kullanacaksın?",
+      "description": "Birden fazla seçebilirsin. Seçimin yalnızca başlangıç düzenini belirler; her şeyi sonradan değiştirebilirsin.",
+      "personal": "Kişisel hayatım",
+      "work": "İşim ve projelerim"
+    },
+    "samples": {
+      "title": "Örnek projeler oluşturulsun mu?",
+      "description": "Başlaman için boş projeler oluşturulur; içlerine görev eklenmez. İstediğin zaman silebilirsin.",
+      "list": "Oluşturulacak projeler: {names}",
+      "none": "Bir amaç seçmediğin için örnek proje oluşturulmayacak.",
+      "yes": "Evet, oluştur",
+      "no": "Hayır, boş başla",
+      "notice": "Projeler sayfası sonraki aşamada geliyor; projelerin orada görünecek."
+    },
+    "prefs": {
+      "title": "Temel tercihlerin",
+      "description": "Tarayıcından aldığımız ayarlar. Gerekirse değiştir; sonra Ayarlar’dan da düzenleyebilirsin."
     }
   }
 }

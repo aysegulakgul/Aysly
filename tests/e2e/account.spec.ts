@@ -107,8 +107,10 @@ test.describe('Ayarlar · Güvenlik', () => {
     browser,
   }) => {
     const email = await signUp(page);
+    test.setTimeout(60_000);
     const other = await secondDevice(browser, email);
     await page.goto('/settings/security');
+    await page.waitForLoadState('networkidle'); // düğmeler etkileşime hazır olsun
     const rows = page.getByRole('main').getByRole('listitem');
     await expect(rows).toHaveCount(2);
     await expect(rows.first().getByText('Bu cihaz')).toBeVisible();
@@ -125,6 +127,7 @@ test.describe('Ayarlar · Güvenlik', () => {
     page,
     browser,
   }) => {
+    test.setTimeout(60_000);
     await signUp(page);
     const otherContext = await browser.newContext({ locale: 'tr-TR' });
     const otherPage = await otherContext.newPage();

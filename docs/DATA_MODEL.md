@@ -122,7 +122,7 @@ Kısıt: Her aktif alanda en az bir `owner` (uygulama kuralı + test; Faz 10).
 | all_day_reminder_time | time | Z | `09:00` | BR-REM-001 |
 | dashboard_layout | jsonb | Z | varsayılan liste | BR-DASH-001; Zod şemalı, `{v:1, widgets:[{id, visible}]}` |
 | notification_settings | jsonb | Z | varsayılan | BR-NOTIF-004; MVP: `{v:1, reminder:{inApp:true}}` — yalnızca uygulama içi (D-037). E-posta kanalı ve günlük özet eklenirse şema `v:2` olur. |
-| onboarding | jsonb | Z | `{}` | `{v:1, intents:[], completedAt, skippedAt, checklist:{...}}` |
+| onboarding | jsonb | Z | `{v:1}` | `{v:1, status:'pending'|'completed', intents:[], skips, lastSkippedAt?, completedAt?, samplesCreated}` (Zod şeması: `preferences/domain/onboarding.ts`; eksik alanlar varsayılanla okunur). "İlk adımlar" kontrol listesi Faz 4'te eklenir. |
 | version | int | Z | 1 | |
 | updated_at | timestamptz | Z | | |
 

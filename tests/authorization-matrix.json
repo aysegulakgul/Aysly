@@ -62,6 +62,27 @@
       "path": "/api/v1/me/sessions/[id]",
       "access": "self",
       "sample": "/api/v1/me/sessions/01900000-0000-7000-8000-000000000000"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/me/onboarding",
+      "access": "self",
+      "body": {
+        "intents": [],
+        "createSamples": false
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/me/onboarding/skip",
+      "access": "self",
+      "body": {}
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/me/onboarding/restart",
+      "access": "self",
+      "body": {}
     }
   ]
 }

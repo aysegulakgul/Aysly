@@ -20,3 +20,9 @@ export async function getCurrentActor(): Promise<Actor | null> {
   const session = await getSession();
   return session ? { userId: session.user.id, sessionId: session.session.id } : null;
 }
+
+/** Oturumun açıldığı an (ONBOARDING §2: atlanan onboarding bir sonraki girişte bir kez daha önerilir). */
+export async function getSessionStartedAt(): Promise<Date | null> {
+  const session = await getSession();
+  return session ? new Date(session.session.createdAt) : null;
+}

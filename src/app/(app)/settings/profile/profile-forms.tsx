@@ -169,3 +169,33 @@ export function EmailPanel({
     </Panel>
   );
 }
+
+/** ONBOARDING §2: rehber Ayarlar'dan yeniden başlatılabilir. */
+export function OnboardingPanel() {
+  const t = useTranslations('settings');
+  const tOnboarding = useTranslations('onboarding');
+  const router = useRouter();
+  const [pending, setPending] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  async function restart() {
+    setPending(true);
+    const result = await apiPost('/api/v1/me/onboarding/restart', {});
+    setPending(false);
+    if (!result.ok) return setFailed(true);
+    router.push('/onboarding');
+  }
+
+  return (
+    <Panel>
+      <SectionHeading>{t('onboardingTitle')}</SectionHeading>
+      <p className="text-sm text-text-secondary">{t('onboardingDescription')}</p>
+      {failed ? <Banner>{tOnboarding('failed')}</Banner> : null}
+      <div>
+        <Button onClick={restart} loading={pending}>
+          {t('onboardingRestart')}
+        </Button>
+      </div>
+    </Panel>
+  );
+}

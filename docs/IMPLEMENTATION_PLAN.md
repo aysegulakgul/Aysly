@@ -9,8 +9,8 @@
 |---|---|---|---|---|---|
 | 1 | Ürün analizi, mimari kararlar, dokümantasyon | **Kapandı** | — | 2026-10-27 | 2026-10-27 |
 | 2 | Proje altyapısı ve temel mimari | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
-| 3 | Kimlik doğrulama, hesap, tercihler, onboarding | **Devam ediyor** — kimlik doğrulama bölümü tamam | Profil ve Güvenlik ekranlarının onayı (D-065); OQ-037 (onboarding zamanlaması) | 2026-10-28 | — |
-| 4 | Görev yönetimi, Inbox, My Tasks, dashboard | Başlamadı | — | — | — |
+| 3 | Kimlik doğrulama, hesap, tercihler, onboarding | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
+| 4 | Görev yönetimi, Inbox, My Tasks, dashboard | **Devam ediyor** — planlama | — | 2026-10-28 | — |
 | 5 | Projeler ve görev görünümleri | Başlamadı | — | — | — |
 | 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | Başlamadı | — | — | — |
 | 7 | Notlar, hedefler, arama | Başlamadı | Not editörü paketi seçimi (Faz 7 başında sunulur) | — | — |
@@ -93,7 +93,8 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
 - **İlerleme (2026-10-28):**
   - **Tamam:** Veritabanı (kimlik, çalışma alanı, üyelik, Inbox, tercihler, denetim); tek işlemli kayıt (BR-WS-001, D-067); Better Auth ile giriş, çıkış, oturum, şifre sıfırlama, e-posta doğrulama; güvenlik e-postaları (D-055); hız sınırları ve Origin kontrolü; giriş, kayıt, şifremi unuttum ve şifre sıfırlama ekranları (D-069 ile onaylandı); korumalı ana sayfa; uygulama kabuğu (kenar çubuğu, alt navigasyon, mobil Menü; D-071); Bugün ekranında selamlama ve boş durum; `GET/PATCH /me/preferences`; Ayarlar · Görünüm (tema, yoğunluk, dil) ve Ayarlar · Tarih ve saat; çıkış düğmesi (D-072 ile onaylandı); yetki matrisi kontrolü.
   - Ayarlar · Profil (ad, e-posta durumu, doğrulamayı yeniden gönderme, e-posta değiştirme) ve Ayarlar · Güvenlik (şifre değiştirme, oturumlar); `/me*` uç noktaları (D-073).
-  - **Kalan:** Onboarding (OQ-037 yanıtına bağlı).
+  - Onboarding: 3 adım, atlama kuralı, örnek projeler, amaca göre dashboard düzeni, Ayarlar'dan yeniden başlatma (D-074).
+- **Sonuç (2026-10-28):** Faz 3 kapandı. `pnpm verify` 13/13 yeşil. Kabul ölçütleri karşılandı: tek işlemli kayıt; giriş, çıkış, sıfırlama ve doğrulama E2E; hız sınırları ve numaralandırma önlemleri test edildi; ayar değişiklikleri kalıcı; TR/EN geçişi çalışıyor. Bilinen sapmalar SECURITY §4.2 notlarında: oturum token'ı açık metin, 90 günlük mutlak sınır yok. İkisi de yayına alma öncesi listesinde (OQ-032).
 
 ### Faz 4 — Görev yönetimi, Inbox, My Tasks, dashboard
 - **Bağımlılık:** Faz 3.

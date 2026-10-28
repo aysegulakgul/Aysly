@@ -1,8 +1,11 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { EmptyState } from '@/ui/components/feedback';
 import { Icon } from '@/ui/components/icon';
 import { Panel } from '@/ui/components/panel';
+import { getSessionStartedAt } from '@/modules/identity';
+import { findOnboardingOffer } from '@/modules/preferences';
 import { getViewer } from '../viewer';
 import { PageFrame } from './page-frame';
 import { dayPart, firstName, longDate } from './time-display';
@@ -19,6 +22,9 @@ export default async function TodayPage() {
     getTranslations('dashboard'),
   ]);
   if (!viewer) return null; // düzen oturumsuz isteği zaten yönlendirir
+  // ONBOARDING §2: kayıttan sonra ve (bir kez atlandıysa) sonraki girişte rehber önerilir.
+  const startedAt = await getSessionStartedAt();
+  if (startedAt && (await findOnboardingOffer(viewer.user.id, startedAt))) redirect('/onboarding');
   const now = new Date();
   const { timezone } = viewer.preferences;
   return (

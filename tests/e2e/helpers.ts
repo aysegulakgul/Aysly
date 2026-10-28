@@ -1,17 +1,34 @@
 import { expect, type Page } from '@playwright/test';
-import { MAILPIT_API } from './e2e-env';
+import { E2E_BASE_URL, MAILPIT_API } from './e2e-env';
 
 export const PASSWORD = 'ayisigi gece 2026';
 export const uniqueEmail = () =>
   `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@ornek.test`;
 
-/** Arayüzden kayıt olur; kullanıcı hemen uygulamaya girer (D-040). */
-export async function signUp(page: Page, email = uniqueEmail(), name = 'E2E Kullanıcı') {
+/**
+ * Arayüzden kayıt olur; kullanıcı hemen uygulamaya girer (D-040) ve onboarding açılır (ONBOARDING §2).
+ * Varsayılan olarak onboarding API üzerinden amaç seçilmeden tamamlanır ve ana sayfaya gidilir;
+ * onboarding testleri `keepOnboarding` ile rehberde kalır.
+ */
+export async function signUp(
+  page: Page,
+  email = uniqueEmail(),
+  name = 'E2E Kullanıcı',
+  options: { keepOnboarding?: boolean } = {},
+) {
   await page.goto('/sign-up');
   await page.getByLabel('Ad').fill(name);
   await page.getByLabel('E-posta').fill(email);
   await page.getByLabel('Şifre').fill(PASSWORD);
   await page.getByRole('button', { name: 'Kayıt ol' }).click();
+  await expect(page).toHaveURL('/onboarding');
+  if (options.keepOnboarding) return email;
+  const done = await page.request.post('/api/v1/me/onboarding', {
+    data: { intents: [], createSamples: false },
+    headers: { origin: E2E_BASE_URL },
+  });
+  expect(done.ok()).toBe(true);
+  await page.goto('/');
   await expect(page).toHaveURL('/');
   return email;
 }

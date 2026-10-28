@@ -1,3 +1,4 @@
+import { and, eq } from 'drizzle-orm';
 import type { DbExecutor } from '@/shared/db/client';
 import { workspaceMemberships, workspaces } from './schema';
 
@@ -29,4 +30,17 @@ export async function insertPersonalWorkspace(
     createdAt: input.now,
     updatedAt: input.now,
   });
+}
+
+/** Kullanıcının kişisel çalışma alanı (BR-WS-001: tam olarak bir tane). */
+export async function findPersonalWorkspaceId(
+  db: DbExecutor,
+  userId: string,
+): Promise<string | null> {
+  const [row] = await db
+    .select({ id: workspaces.id })
+    .from(workspaces)
+    .where(and(eq(workspaces.ownerUserId, userId), eq(workspaces.type, 'personal')))
+    .limit(1);
+  return row?.id ?? null;
 }

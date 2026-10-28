@@ -1,6 +1,6 @@
 # Onboarding ve Kişiselleştirme
 
-> Durum: v0.4 · Son güncelleme: 2026-10-27 · Genel yaklaşım ONAYLI (D-063). **Ekranlar, adımlar, metinler ve başlangıç projelerinin görünümü Figma'daki tasarımlara birebir uyar**; bu belge ile Figma çelişirse Figma geçerlidir, davranış/iş kuralı farkı varsa sorulur. Bağlamsal ipucu tetikleyicileri (§5) P2 (D-061).
+> Durum: v0.5 · Son güncelleme: 2026-10-28 · Genel yaklaşım ONAYLI (D-063). **Ekranlar, adımlar, metinler ve başlangıç projelerinin görünümü Figma'daki tasarımlara birebir uyar**; bu belge ile Figma çelişirse Figma geçerlidir, davranış/iş kuralı farkı varsa sorulur. Bağlamsal ipucu tetikleyicileri (§5) P2 (D-061).
 > İlgili: [USER_PERSONAS.md](USER_PERSONAS.md) · BR-PREF-001..003 · BR-DASH-001
 
 ## 1. Hedefler
@@ -10,6 +10,8 @@
 4. Yoğun kullanıcı onboarding'i tek tıkla atlayabilir.
 
 ## 2. Akış
+
+> **Uygulama durumu (Faz 3, D-074):** 3 adımlı akış, atlama kuralı, örnek projeler ve amaca göre dashboard düzeni uygulandı. Ekran `/onboarding` (D-065: Figma'da yok; giriş ekranlarının düzeni ve Figma bileşenleri). Yeniden başlatma: Ayarlar · Profil → "Başlangıç rehberi". "İlk adımlar" listesi (§4) Faz 4'te. Örnek projeler Faz 5'e kadar görünmez; rehber bunu kullanıcıya söyler.
 
 ```mermaid
 flowchart TD

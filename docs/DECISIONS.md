@@ -343,6 +343,12 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Karar: API_CONTRACTS §3'teki `/api/v1/me*` uç noktaları uygulandı; kurallar identity modülünün application katmanında, kütüphane yalnızca adaptör olarak (`better-auth-credentials.ts`) kullanılıyor. Better Auth'un ilgili yolları HTTP'ye kapatıldı (`disabledPaths`). E-posta değiştirmede yeni adrese doğrulama bağlantısı gider, doğrulanınca adres değişir; eski adrese ek e-posta gönderilmez (D-055, D-062).
 - Sonuçlar: Ürün davranışı değişmedi. E2E testi kapalı yolların 404 döndüğünü doğruluyor.
 
+### D-074 — Onboarding Faz 3'te tamamıyla (OQ-037)
+- Durum: ONAYLI · Tarih: 2026-10-28 · Karar veren: Ürün sahibi ("B seçeneği ile devam edelim")
+- Karar: Üç adımlı onboarding Faz 3'te kuruldu: amaç seçimi, örnek projeler, temel tercihlerin onayı. Yanıtlar, başlangıç dashboard düzeni ve örnek projeler kaydedilir.
+- Sonuçlar: Örnek projeler proje sayfaları gelene kadar (Faz 5) görünmez; onboarding bunu kullanıcıya açıkça söyler. Dashboard düzeni Faz 4'teki widget'larla birlikte görünür hale gelir. "İlk adımlar" kontrol listesi görevlerle birlikte Faz 4'te.
+- Uygulama ayrıntıları (Claude, §5.5): "Atla" sayısı tutulur; bir kez atlanan rehber yalnızca atlamadan sonra açılan bir oturumda ("sonraki giriş") bir kez daha önerilir, ikinci atlamadan sonra önerilmez. Yeniden başlatma Ayarlar · Profil'deki "Başlangıç rehberi" panelinden yapılır. Örnek projeler bir kez oluşturulur; rehber yeniden başlatılsa da tekrar oluşturulmaz.
+
 ---
 
 ## 5. Faz kapanış kayıtları
@@ -351,3 +357,4 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 |---|---|---|---|
 | Faz 1 — Analiz ve dokümantasyon | 2026-10-27 | Ürün sahibi ("Artık geliştirme aşamasına geçelim") | OQ-001..OQ-034 kapandı (D-030..D-063). Açık: yalnızca OQ-032 (yayına alma, ertelendi). |
 | Faz 2 — Proje altyapısı | 2026-10-28 | Ürün sahibi ("onaylıyorum") | `pnpm verify` 12/12 yeşil; sapmalar IMPLEMENTATION_PLAN Faz 2 Sonuç bölümünde. `feat/faz-2-altyapi` → `main`. |
+| Faz 3 — Kimlik, hesap, tercihler, onboarding | 2026-10-28 | Ürün sahibi ("Faz 3'ü kapatıp 4'e geçelim") | `pnpm verify` 13/13 yeşil. Onboarding ekranı (D-065) ürün sahibinin görsel incelemesine sunuldu; değişiklik istenirse Faz 4 içinde yapılır. `feat/faz-3-kimlik` → `main`. |

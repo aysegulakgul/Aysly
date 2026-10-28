@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { getViewer } from '../../../viewer';
-import { EmailPanel, ProfileForm } from './profile-forms';
+import { EmailPanel, OnboardingPanel, ProfileForm } from './profile-forms';
 
 /** Ayarlar · Profil (D-065: Figma'da yok; Görünüm ekranının düzeni ve Figma UI/Panel, UI/Input, UI/Button ile). */
 export default async function ProfileSettingsPage({
@@ -23,6 +23,7 @@ export default async function ProfileSettingsPage({
         verified={viewer.user.emailVerified}
         justVerified={query.email === 'verified' && !query.error}
       />
+      <OnboardingPanel />
     </>
   );
 }

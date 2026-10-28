@@ -19,11 +19,10 @@ Bu dosya, **ürün sahibinin kararını bekleyen** konuların tek kaynağıdır.
 
 | ID | Konu | Engellediği faz | Öneri (kısa) | Durum |
 |---|---|---|---|---|
-| OQ-037 | Onboarding ne zaman yapılsın? (örnek projeler ve "İlk adımlar" listesi Faz 4–5 özelliklerine bağlı) | Faz 3 kapanışı | Onboarding'i Faz 5 sonuna taşı | AÇIK |
 | OQ-032 | Yayına alma (hosting, alan adı, e-posta sağlayıcı, hata izleme, yedekleme) | Yayın kararı (MVP sonrası) | Şimdi karar gerekmiyor | AÇIK (ertelendi) |
 
 
-### OQ-037 — Onboarding'in zamanlaması
+### OQ-037 — Onboarding'in zamanlaması — KAPANDI (D-074: seçenek B)
 
 **Bağlam.** Plan onboarding'i Faz 3'e koyuyor (ONBOARDING §2–3). Ancak onboarding'in somut sonuçları sonraki fazlardaki özelliklere bağlı:
 - Adım 2 "örnek projeler" (Ev, İş, Sağlık…): proje sayfaları Faz 5'te geliyor; Faz 3'te oluşturulan projeler Faz 5'e kadar hiçbir yerde görünmez.
@@ -111,5 +110,6 @@ D-045 gereği şimdilik yalnızca yerel ortam kullanılıyor. Yayına alma karar
 | OQ-034 | Ürün/UX ayrıntıları | Genel öneriler onaylandı; arayüz tasarımında tek kaynak Figma; eksik/belirsiz detayda önce ürün sahibine sorulur. | D-063 |
 | OQ-035 | Açık temada eksik iki Figma rengi | Claude temaya uygun belirledi: support-1 `#dfe3f6`, support-2 `#d6d6cf`. | D-066 |
 | OQ-036 | Kayıtta hesap varlığının gizlenmesi | Şimdilik genel mesaj + hız sınırı; kayıttan hemen sonra kullanım korunur; yayına alma öncesi yeniden değerlendirilir. | D-070 |
+| OQ-037 | Onboarding zamanlaması | Faz 3'te tamamıyla; örnek projeler Faz 5'te görünür hale gelir. | D-074 |
 
 Kapanan soruların değerlendirilen seçenekleri DECISIONS.md'deki ilgili kaydın "Alternatifler" alanında özetlenmiştir.

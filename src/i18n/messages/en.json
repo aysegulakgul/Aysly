@@ -194,6 +194,37 @@
       "onlyThis": "You have no open sessions on other devices.",
       "unknownDevice": "Unknown device",
       "failed": "The session couldn’t be signed out. Try again."
+    },
+    "onboardingTitle": "Getting started guide",
+    "onboardingDescription": "Restart the guide to choose your purpose and starting layout again.",
+    "onboardingRestart": "Restart guide"
+  },
+  "onboarding": {
+    "title": "Welcome to Aysly",
+    "step": "Step {current}/{total}",
+    "skip": "Skip",
+    "back": "Back",
+    "next": "Continue",
+    "finish": "Finish",
+    "failed": "Couldn’t save. Try again.",
+    "intents": {
+      "title": "What will you use Aysly for?",
+      "description": "You can choose more than one. Your choice only sets the starting layout; you can change everything later.",
+      "personal": "My personal life",
+      "work": "My work and projects"
+    },
+    "samples": {
+      "title": "Create sample projects?",
+      "description": "Empty projects are created to help you start; no tasks are added. You can delete them anytime.",
+      "list": "Projects to create: {names}",
+      "none": "You didn’t choose a purpose, so no sample projects will be created.",
+      "yes": "Yes, create them",
+      "no": "No, start empty",
+      "notice": "The projects page arrives in a later phase; your projects will appear there."
+    },
+    "prefs": {
+      "title": "Your basic preferences",
+      "description": "Taken from your browser. Change them if needed; you can also edit them later in Settings."
     }
   }
 }

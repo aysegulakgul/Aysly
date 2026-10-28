@@ -109,6 +109,44 @@ export function ThemeChoice<T extends 'light' | 'dark' | 'system'>({
   );
 }
 
+/**
+ * Seçenek kartı: Figma UI/ThemePreview kartının kenarlık ve seçili hali (4:67754), önizleme alanı olmadan.
+ * `type="checkbox"` çoklu, `type="radio"` tekli seçim içindir; seçim işareti ve kenarlıkla gösterilir.
+ */
+export function OptionCard({
+  type,
+  name,
+  checked,
+  onChange,
+  children,
+}: {
+  type: 'checkbox' | 'radio';
+  name: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  children: ReactNode;
+}) {
+  const mark = type === 'radio' ? (checked ? '◉ ' : '○ ') : checked ? '☑ ' : '☐ ';
+  return (
+    <label
+      className={cn(
+        'flex min-h-11 w-full cursor-pointer items-center rounded-md p-3 text-base has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary',
+        checked ? 'border-2 border-primary text-primary' : 'border border-border text-text',
+      )}
+    >
+      <input
+        type={type}
+        name={name}
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        className="sr-only"
+      />
+      <span aria-hidden="true">{mark}</span>
+      {children}
+    </label>
+  );
+}
+
 /** Figma UI/Input/Normal (4:67778) görünümünde seçim kutusu: "Türkçe  ▾". */
 export function Select({
   label,

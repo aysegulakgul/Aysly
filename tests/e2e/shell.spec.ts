@@ -149,11 +149,13 @@ test.describe('PATCH /api/v1/me/preferences (oturumsuz 401: authorization.spec.t
     const api = page.request;
 
     const current = await (await api.get(url)).json();
-    expect(current.data).toMatchObject({ theme: 'system', version: 1 });
+    // Onboarding tamamlandığında da sürüm artar; testler güncel sürümden ilerler.
+    expect(current.data).toMatchObject({ theme: 'system' });
+    const v: number = current.data.version;
 
     // BR-PREF-001: geçersiz saat dilimi → 400
     const badTz = await api.patch(url, {
-      data: { version: 1, timezone: 'Mars/Olympus' },
+      data: { version: v, timezone: 'Mars/Olympus' },
       headers: origin,
     });
     expect(badTz.status()).toBe(400);
@@ -161,29 +163,29 @@ test.describe('PATCH /api/v1/me/preferences (oturumsuz 401: authorization.spec.t
 
     // Bilinmeyen alan ve izinli olmayan değer → 400
     expect(
-      (await api.patch(url, { data: { version: 1, userId: 'x' }, headers: origin })).status(),
+      (await api.patch(url, { data: { version: v, userId: 'x' }, headers: origin })).status(),
     ).toBe(400);
     expect(
-      (await api.patch(url, { data: { version: 1, theme: 'neon' }, headers: origin })).status(),
+      (await api.patch(url, { data: { version: v, theme: 'neon' }, headers: origin })).status(),
     ).toBe(400);
 
     // Başka kökenden yazma isteği → 403
     const csrf = await api.patch(url, {
-      data: { version: 1, theme: 'dark' },
+      data: { version: v, theme: 'dark' },
       headers: { origin: 'https://evil.example' },
     });
     expect(csrf.status()).toBe(403);
 
-    const ok = await api.patch(url, { data: { version: 1, theme: 'dark' }, headers: origin });
+    const ok = await api.patch(url, { data: { version: v, theme: 'dark' }, headers: origin });
     expect(ok.status()).toBe(200);
-    expect((await ok.json()).data).toMatchObject({ theme: 'dark', version: 2 });
+    expect((await ok.json()).data).toMatchObject({ theme: 'dark', version: v + 1 });
 
     // Eski sürüm → 409 ve güncel kayıt
-    const stale = await api.patch(url, { data: { version: 1, theme: 'light' }, headers: origin });
+    const stale = await api.patch(url, { data: { version: v, theme: 'light' }, headers: origin });
     expect(stale.status()).toBe(409);
     expect((await stale.json()).error).toMatchObject({
       code: 'VERSION_CONFLICT',
-      current: { theme: 'dark', version: 2 },
+      current: { theme: 'dark', version: v + 1 },
     });
   });
 });
