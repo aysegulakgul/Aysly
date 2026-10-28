@@ -13,7 +13,8 @@
     "unauthenticated": "Your session has ended. Please sign in again."
   },
   "rules": {
-    "BR-ACC-001": "A new account can't be created with this email. If you have an account, sign in or reset your password."
+    "BR-ACC-001": "A new account can't be created with this email. If you have an account, sign in or reset your password.",
+    "BR-ACC-004": "Verify your email address first."
   },
   "ui": {
     "offline": "No connection. Your changes may not be saved.",
@@ -75,7 +76,9 @@
       "invalid": "Enter a valid email address.",
       "too_short": "Password must be at least 10 characters.",
       "too_long": "This field is too long.",
-      "too_common": "This password is too common; choose another one."
+      "too_common": "This password is too common; choose another one.",
+      "incorrect": "Current password is incorrect.",
+      "same": "This is already your email address."
     },
     "network": "Could not connect. Check your internet connection and try again."
   },
@@ -148,6 +151,49 @@
       "0": "Sunday",
       "1": "Monday",
       "6": "Saturday"
+    },
+    "profile": "Profile",
+    "security": "Security",
+    "profileForm": {
+      "title": "Profile",
+      "name": "Name",
+      "save": "Save",
+      "saved": "Your name was saved."
+    },
+    "email": {
+      "title": "Email",
+      "label": "Your email address",
+      "verified": "Verified",
+      "unverified": "Not verified",
+      "unverifiedHint": "Open the link in your inbox to verify your address.",
+      "resend": "Resend verification email",
+      "resent": "We sent a verification link. Check your inbox.",
+      "changeTitle": "Change email address",
+      "newEmail": "New email",
+      "currentPassword": "Current password",
+      "submit": "Send verification link",
+      "sent": "We sent a verification link to your new address. Your current address stays active until you open it.",
+      "needsVerification": "Verify your current address before changing it.",
+      "changed": "Your email address was verified."
+    },
+    "password": {
+      "title": "Password",
+      "current": "Current password",
+      "new": "New password",
+      "hint": "At least 10 characters.",
+      "submit": "Change password",
+      "done": "Your password changed. Sessions on your other devices were signed out."
+    },
+    "sessions": {
+      "title": "Sessions",
+      "description": "Devices where your account is signed in.",
+      "thisDevice": "This device",
+      "lastSeen": "Last active: {date}",
+      "revoke": "Sign out session",
+      "revokeOthers": "Sign out all other sessions",
+      "onlyThis": "You have no open sessions on other devices.",
+      "unknownDevice": "Unknown device",
+      "failed": "The session couldn’t be signed out. Try again."
     }
   }
 }

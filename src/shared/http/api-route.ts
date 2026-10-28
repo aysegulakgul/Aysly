@@ -10,7 +10,7 @@ import { isSameOrigin } from './origin';
 import { REQUEST_ID_HEADER, resolveRequestId } from './request-id';
 
 /** Oturumdaki aktör (ARCHITECTURE §7). Kimlik modülü tarafından çözülür ve rotada enjekte edilir. */
-export type Actor = { userId: string };
+export type Actor = { userId: string; sessionId: string };
 
 /** İsteğin dili: kullanıcının seçtiği dil çerezi, yoksa tarayıcı dili. Hata metinleri bu dilde döner. */
 export function requestLocale(headers: Headers): Locale {
@@ -28,6 +28,8 @@ export type ApiContext = {
   locale: Locale;
   t: Translate;
   actor: Actor;
+  /** Dinamik rota parametreleri (ör. /me/sessions/[id]). */
+  params: Record<string, string>;
   json(status: number, body: unknown, headers?: HeadersInit): NextResponse;
   fail(error: DomainError): NextResponse;
   /** Gövdeyi Zod şemasıyla doğrular; geçersizse 400 yanıtını döner (API_CONTRACTS §2.4). */
@@ -45,8 +47,8 @@ const MUTATING = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 export function apiRoute(options: {
   resolveActor: () => Promise<Actor | null>;
   handler: (ctx: ApiContext) => Promise<Response>;
-}): (request: Request) => Promise<Response> {
-  return async (request) => {
+}): (request: Request, context?: { params: Promise<Record<string, string>> }) => Promise<Response> {
+  return async (request, context) => {
     const requestId = resolveRequestId(request.headers.get(REQUEST_ID_HEADER));
     const locale = requestLocale(request.headers);
     const t = serverText(locale);
@@ -71,6 +73,7 @@ export function apiRoute(options: {
         locale,
         t,
         actor,
+        params: (await context?.params) ?? {},
         json,
         fail,
         async parse(schema) {

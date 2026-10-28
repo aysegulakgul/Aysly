@@ -19,8 +19,23 @@ Bu dosya, **ürün sahibinin kararını bekleyen** konuların tek kaynağıdır.
 
 | ID | Konu | Engellediği faz | Öneri (kısa) | Durum |
 |---|---|---|---|---|
+| OQ-037 | Onboarding ne zaman yapılsın? (örnek projeler ve "İlk adımlar" listesi Faz 4–5 özelliklerine bağlı) | Faz 3 kapanışı | Onboarding'i Faz 5 sonuna taşı | AÇIK |
 | OQ-032 | Yayına alma (hosting, alan adı, e-posta sağlayıcı, hata izleme, yedekleme) | Yayın kararı (MVP sonrası) | Şimdi karar gerekmiyor | AÇIK (ertelendi) |
 
+
+### OQ-037 — Onboarding'in zamanlaması
+
+**Bağlam.** Plan onboarding'i Faz 3'e koyuyor (ONBOARDING §2–3). Ancak onboarding'in somut sonuçları sonraki fazlardaki özelliklere bağlı:
+- Adım 2 "örnek projeler" (Ev, İş, Sağlık…): proje sayfaları Faz 5'te geliyor; Faz 3'te oluşturulan projeler Faz 5'e kadar hiçbir yerde görünmez.
+- Amaca göre dashboard widget sırası: widget'lar Faz 4'te geliyor.
+- "İlk adımlar" kontrol listesi ve "60 saniyede ilk görev" hedefi: görevler Faz 4'te geliyor.
+- Figma'da onboarding ekranı yok (D-065: Claude kurar, onaya sunulur).
+
+| Seçenek | Sonuç |
+|---|---|
+| A. Onboarding'i Faz 5 sonuna taşı | Projeler, görevler ve widget'lar çalışırken kurulur; her adımın sonucu hemen görünür. Faz 3 onboarding olmadan kapanır. **Önerilen.** |
+| B. Faz 3'te tamamını kur | Yanıtlar ve örnek projeler kaydedilir ama Faz 4–5'e kadar görünmez; "çalışmayan özelliği çalışıyormuş gibi gösterme" talimatıyla çelişme riski. |
+| C. Faz 3'te adım 1 ve 3, örnek projeler Faz 5'te | Akış iki parçaya bölünür; daha önce onboarding'i bitirenlere Faz 5'te ek bir soru gerekir. |
 
 ### OQ-036 — Kayıtta hesap varlığının gizlenmesi ile "hemen kullanım" arasındaki çelişki — KAPANDI (D-070)
 

@@ -8,12 +8,14 @@ import { cn } from '@/ui/cn';
 import { NavItem } from '@/ui/components/nav';
 
 /**
- * Figma "Settings categories". Profil, Güvenlik ve diğer kategoriler hazır oldukça eklenir; Varsayılanlar,
- * Bildirimler ve Veri ve gizlilik ait oldukları fazlarda gelir.
+ * Figma "Settings categories" (Figma sırasıyla). Varsayılanlar, Bildirimler ve Veri ve gizlilik ait oldukları
+ * fazlarda gelir.
  */
 const CATEGORIES = [
+  { href: '/settings/profile', glyph: '○', key: 'profile' },
   { href: '/settings/appearance', glyph: '☾', key: 'appearance' },
   { href: '/settings/date-time', glyph: '◷', key: 'dateTime' },
+  { href: '/settings/security', glyph: '▣', key: 'security' },
 ] as const satisfies readonly { href: Route; glyph: string; key: string }[];
 
 export function SettingsCategories() {

@@ -1,29 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { MAILPIT_API } from './e2e-env';
-import { PASSWORD, signUp, uniqueEmail } from './helpers';
-
-type MailSummary = { ID: string; Subject: string; To: { Address: string }[] };
-
-/** Mailpit'te belirli alıcıya giden, konusu eşleşen e-postayı bekler ve metnini döner. */
-async function waitForEmail(to: string, subject: RegExp): Promise<string> {
-  for (let attempt = 0; attempt < 40; attempt++) {
-    const list = (await (
-      await fetch(`${MAILPIT_API}/search?query=${encodeURIComponent(`to:${to}`)}`)
-    ).json()) as {
-      messages: MailSummary[];
-    };
-    const match = list.messages.find((m) => subject.test(m.Subject));
-    if (match) {
-      const detail = (await (await fetch(`${MAILPIT_API}/message/${match.ID}`)).json()) as {
-        Text: string;
-      };
-      return detail.Text;
-    }
-    await new Promise((r) => setTimeout(r, 250));
-  }
-  throw new Error(`E-posta gelmedi: ${to} ${subject}`);
-}
+import { PASSWORD, signUp, uniqueEmail, waitForEmail } from './helpers';
 
 test.describe('Kimlik doğrulama', () => {
   test('korumalı sayfa oturumsuz kullanıcıyı girişe yönlendirir (BR-PERM-001)', async ({

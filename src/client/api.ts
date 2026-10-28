@@ -40,3 +40,4 @@ async function apiRequest<T>(method: string, path: ApiPath, body?: unknown): Pro
 
 export const apiPost = <T>(path: ApiPath, body: unknown) => apiRequest<T>('POST', path, body);
 export const apiPatch = <T>(path: ApiPath, body: unknown) => apiRequest<T>('PATCH', path, body);
+export const apiDelete = (path: ApiPath) => apiRequest<void>('DELETE', path);

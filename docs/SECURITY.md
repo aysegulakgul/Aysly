@@ -48,6 +48,8 @@ Her madde **[MVP]** (lansman öncesi zorunlu) veya **[SONRA]** olarak işaretlid
 - **90 günlük mutlak oturum sınırı** Better Auth'ta yerleşik değil; şu an yalnızca 30 günlük kayan süre uygulanıyor. Yayına alma öncesi ele alınacak.
 - Origin kontrolü: Better Auth uç noktalarında kütüphanenin kendi kontrolü (`trustedOrigins`), kayıt uç noktasında `shared/http/origin.ts`.
 - Kayıt hız sınırında `X-Forwarded-For` başlığına güvenilmez; yerelde proxy olmadığından tüm istekler tek anahtarı paylaşır.
+- Oturum listesi (`GET /me/sessions`) yalnızca kimlik, tarih ve tarayıcı bilgisini döner; oturum token'ı hiçbir yanıtta yer almaz. Better Auth'un token döndüren oturum listeleme yolu ve doğrulama kurallarımızı atlayabilecek hesap yolları dışarıya kapalıdır (D-073).
+- Şifre değiştirme 5/saat, e-posta değiştirme 3/saat (kullanıcı başına); şifre değişince diğer tüm oturumlar her zaman kapanır (istemci bunu seçemez).
 
 ### 4.3. Hesap numaralandırmayı önleme
 - Giriş hatası genel mesaj; şifre sıfırlama her zaman aynı yanıt; kayıt, mevcut e-postada genel yanıt (mevcut sahibe bilgi e-postası MVP'de yok, D-062).

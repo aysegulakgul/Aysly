@@ -13,7 +13,8 @@
     "unauthenticated": "Oturumun sona erdi. Lütfen yeniden giriş yap."
   },
   "rules": {
-    "BR-ACC-001": "Bu e-posta adresiyle yeni hesap açılamıyor. Hesabın varsa giriş yap ya da şifreni sıfırla."
+    "BR-ACC-001": "Bu e-posta adresiyle yeni hesap açılamıyor. Hesabın varsa giriş yap ya da şifreni sıfırla.",
+    "BR-ACC-004": "Önce e-posta adresini doğrula."
   },
   "ui": {
     "offline": "Bağlantı yok. Değişikliklerin kaydedilemeyebilir.",
@@ -75,7 +76,9 @@
       "invalid": "Geçerli bir e-posta adresi yaz.",
       "too_short": "Şifre en az 10 karakter olmalı.",
       "too_long": "Bu alan çok uzun.",
-      "too_common": "Bu şifre çok yaygın; başka bir şifre seç."
+      "too_common": "Bu şifre çok yaygın; başka bir şifre seç.",
+      "incorrect": "Mevcut şifre yanlış.",
+      "same": "Bu zaten kullandığın e-posta adresi."
     },
     "network": "Bağlantı kurulamadı. İnternet bağlantını kontrol edip tekrar dene."
   },
@@ -148,6 +151,49 @@
       "0": "Pazar",
       "1": "Pazartesi",
       "6": "Cumartesi"
+    },
+    "profile": "Profil",
+    "security": "Güvenlik",
+    "profileForm": {
+      "title": "Profil",
+      "name": "Ad",
+      "save": "Kaydet",
+      "saved": "Adın kaydedildi."
+    },
+    "email": {
+      "title": "E-posta",
+      "label": "E-posta adresin",
+      "verified": "Doğrulandı",
+      "unverified": "Doğrulanmadı",
+      "unverifiedHint": "Adresini doğrulamak için gelen kutundaki bağlantıyı aç.",
+      "resend": "Doğrulama e-postasını yeniden gönder",
+      "resent": "Doğrulama bağlantısını gönderdik. Gelen kutunu kontrol et.",
+      "changeTitle": "E-posta adresini değiştir",
+      "newEmail": "Yeni e-posta",
+      "currentPassword": "Mevcut şifre",
+      "submit": "Doğrulama bağlantısı gönder",
+      "sent": "Yeni adresine bir doğrulama bağlantısı gönderdik. Bağlantıyı açana kadar mevcut adresin geçerli kalır.",
+      "needsVerification": "E-posta adresini değiştirmek için önce mevcut adresini doğrula.",
+      "changed": "E-posta adresin doğrulandı."
+    },
+    "password": {
+      "title": "Şifre",
+      "current": "Mevcut şifre",
+      "new": "Yeni şifre",
+      "hint": "En az 10 karakter.",
+      "submit": "Şifreyi değiştir",
+      "done": "Şifren değişti. Diğer cihazlardaki oturumların kapatıldı."
+    },
+    "sessions": {
+      "title": "Oturumlar",
+      "description": "Hesabının açık olduğu cihazlar.",
+      "thisDevice": "Bu cihaz",
+      "lastSeen": "Son etkinlik: {date}",
+      "revoke": "Oturumu kapat",
+      "revokeOthers": "Diğer tüm oturumları kapat",
+      "onlyThis": "Başka cihazda açık oturumun yok.",
+      "unknownDevice": "Bilinmeyen cihaz",
+      "failed": "Oturum kapatılamadı. Tekrar dene."
     }
   }
 }

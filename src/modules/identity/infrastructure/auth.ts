@@ -70,6 +70,11 @@ function createAuth() {
         await sendSecurityEmail('passwordChanged', user); // D-055
       },
     },
+    user: {
+      // BR-ACC-004: yeni adrese doğrulama bağlantısı gider, doğrulanınca e-posta değişir; o zamana kadar eski adres
+      // geçerlidir. Eski adrese onay e-postası MVP'de yok (D-055, D-062).
+      changeEmail: { enabled: true, updateEmailWithoutVerification: false },
+    },
     emailVerification: {
       sendOnSignUp: false, // kayıt kendi use case'imizde; e-posta oradan istenir
       expiresIn: DAY, // BR-ACC-004: 24 saat
@@ -80,6 +85,23 @@ function createAuth() {
       expiresIn: 30 * DAY, // BR-ACC-006: 30 gün hareketsizlikte sona erer
       updateAge: DAY,
     },
+    /**
+     * Bu işlemler kendi /api/v1/me uç noktalarımızdan yapılır: doğrulama kuralları uygulanır, oturum listesinde
+     * token'lar tarayıcıya gönderilmez, şifre değişince diğer oturumlar her zaman kapanır. Kapalı yollar yalnızca
+     * HTTP'den kapanır; sunucu içi `auth().api` çağrıları çalışmaya devam eder.
+     */
+    disabledPaths: [
+      '/update-user',
+      '/change-email',
+      '/change-password',
+      '/verify-password',
+      '/list-sessions',
+      '/revoke-session',
+      '/revoke-sessions',
+      '/revoke-other-sessions',
+      '/delete-user',
+      '/set-password',
+    ],
     rateLimit: {
       enabled: config.AUTH_RATE_LIMIT_ENABLED,
       storage: 'database',
@@ -92,7 +114,7 @@ function createAuth() {
         '/request-password-reset': { window: 60 * 60, max: 3 },
         '/reset-password/*': { window: 60 * 60, max: 10 },
         '/send-verification-email': { window: 60 * 60, max: 3 },
-        '/change-password': { window: 60 * 60, max: 5 },
+        // Şifre ve e-posta değiştirme sınırları kendi uç noktalarımızda (account-handlers.ts).
       },
     },
     hooks: {

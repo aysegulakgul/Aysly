@@ -333,9 +333,15 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Karar: Kenar çubuğu, alt navigasyon, mobil Menü ve ayar kategorilerinde yalnızca çalışan bölümler gösterilir; Inbox, Görevlerim, Takvim, Projeler, Hedefler, Notlar, Bildirimler, arama, "Görev ekle", kayıtlı görünümler, Arşiv ve Çöp kutusu ait oldukları fazda eklenir. Bugün ekranı görevler gelene kadar selamlama, tarih ve dürüst bir boş durum gösterir.
 - `lg` (1024 px) altında UI_UX'teki "çekmece" yerine Figma'daki mobil düzen (alt navigasyon + Menü ekranı) uygulanır (D-063: Figma önceliklidir).
 
-### D-072 — Ayarlar kategorisi ve çıkış düğmesinin yeri (D-065 ekranları, onay bekliyor)
-- Durum: ÖNERİ (ekranlar onaya sunuldu) · Tarih: 2026-10-28 · Karar veren: Ürün sahibi (bekleniyor)
+### D-072 — Ayarlar · Tarih ve saat ekranı ve çıkış düğmesinin yeri (D-065 ekranları)
+- Durum: ONAYLI · Tarih: 2026-10-28 · Karar veren: Ürün sahibi ("onaylıyorum")
 - Figma'da olmayan iki öğe Figma bileşenleriyle kuruldu: (1) **Çıkış yap**: masaüstünde kenar çubuğunda kullanıcı adının altında, mobilde Menü ekranında Ayarlar'ın altında, UI/NavItem görünümünde. (2) **Ayarlar · Tarih ve saat**: Görünüm ekranının düzeninde; saat dilimi, tarih biçimi, saat biçimi ve hafta başlangıcı.
+
+### D-073 — Hesap işlemleri kendi /me uç noktalarımızda (teknik, güvenlik)
+- Durum: ONAYLI (teknik; onaylı kuralları karşılamak için) · Tarih: 2026-10-28 · Karar veren: Claude (CLAUDE.md §5.5)
+- Bağlam: Better Auth'un hazır yolları üç noktada kurallarımızın gerisinde kalıyordu: oturum listesi oturum token'larını tarayıcıya döndürüyor (SECURITY §4.2); şifre değiştirme yaygın şifre listesini uygulamıyor (BR-ACC-002) ve "diğer oturumları kapat" seçimini istemciye bırakıyor (BR-ACC-006); kullanıcı güncelleme ad kuralını uygulamıyor.
+- Karar: API_CONTRACTS §3'teki `/api/v1/me*` uç noktaları uygulandı; kurallar identity modülünün application katmanında, kütüphane yalnızca adaptör olarak (`better-auth-credentials.ts`) kullanılıyor. Better Auth'un ilgili yolları HTTP'ye kapatıldı (`disabledPaths`). E-posta değiştirmede yeni adrese doğrulama bağlantısı gider, doğrulanınca adres değişir; eski adrese ek e-posta gönderilmez (D-055, D-062).
+- Sonuçlar: Ürün davranışı değişmedi. E2E testi kapalı yolların 404 döndüğünü doğruluyor.
 
 ---
 
