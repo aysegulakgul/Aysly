@@ -108,7 +108,10 @@
     "add": "Add",
     "inboxCount": "{count} open tasks",
     "myTasks": "My tasks",
-    "myTasksCount": "{count} open tasks"
+    "myTasksCount": "{count} open tasks",
+    "upcoming": "Upcoming",
+    "todayCount": "{count} tasks",
+    "upcomingCount": "{count} tasks"
   },
   "dashboard": {
     "greeting": {
@@ -118,9 +121,37 @@
       "night": "Good night, {name}"
     },
     "subtitle": "Make some calm space for yourself.",
-    "emptyTitle": "Today’s sections are coming here soon",
-    "emptyDescription": "Tasks you add are in the Inbox. Today, Overdue and Upcoming sections arrive on this page in the next step.",
-    "toInbox": "Go to Inbox"
+    "edit": "Edit",
+    "editTitle": "Edit sections",
+    "editDescription": "Choose and order the sections you want to see.",
+    "moveUp": "Move {widget} up",
+    "moveDown": "Move {widget} down",
+    "save": "Save",
+    "cancel": "Cancel",
+    "widgets": {
+      "today": "Today",
+      "overdue": "Overdue",
+      "upcoming": "Upcoming",
+      "priority": "Priority"
+    },
+    "counts": {
+      "today": "{count} tasks",
+      "overdue": "{count} tasks",
+      "upcoming": "Next 7 days · {count}",
+      "priority": "High · {count}"
+    },
+    "empty": {
+      "today": "Nothing planned for today. Take a look at what’s upcoming.",
+      "overdue": "No overdue tasks.",
+      "upcoming": "No tasks in the next 7 days.",
+      "priority": "No open high-priority tasks."
+    },
+    "allUpcoming": "See all {count} tasks",
+    "toToday": "Move to today",
+    "toTomorrow": "Move to tomorrow",
+    "noTasksTitle": "Start planning your day with a task",
+    "noTasksDescription": "Write your first task with quick add; today’s, overdue and upcoming tasks gather here.",
+    "allHidden": "All sections are hidden. Use “Edit” to add one."
   },
   "settings": {
     "title": "Settings",
@@ -372,6 +403,46 @@
       "onlyParent": "Complete only the main task",
       "cancel": "Cancel",
       "footnote": "Completing all subtasks doesn’t complete the main task automatically."
+    }
+  },
+  "firstSteps": {
+    "title": "First steps",
+    "progress": "{done}/{total}",
+    "close": "Close the first steps list",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "items": {
+      "firstTask": "Add your first task",
+      "moveToProject": "Move a task to a project",
+      "setDate": "Give a task a date",
+      "shortcuts": "Discover keyboard shortcuts (?)"
+    }
+  },
+  "upcoming": {
+    "title": "Upcoming",
+    "subtitle": "{range} · Next 7 days · {count, plural, =0 {no open tasks} one {# open task} other {# open tasks}}",
+    "empty": "You have no open dated tasks in the next 7 days.",
+    "footer": "A date filter of My tasks. Tasks keep their project and status."
+  },
+  "shortcuts": {
+    "title": "Keyboard shortcuts",
+    "description": "Single-key shortcuts don’t work while a text field is focused.",
+    "close": "Close",
+    "items": {
+      "q": "Quick add",
+      "gd": "Go to Today",
+      "gi": "Go to Inbox",
+      "gm": "Go to My tasks",
+      "gu": "Go to Upcoming",
+      "jk": "Move through the list",
+      "enter": "Open task",
+      "complete": "Complete selected task",
+      "t": "Set date",
+      "m": "Move to project",
+      "l": "Add tag",
+      "del": "Move to trash",
+      "undo": "Undo last action (while the notice is shown)",
+      "help": "Open this guide"
     }
   }
 }

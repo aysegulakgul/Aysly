@@ -17,11 +17,14 @@ export {
   postTask,
 } from './http/task-handlers';
 export {
+  findDashboard,
   findInboxCount,
   findInboxTasks,
   findMyTasks,
   findMyTasksCount,
+  findTaskProgress,
   findTaskDetail,
+  type DashboardView,
   type TaskDetailView,
   type TaskView,
 } from './http/task-queries';

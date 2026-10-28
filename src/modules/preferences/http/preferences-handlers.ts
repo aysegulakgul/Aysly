@@ -17,6 +17,13 @@ const PatchPreferencesBody = z.strictObject({
   dateFormat: z.enum(DATE_FORMATS).optional(),
   timeFormat: z.enum(TIME_FORMATS).optional(),
   weekStart: z.union(WEEK_STARTS.map((n) => z.literal(n))).optional(),
+  // BR-DASH-001: sürümlü JSON; bilinmeyen kimlikler sunucuda atılır.
+  dashboardLayout: z
+    .strictObject({
+      v: z.literal(1),
+      widgets: z.array(z.strictObject({ id: z.string().max(40), visible: z.boolean() })).max(20),
+    })
+    .optional(),
 });
 
 /** Dil çerezi bir yıl geçerlidir; oturum açık değilken giriş ekranlarının da bu dilde açılmasını sağlar. */

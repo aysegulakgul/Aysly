@@ -11,6 +11,7 @@ const base: Preferences = {
   dateFormat: 'DD.MM.YYYY',
   timeFormat: '24h',
   weekStart: 1,
+  dashboardLayout: { v: 1, widgets: [] },
   version: 1,
 };
 

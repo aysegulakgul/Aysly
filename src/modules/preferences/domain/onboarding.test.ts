@@ -19,6 +19,7 @@ describe('onboarding durumu (ONBOARDING §2)', () => {
       intents: [],
       skips: 0,
       samplesCreated: false,
+      checklist: { dismissed: false, shortcutsSeen: false },
     });
     expect(parseOnboarding('bozuk').status).toBe('pending');
   });
@@ -38,13 +39,18 @@ describe('onboarding durumu (ONBOARDING §2)', () => {
   });
 
   it('yeniden başlatma atlamaları sıfırlar, örnek projelerin oluşturulduğu bilgisini korur', () => {
-    const state = { ...recordSkip(parseOnboarding({ v: 1 }), t0), samplesCreated: true };
+    const state = {
+      ...recordSkip(parseOnboarding({ v: 1 }), t0),
+      samplesCreated: true,
+      checklist: { dismissed: true, shortcutsSeen: true },
+    };
     expect(restartOnboarding(state)).toEqual({
       v: 1,
       status: 'pending',
       intents: [],
       skips: 0,
       samplesCreated: true,
+      checklist: { dismissed: true, shortcutsSeen: true }, // yeniden başlatma listeyi sıfırlamaz
     });
   });
 });

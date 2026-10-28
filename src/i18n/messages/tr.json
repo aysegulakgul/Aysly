@@ -108,7 +108,10 @@
     "add": "Ekle",
     "inboxCount": "{count} açık görev",
     "myTasks": "Görevlerim",
-    "myTasksCount": "{count} açık görev"
+    "myTasksCount": "{count} açık görev",
+    "upcoming": "Yaklaşanlar",
+    "todayCount": "{count} görev",
+    "upcomingCount": "{count} görev"
   },
   "dashboard": {
     "greeting": {
@@ -118,9 +121,37 @@
       "night": "İyi geceler, {name}"
     },
     "subtitle": "Kendine sakin bir alan aç.",
-    "emptyTitle": "Bugün bölümleri yakında burada",
-    "emptyDescription": "Eklediğin görevler Inbox’ta. Bugün, Geciken ve Yaklaşan bölümleri sonraki adımda bu sayfaya gelecek.",
-    "toInbox": "Inbox’a git"
+    "edit": "Düzenle",
+    "editTitle": "Bölümleri düzenle",
+    "editDescription": "Göstermek istediğin bölümleri seç ve sırala.",
+    "moveUp": "{widget} yukarı taşı",
+    "moveDown": "{widget} aşağı taşı",
+    "save": "Kaydet",
+    "cancel": "Vazgeç",
+    "widgets": {
+      "today": "Bugün",
+      "overdue": "Geciken",
+      "upcoming": "Yaklaşan",
+      "priority": "Öncelikli"
+    },
+    "counts": {
+      "today": "{count} görev",
+      "overdue": "{count} görev",
+      "upcoming": "Sonraki 7 gün · {count}",
+      "priority": "Yüksek · {count}"
+    },
+    "empty": {
+      "today": "Bugün için planlanmış iş yok. Yaklaşanlara göz at.",
+      "overdue": "Geciken görev yok.",
+      "upcoming": "Sonraki 7 günde görev yok.",
+      "priority": "Yüksek öncelikli açık görev yok."
+    },
+    "allUpcoming": "{count} görevin tümünü gör",
+    "toToday": "Bugüne taşı",
+    "toTomorrow": "Yarına taşı",
+    "noTasksTitle": "Gününü planlamaya bir görevle başla",
+    "noTasksDescription": "Hızlı eklemeyle ilk görevini yaz; bugün, geciken ve yaklaşan görevlerin burada toplanır.",
+    "allHidden": "Tüm bölümler gizli. “Düzenle” ile bölüm ekleyebilirsin."
   },
   "settings": {
     "title": "Ayarlar",
@@ -372,6 +403,46 @@
       "onlyParent": "Yalnızca ana görevi tamamla",
       "cancel": "Vazgeç",
       "footnote": "Alt görevlerin tamamlanması ana görevi kendiliğinden tamamlamaz."
+    }
+  },
+  "firstSteps": {
+    "title": "İlk adımlar",
+    "progress": "{done}/{total}",
+    "close": "İlk adımlar listesini kapat",
+    "collapse": "Daralt",
+    "expand": "Genişlet",
+    "items": {
+      "firstTask": "İlk görevini ekle",
+      "moveToProject": "Bir görevi projeye taşı",
+      "setDate": "Bir göreve tarih ekle",
+      "shortcuts": "Klavye kısayollarını keşfet (?)"
+    }
+  },
+  "upcoming": {
+    "title": "Yaklaşanlar",
+    "subtitle": "{range} · Bugünden sonraki 7 gün · {count, plural, =0 {açık görev yok} other {# açık görev}}",
+    "empty": "Sonraki 7 günde tarihi olan açık görevin yok.",
+    "footer": "Görevlerim’in tarih filtresi. Mevcut görevler aynı proje ve durumlarıyla gösterilir."
+  },
+  "shortcuts": {
+    "title": "Klavye kısayolları",
+    "description": "Metin alanı odaktayken tek harfli kısayollar çalışmaz.",
+    "close": "Kapat",
+    "items": {
+      "q": "Hızlı ekleme",
+      "gd": "Bugün’e git",
+      "gi": "Inbox’a git",
+      "gm": "Görevlerim’e git",
+      "gu": "Yaklaşanlar’a git",
+      "jk": "Listede gezin",
+      "enter": "Görevi aç",
+      "complete": "Seçili görevi tamamla",
+      "t": "Tarih ata",
+      "m": "Projeye taşı",
+      "l": "Etiket ekle",
+      "del": "Çöpe taşı",
+      "undo": "Son eylemi geri al (bildirim açıkken)",
+      "help": "Bu rehberi aç"
     }
   }
 }

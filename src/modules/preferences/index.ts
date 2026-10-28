@@ -16,4 +16,5 @@ export {
   postOnboarding,
   postOnboardingRestart,
   postOnboardingSkip,
+  patchChecklist,
 } from './http/onboarding-handlers';

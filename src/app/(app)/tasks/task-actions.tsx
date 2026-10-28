@@ -9,6 +9,7 @@ import { Button } from '@/ui/components/button';
 import { Dialog } from '@/ui/components/dialog';
 import { Banner, Toast } from '@/ui/components/feedback';
 import { Icon } from '@/ui/components/icon';
+import { UNDO_EVENT } from '../shortcuts';
 import type { TaskUiContext } from './task-context';
 
 const UNDO_MS = 5000; // BR-TASK-004: 5 sn'lik "Geri al"
@@ -29,6 +30,13 @@ export function useTaskCompletion(context: TaskUiContext) {
   const [failed, setFailed] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
+  // Ctrl/⌘ + Z (UI_UX §11): bildirim açıkken son tamamlamayı geri alır.
+  const revertRef = useRef<() => void>(() => {});
+  useEffect(() => {
+    const onUndo = () => revertRef.current();
+    window.addEventListener(UNDO_EVENT, onUndo);
+    return () => window.removeEventListener(UNDO_EVENT, onUndo);
+  }, []);
 
   const base = `/api/v1/workspaces/${context.workspaceId}/tasks` as const;
   const show = (id: string) =>
@@ -73,6 +81,10 @@ export function useTaskCompletion(context: TaskUiContext) {
     else setFailed(true);
     router.refresh();
   }
+
+  useEffect(() => {
+    revertRef.current = () => void revert();
+  });
 
   const counts = asking?.subtaskCount ?? { total: 0, done: 0 };
   const ui = (

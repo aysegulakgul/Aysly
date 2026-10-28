@@ -10,7 +10,7 @@ import {
   restoreFromTrash,
   unarchiveTask,
 } from './lifecycle';
-import { detachTask, moveTask, myTasks } from './organize';
+import { dashboard, detachTask, moveTask, myTasks } from './organize';
 import type { ProjectRef, TaskRepository } from './ports';
 import {
   completeTask,
@@ -123,6 +123,14 @@ function setup(projects: ProjectRef[] = [], tagCount = 0) {
           });
         }
       }
+    },
+    progressFlags: async (_s, inboxId) => {
+      const all = [...rows.values()].filter((t) => !t.deletedAt);
+      return {
+        hasTask: all.length > 0,
+        hasProjectTask: all.some((t) => t.projectId !== inboxId),
+        hasDatedTask: all.some((t) => t.due !== null),
+      };
     },
     findAny: async (s, id) => {
       const t = rows.get(id);
@@ -563,3 +571,32 @@ describe('yaşam durumları', () => {
 async function getTaskSafe(deps: TaskDeps, id: string) {
   return (await deps.tasks.findById(scope, id)) !== null;
 }
+
+describe('dashboard', () => {
+  it('BR-DASH-002 / FR-DASH: bugün, geciken (en eski önce), yaklaşan (7 gün) ve öncelikli', async () => {
+    const { deps } = setup();
+    // fixedClock: 2026-10-28T09:00Z → İstanbul 12:00
+    const mk = async (title: string, due?: { date: string; time?: string }, priority = 0) =>
+      value(
+        await createTask(deps, scope, {
+          title,
+          priority: priority as 0 | 1 | 2 | 3,
+          ...(due ? { due: { ...due, ...(due.time ? { timezone: 'Europe/Istanbul' } : {}) } } : {}),
+        }),
+      );
+    await mk('Eski', { date: '2026-10-20' });
+    await mk('Daha eski', { date: '2026-10-10' });
+    await mk('Bugün tüm gün', { date: '2026-10-28' });
+    await mk('Bugün 15:00', { date: '2026-10-28', time: '15:00' }, 3);
+    await mk('Bugün 10:00', { date: '2026-10-28', time: '10:00' }); // geçti → geciken
+    await mk('Yarın', { date: '2026-10-29' });
+    await mk('7 gün sonra', { date: '2026-11-04' });
+    await mk('8 gün sonra', { date: '2026-11-05' });
+    const d = value(await dashboard(deps, scope, { today: '2026-10-28', weekStart: 1 }));
+    const titles = (items: { task: { title: string } }[]) => items.map((i) => i.task.title);
+    expect(titles(d.today)).toEqual(['Bugün 15:00', 'Bugün tüm gün']);
+    expect(titles(d.overdue)).toEqual(['Daha eski', 'Eski', 'Bugün 10:00']);
+    expect(titles(d.upcoming)).toEqual(['Yarın', '7 gün sonra']);
+    expect(titles(d.priority)).toEqual(['Bugün 15:00']);
+  });
+});

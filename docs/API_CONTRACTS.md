@@ -117,9 +117,10 @@ Hesap varlığını ifşa etmeme: `sign-up` mevcut e-postada da kullanıcıya ge
 | GET | `/workspaces/{ws}` | Alan bilgisi + aktörün rolü | 404 kuralı |
 | PATCH | `/workspaces/{ws}` | Ad değiştirme | `workspace.update` |
 | GET | `/me/preferences` | Tercihler | |
-| PATCH | `/me/preferences` | Kısmi güncelleme | `version` zorunlu; JSON alanları Zod şemalı; geçersiz saat dilimi → 400. **Uygulandı (Faz 3):** alanlar `locale, timezone, theme, density, dateFormat, timeFormat, weekStart`; diğer alanlar ilgili fazlarda eklenir. Yanıt `{ data: { …tercihler, version } }`; `locale` değişince `aysly_locale` çerezi de güncellenir. |
+| PATCH | `/me/preferences` | Kısmi güncelleme | `version` zorunlu; JSON alanları Zod şemalı; geçersiz saat dilimi → 400. **Uygulandı (Faz 3):** alanlar `locale, timezone, theme, density, dateFormat, timeFormat, weekStart`; diğer alanlar ilgili fazlarda eklenir. Yanıt `{ data: { …tercihler, version } }`; `locale` değişince `aysly_locale` çerezi de güncellenir. Faz 4'te `dashboardLayout` (`{ v: 1, widgets: [{ id, visible }] }`, BR-DASH-001) eklendi. |
 | POST | `/me/onboarding` | Onboarding yanıtı | `{ intents: ('personal'|'work')[], createSamples: boolean }` → başlangıç projeleri (ONBOARDING §3) |
 | POST | `/me/onboarding/skip` | Atla | Atlama sayısını artırır (ONBOARDING §2) |
+| PATCH | `/me/onboarding/checklist` | İlk adımlar | `{ dismissed?: true, shortcutsSeen?: true }` (ONBOARDING §4; uygulandı, Faz 4) |
 | POST | `/me/onboarding/restart` | Ayarlar'dan yeniden başlatma | Örnek projeler yeniden oluşturulmaz (D-074) |
 
 **Uygulandı (Faz 3):** `POST /me/onboarding` (`intents` boş olabilir: varsayılan düzen), `/skip`, `/restart`; yanıt `{ data: onboardingDurumu }`.

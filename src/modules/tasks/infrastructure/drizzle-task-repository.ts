@@ -228,6 +228,24 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
         .where(and(eq(tasks.workspaceId, scope.workspaceId), eq(tasks.parentTaskId, parentId)));
     },
 
+    async progressFlags(scope, inboxId) {
+      const [row] = await db
+        .select({
+          total: count(),
+          inProject: sql<number>`count(*) filter (where ${tasks.projectId} <> ${inboxId})`.mapWith(
+            Number,
+          ),
+          dated: sql<number>`count(*) filter (where ${tasks.dueDate} is not null)`.mapWith(Number),
+        })
+        .from(tasks)
+        .where(inScope(scope));
+      return {
+        hasTask: (row?.total ?? 0) > 0,
+        hasProjectTask: (row?.inProject ?? 0) > 0,
+        hasDatedTask: (row?.dated ?? 0) > 0,
+      };
+    },
+
     async findAny(scope, id) {
       if (!isUuid(id)) return null;
       const [row] = await db

@@ -50,21 +50,29 @@ export function TaskRow({
   overdue = false,
   onComplete,
   actions,
+  stacked = false,
 }: {
   task: TaskView;
   meta: string;
   overdue?: boolean;
   onComplete: () => void;
   actions?: ReactNode;
+  /** Dar panellerde (Bugün bölümleri, Figma TaskRow 4:72024) bilgi başlığın altında. */
+  stacked?: boolean;
 }) {
   const t = useTranslations('tasks');
   const pathname = usePathname();
   const done = task.status === 'done';
   return (
-    <li className="flex w-full flex-col border-b border-border">
+    <li
+      data-task-row
+      data-task-id={task.id}
+      className="flex w-full flex-col border-b border-border"
+    >
       <div className="flex min-h-row w-full items-center gap-3 rounded-sm px-2 py-1">
         <button
           type="button"
+          data-complete
           onClick={onComplete}
           aria-label={done ? t('detail.reopen') : t('row.complete', { title: task.title })}
           className={cn(
@@ -78,26 +86,37 @@ export function TaskRow({
         >
           <span aria-hidden="true">{done ? '✓' : task.status === 'in_progress' ? '◐' : '○'}</span>
         </button>
-        <div className="flex min-w-0 flex-1 flex-col lg:flex-row lg:items-center lg:gap-3">
+        <div
+          className={cn(
+            'flex min-w-0 flex-1 flex-col',
+            !stacked && 'lg:flex-row lg:items-center lg:gap-3',
+          )}
+        >
           <Link
             href={`${pathname}?task=${task.id}` as never}
             scroll={false}
+            data-task-link
             className={cn('min-w-0 flex-1 truncate text-base text-text', done && 'line-through')}
           >
             {task.title}
           </Link>
           <p
             className={cn(
-              'text-xs lg:w-[300px] lg:shrink-0',
+              'text-xs',
+              !stacked && 'lg:w-[300px] lg:shrink-0',
               overdue ? 'text-danger' : 'text-text-secondary',
             )}
           >
             {meta}
           </p>
         </div>
-        {actions ? <div className="hidden shrink-0 lg:flex">{actions}</div> : null}
+        {actions && !stacked ? <div className="hidden shrink-0 lg:flex">{actions}</div> : null}
       </div>
-      {actions ? <div className="flex flex-wrap gap-1 pb-2 pl-12 lg:hidden">{actions}</div> : null}
+      {actions ? (
+        <div className={cn('flex flex-wrap gap-1 pb-2 pl-12', !stacked && 'lg:hidden')}>
+          {actions}
+        </div>
+      ) : null}
     </li>
   );
 }

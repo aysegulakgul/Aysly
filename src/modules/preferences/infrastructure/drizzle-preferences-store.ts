@@ -1,6 +1,7 @@
 import { and, eq, sql } from 'drizzle-orm';
 import type { DbExecutor } from '@/shared/db/client';
 import type { PreferencesStore } from '../application/update-preferences';
+import { normalizeLayout } from '../domain/dashboard';
 import type { Preferences } from '../domain/preferences';
 import { userPreferences } from './schema';
 
@@ -12,11 +13,13 @@ const columns = {
   dateFormat: userPreferences.dateFormat,
   timeFormat: userPreferences.timeFormat,
   weekStart: userPreferences.weekStart,
+  dashboardLayout: userPreferences.dashboardLayout,
   version: userPreferences.version,
 };
 
 // Değerler veritabanı CHECK kısıtlarıyla sınırlıdır (schema.ts); okunan satır domain türüne uyar.
-const toPreferences = (row: Record<keyof typeof columns, unknown>) => row as Preferences;
+const toPreferences = (row: Record<keyof typeof columns, unknown>) =>
+  ({ ...row, dashboardLayout: normalizeLayout(row.dashboardLayout) }) as Preferences;
 
 export function createDrizzlePreferencesStore(db: DbExecutor): PreferencesStore {
   return {

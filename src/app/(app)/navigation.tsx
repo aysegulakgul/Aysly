@@ -14,6 +14,7 @@ function useSection() {
     today: pathname === '/',
     inbox: pathname === '/inbox',
     myTasks: pathname === '/my-tasks',
+    upcoming: pathname === '/upcoming',
     settings: pathname.startsWith('/settings'),
     menu: pathname === '/menu',
   };
@@ -24,12 +25,10 @@ const Divider = () => <div className="h-px w-full shrink-0 bg-border" />;
 /** Figma UI/Sidebar (4:66491): 232 px, surface-muted zemin, 16 px iç boşluk, 12 px aralık. */
 export function Sidebar({
   userName,
-  inboxCount,
-  myTasksCount,
+  counts,
 }: {
   userName: string;
-  inboxCount: number;
-  myTasksCount: number;
+  counts: { inbox: number; myTasks: number; today: number; upcoming: number };
 }) {
   const t = useTranslations('shell');
   const section = useSection();
@@ -52,8 +51,8 @@ export function Sidebar({
           href="/inbox"
           glyph="▱"
           active={section.inbox}
-          count={badge(inboxCount)}
-          countLabel={t('inboxCount', { count: inboxCount })}
+          count={badge(counts.inbox)}
+          countLabel={t('inboxCount', { count: counts.inbox })}
         >
           {t('inbox')}
         </NavItem>
@@ -61,13 +60,28 @@ export function Sidebar({
           href="/my-tasks"
           glyph="✓"
           active={section.myTasks}
-          count={badge(myTasksCount)}
-          countLabel={t('myTasksCount', { count: myTasksCount })}
+          count={badge(counts.myTasks)}
+          countLabel={t('myTasksCount', { count: counts.myTasks })}
         >
           {t('myTasks')}
         </NavItem>
-        <NavItem href="/" glyph="☼" active={section.today}>
+        <NavItem
+          href="/"
+          glyph="☼"
+          active={section.today}
+          count={badge(counts.today)}
+          countLabel={t('todayCount', { count: counts.today })}
+        >
           {t('today')}
+        </NavItem>
+        <NavItem
+          href="/upcoming"
+          glyph="▦"
+          active={section.upcoming}
+          count={badge(counts.upcoming)}
+          countLabel={t('upcomingCount', { count: counts.upcoming })}
+        >
+          {t('upcoming')}
         </NavItem>
         <Divider />
         <NavItem href="/settings" glyph="⚙" active={section.settings}>

@@ -79,6 +79,11 @@ export type TaskRepository = {
     projectId: string,
     now: Date,
   ): Promise<void>;
+  /** ONBOARDING §4 ilerlemesi: çöpte olmayan görevler üzerinden. */
+  progressFlags(
+    scope: WorkspaceScope,
+    inboxId: string,
+  ): Promise<{ hasTask: boolean; hasProjectTask: boolean; hasDatedTask: boolean }>;
   /** Çöpteki görev dahil (BR-DEL-007: durum sorgusu ve geri yükleme için). */
   findAny(scope: WorkspaceScope, id: string): Promise<Task | null>;
   /** BR-DEL-002 / BR-SUB-004: arşivleme ve arşivden çıkarma; sürüm artar. */

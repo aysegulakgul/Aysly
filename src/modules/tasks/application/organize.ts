@@ -2,7 +2,7 @@ import { generateKeyBetween } from 'fractional-indexing';
 import { authorize, type WorkspaceScope } from '@/modules/workspaces';
 import { businessRule, notFound, type DomainError } from '@/shared/kernel/errors';
 import { err, ok, type Result } from '@/shared/kernel/result';
-import { DUE_GROUPS, dueGroup, type DueGroup } from '../domain/schedule';
+import { DUE_GROUPS, dueGroup, isUpcoming, type DueGroup } from '../domain/schedule';
 import type { Task } from '../domain/task';
 import type { ProjectRef } from './ports';
 import type { TaskDeps } from './tasks';
@@ -175,4 +175,44 @@ export async function listSummaries(
 ): Promise<TaskSummary[]> {
   const projects = new Map((await deps.projects.listActive(scope)).map((p) => [p.id, p]));
   return summarize(deps, scope, tasks, projects);
+}
+
+export type Dashboard = {
+  today: TaskSummary[];
+  overdue: TaskSummary[];
+  upcoming: TaskSummary[];
+  priority: TaskSummary[];
+};
+
+const PRIORITY_LIMIT = 10; // FR-DASH-04
+
+/**
+ * Dashboard bölümleri (FR-DASH-01..04, BR-DASH-002): "bugün" sunucuda kullanıcının saat diliminde hesaplanır
+ * (BR-DATE-003). Bugün: saatli olanlar zaman sırasıyla, sonra tüm gün görevler; Geciken: en eski önce;
+ * Yaklaşan: sonraki 7 gün; Öncelikli: yüksek öncelikli açık görevler (en fazla 10).
+ */
+export async function dashboard(
+  deps: TaskDeps,
+  scope: WorkspaceScope,
+  context: { today: string; weekStart: number },
+): Promise<Result<Dashboard, DomainError>> {
+  const allowed = authorize(scope, 'task.read');
+  if (!allowed.ok) return allowed;
+  const projects = await deps.projects.listActive(scope);
+  const byId = new Map(projects.map((p) => [p.id, p]));
+  const tasks = await deps.tasks.listOpenInProjects(scope, [...byId.keys()]);
+  const items = await summarize(deps, scope, tasks, byId);
+  const now = deps.clock.now();
+  const group = (item: TaskSummary) => dueGroup(item.task.due, { ...context, now });
+  const timeOf = (item: TaskSummary) => item.task.due?.at?.getTime() ?? Number.POSITIVE_INFINITY;
+  return ok({
+    today: items.filter((i) => group(i) === 'today').sort((a, b) => timeOf(a) - timeOf(b)),
+    overdue: items
+      .filter((i) => group(i) === 'overdue')
+      .sort((a, b) => (a.task.due!.date < b.task.due!.date ? -1 : 1)),
+    upcoming: items
+      .filter((i) => i.task.due && isUpcoming(i.task.due.date, context.today))
+      .sort((a, b) => (a.task.due!.date < b.task.due!.date ? -1 : 1)),
+    priority: items.filter((i) => i.task.priority === 3).slice(0, PRIORITY_LIMIT),
+  });
 }

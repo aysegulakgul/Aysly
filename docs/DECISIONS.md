@@ -385,6 +385,14 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Geri yükleme: ebeveyn tek başına geri yüklenince aynı gruptaki alt görevler de döner; ebeveyni çöpteki alt görev ebeveyniyle geri yüklenir (BR-SUB-004). Projesi artık yoksa görev Inbox'a döner; proje çöpü Faz 5'te geldiğinde "projeyi de geri yükle" seçimi eklenecek (BR-DEL-004).
 - Çöpe taşıma sürüm kontrolü yapmaz (tüm kaydı hedefler, geri alınabilir); arşivleme yapar.
 
+### D-080 — Bugün bölümleri, Yaklaşanlar, İlk adımlar ve kısayollar: Faz 4 kapsamı (teknik/uygulama)
+- Durum: ONAYLI (teknik; plan ve D-071 ilkesi) · Tarih: 2026-10-28 · Karar veren: Claude
+- Bugün (Figma 4:66490): Bugün, Geciken (tek tıkla "Bugüne taşı" / "Yarına taşı"), Yaklaşan (ilk 3 + "tümünü gör"), Öncelikli bölümleri; masaüstünde iki sütun. Projeler ve Hedefler bölümleri plan gereği Faz 7'de. "Düzenle" (FR-DASH-08) yalnızca çalışan bölümleri listeler; kayıttaki diğerlerinin yeri korunur. Düzenleme penceresi Figma'da yok (D-065).
+- Yaklaşanlar (Figma 4:67785): sonraki 7 gün, gün gün. Filtre çipleri, "Görünümü kaydet", Pano/Takvim sekmeleri kayıtlı görünümlerle (Faz 5).
+- İlk adımlar (ONBOARDING §4, Figma'da yok): şimdilik "İlk görevini ekle", "Bir görevi projeye taşı", "Bir göreve tarih ekle", "Klavye kısayollarını keşfet". Hatırlatıcı (Faz 6), tekrarlayan görev (Faz 6), pano (Faz 5) ve hedef (Faz 7) maddeleri ilgili fazlarda eklenir. Durum `user_preferences.onboarding.checklist` içinde.
+- Kısayollar (UI_UX §11): Q, G D/I/M/U, J/K ve ↑/↓, Enter, Ctrl/⌘+Enter, T/M/L (detay panelinde ilgili alana odaklanır), Del, Ctrl/⌘+Z (açık "Geri al" bildiriminde), ?. Ctrl/⌘+K (arama, Faz 7) ile G C / G P (Takvim, Projeler) ilgili fazlarda. Rehber penceresi Figma'da yok (D-065).
+- "Bugün" sunucuda kullanıcının saat diliminde hesaplanır (BR-DASH-002); kenar çubuğunda Bugün ve Yaklaşanlar sayıları.
+
 ---
 
 ## 5. Faz kapanış kayıtları

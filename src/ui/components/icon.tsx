@@ -8,6 +8,7 @@ const ICONS = {
   inbox: 32,
   moon: 24,
   'chevron-down': 16,
+  'sliders-horizontal': 18,
 } as const;
 
 export type IconName = keyof typeof ICONS;

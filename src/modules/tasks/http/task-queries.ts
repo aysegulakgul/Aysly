@@ -1,6 +1,12 @@
 import type { WorkspaceScope } from '@/modules/workspaces';
 import { db } from '@/shared/db/client';
-import { getTaskDetail, listSummaries, myTasks, myTasksCount } from '../application/organize';
+import {
+  dashboard,
+  getTaskDetail,
+  listSummaries,
+  myTasks,
+  myTasksCount,
+} from '../application/organize';
 import { inboxBadge, listTasks } from '../application/tasks';
 import { todayIn } from '../domain/schedule';
 import { taskDeps, toSummaryJson } from './task-handlers';
@@ -52,4 +58,31 @@ export async function findTaskDetail(
 export async function findMyTasksCount(scope: WorkspaceScope): Promise<number> {
   const result = await myTasksCount(taskDeps(db()), scope);
   return result.ok ? result.value : 0;
+}
+
+/** Bugün ekranının bölümleri (FR-DASH-01..04). */
+export async function findDashboard(
+  scope: WorkspaceScope,
+  prefs: { timezone: string; weekStart: number },
+) {
+  const result = await dashboard(taskDeps(db()), scope, {
+    today: todayIn(prefs.timezone, new Date()),
+    weekStart: prefs.weekStart,
+  });
+  if (!result.ok) return null;
+  const json = (items: typeof result.value.today) => items.map(toSummaryJson);
+  return {
+    today: json(result.value.today),
+    overdue: json(result.value.overdue),
+    upcoming: json(result.value.upcoming),
+    priority: json(result.value.priority),
+  };
+}
+export type DashboardView = NonNullable<Awaited<ReturnType<typeof findDashboard>>>;
+
+/** "İlk adımlar" (ONBOARDING §4) için görevlerden hesaplanan ilerleme. */
+export async function findTaskProgress(scope: WorkspaceScope) {
+  const deps = taskDeps(db());
+  const inbox = await deps.projects.inbox(scope);
+  return deps.tasks.progressFlags(scope, inbox.id);
 }

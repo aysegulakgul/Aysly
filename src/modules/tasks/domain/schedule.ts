@@ -46,3 +46,8 @@ export function todayIn(timeZone: string, now: Date): string {
   );
   return `${parts.year}-${parts.month}-${parts.day}`;
 }
+
+/** BR-DATE-003: "Yaklaşan" bugünden sonraki 7 gündür (yarından itibaren, 7. gün dahil). */
+export function isUpcoming(dueDate: string, today: string): boolean {
+  return dueDate > today && dueDate <= shift(today, 7);
+}

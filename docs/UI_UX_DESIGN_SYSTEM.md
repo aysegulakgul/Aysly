@@ -228,6 +228,8 @@ Tüm metinler çeviri dosyasındadır; ton: samimi, kısa, suçlamayan ("Hatalı
 - Dil özniteliği (`lang="tr"`) ve Türkçe ekran okuyucu telaffuzu için doğru metin.
 
 ## 11. Klavye kısayolları (MVP temel seti)
+
+> **Uygulama durumu (Faz 4, D-080):** `Ctrl/Cmd + K` (Faz 7) ve `G C` / `G P` (Faz 5–6) dışındakiler uygulandı; ek olarak `G U` (Yaklaşanlar). Rehber `?` ile açılır.
 | Kısayol | Eylem |
 |---|---|
 | `Q` | Hızlı ekleme |

@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { useState, type KeyboardEvent } from 'react';
+import { useEffect, useState, type KeyboardEvent } from 'react';
 import { apiDelete, apiPatch, apiPost, type ApiResult } from '@/client/api';
 import type { TaskDetailView, TaskView } from '@/modules/tasks';
 import { Button } from '@/ui/components/button';
@@ -151,6 +151,11 @@ function DetailBody({ detail, context }: { detail: TaskDetailView; context: Task
   const [dateOpen, setDateOpen] = useState(false);
   const done = detail.status === 'done';
   const readOnly = detail.archivedAt !== null || detail.deletedAt !== null;
+  // Kısayollar T / M / L (UI_UX §11): ilgili alana odaklan.
+  const focusField = useSearchParams().get('focus');
+  useEffect(() => {
+    if (focusField) document.getElementById(`detail-${focusField}`)?.focus();
+  }, [focusField]);
   const projectNames = context.projects.map((p) => p.id);
   const subtasksDone = detail.subtasks.filter((s) => s.status === 'done').length;
 
@@ -250,6 +255,7 @@ function DetailBody({ detail, context }: { detail: TaskDetailView; context: Task
           {detail.parentTaskId ? null : (
             <Field label={t('detail.project')}>
               <select
+                id="detail-project"
                 aria-label={t('detail.project')}
                 value={projectNames.includes(detail.projectId) ? detail.projectId : ''}
                 disabled={done}
@@ -314,7 +320,7 @@ function DetailBody({ detail, context }: { detail: TaskDetailView; context: Task
               open={dateOpen}
               onOpenChange={setDateOpen}
               trigger={
-                <button type="button" className={cn(selectClass, 'text-left')}>
+                <button id="detail-due" type="button" className={cn(selectClass, 'text-left')}>
                   {dueText}
                 </button>
               }
@@ -352,6 +358,7 @@ function DetailBody({ detail, context }: { detail: TaskDetailView; context: Task
                 </button>
               ))}
               <input
+                id="detail-tags"
                 aria-label={t('detail.tags')}
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}

@@ -31,6 +31,9 @@ export default async function MenuPage() {
         <NavItem href="/my-tasks" glyph="✓">
           {t('myTasks')}
         </NavItem>
+        <NavItem href="/upcoming" glyph="▦">
+          {t('upcoming')}
+        </NavItem>
         <div className="h-px w-full bg-border" />
         <NavItem href="/settings" glyph="⚙">
           {t('settings')}

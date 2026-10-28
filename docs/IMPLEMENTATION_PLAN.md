@@ -10,7 +10,7 @@
 | 1 | Ürün analizi, mimari kararlar, dokümantasyon | **Kapandı** | — | 2026-10-27 | 2026-10-27 |
 | 2 | Proje altyapısı ve temel mimari | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
 | 3 | Kimlik doğrulama, hesap, tercihler, onboarding | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
-| 4 | Görev yönetimi, Inbox, My Tasks, dashboard | **Devam ediyor** — 1–4. bölüm tamam (görev çekirdeği, Inbox, Görevlerim, görev detayı, arşiv ve çöp) | — | 2026-10-28 | — |
+| 4 | Görev yönetimi, Inbox, My Tasks, dashboard | **Devam ediyor** — 1–5. bölüm tamam; kapanış ölçümü kaldı | — | 2026-10-28 | — |
 | 5 | Projeler ve görev görünümleri | Başlamadı | — | — | — |
 | 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | Başlamadı | — | — | — |
 | 7 | Notlar, hedefler, arama | Başlamadı | Not editörü paketi seçimi (Faz 7 başında sunulur) | — | — |
@@ -106,7 +106,8 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
   - **2. bölüm (tamam):** Inbox ekranı; hızlı ekleme (tarih seçici, öncelik, hata ve tekrar dene); tamamlama ve 5 sn "Geri al"; kenar çubuğunda Inbox sayacı (BR-INBOX-003) ve "Görev ekle"; alt menüde Inbox ve Ekle; Bugün sayfasında hızlı ekleme (BR-INBOX-001) (D-077).
   - **3. bölüm (tamam):** Migration 0004 (`tags`, `task_tags`); alt görevler (BR-SUB-001/002/003/005), etiketler (BR-TAG-001/003), taşıma (BR-INBOX-002) ve ayırma; Görevlerim (BR-INBOX-004, BR-DATE-003/004); görev detay paneli (sürüm çakışmasında otomatik yeniden uygulama veya seçim, BR-TASK-010); Inbox satırında "Projeye taşı" ve mobilde "Tarih ver"; kenar çubuğu ve mobil Menü'de Görevlerim (D-078).
   - **4. bölüm (tamam):** Görev arşivleme ve arşivden çıkarma (BR-DEL-002, BR-SUB-004), çöpe taşıma ve silme grupları (BR-DEL-001/006), geri yükleme (BR-DEL-004), kalıcı silme (BR-DEL-005), 30 günlük temizlik işi (BR-DEL-003, D-035, D-053), çöpteki/arşivdeki kayda doğrudan erişim bandı (BR-DEL-007) (D-079). Toplu işlemler ve Arşiv/Çöp sayfaları plan gereği Faz 5'te.
-  - **Sıradaki:** 5) Bugün ekranı bölümleri, Yaklaşanlar, İlk adımlar, kısayollar; 6) performans ölçümü.
+  - **5. bölüm (tamam):** Bugün bölümleri (FR-DASH-01..04, 08; BR-DASH-001/002), Yaklaşanlar, İlk adımlar (ONBOARDING §4), temel klavye kısayolları ve rehber (D-080).
+  - **Sıradaki:** 6) performans ölçümü ve kapanış.
 
 ### Faz 5 — Projeler ve görev görünümleri
 - **Bağımlılık:** Faz 4.
