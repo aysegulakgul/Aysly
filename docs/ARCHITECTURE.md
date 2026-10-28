@@ -97,7 +97,7 @@ Bu tablodaki paketler onaylıdır ama **baştan kurulmaz**. Her paket, onu gerek
 
 | İhtiyaç | Önerilen | Not |
 |---|---|---|
-| Tarih/saat dilimi | `date-fns` + `@date-fns/tz` | Tüm dönüşümler `shared/time` modülünde; doğrudan `new Date()` aritmetiği yasak |
+| Tarih/saat dilimi | Yerleşik `Intl` API (Faz 4, D-076; `date-fns` gerekmedi) | Yerel saat ↔ mutlak an dönüşümü ve yaz saati kuralları `modules/tasks/domain/due.ts` içinde, testli (BR-DATE-001/006); domain'de `new Date()` ile şimdiki zaman alınmaz (Clock) |
 | Tekrar kuralları | `rrule`, `modules/tasks/domain/recurrence` arkasında | Saf fonksiyonla sarılır, kendi testleri |
 | Sıralama anahtarı | `fractional-indexing` | BR-TASK-006 |
 | i18n | `next-intl` | D-038 |
@@ -305,10 +305,10 @@ pg-boss kullanılmaz (D-044). Aşağıdaki işler **use case** olarak yazılır 
 | İş | Tetikleyici (D-053) | Kural | Güvenlik önlemi |
 |---|---|---|---|
 | `reminders.materializeDue` | İstek anında: kullanıcının bildirim sayacı/listesi sorgulanırken (istemci ~60 sn'de bir yoklar) | BR-REM-005 | Koşullu güncelleme + `dedupe_key` → tek bildirim |
-| `trash.purgeExpired` | Uygulama içinde periyodik (saatte bir) + uygulama açılışında | BR-DEL-003 | Idempotent; PostgreSQL advisory lock ile aynı anda tek çalışma |
+| `trash.purge` (uygulandı, Faz 4) | Uygulama içinde periyodik (saatte bir) + uygulama açılışında | BR-DEL-003 | Idempotent; PostgreSQL advisory lock ile aynı anda tek çalışma |
 | `accounts.purgeDeleted` | Aynı | BR-ACC-005 | Idempotent; her adım loglanır |
 | `notifications.cleanup` | Aynı (günde bir) | BR-NOTIF-003 | — |
-| `idempotency.cleanup` | Aynı | D-019 | — |
+| `idempotency.cleanup` (uygulandı, Faz 4) | Aynı | D-019 | — |
 
 Zamanlayıcı gerektirmeyen, istek içinde yapılan işler:
 - Tekrarlayan görevin sonraki örneği — tamamlama ile aynı işlemde (D-033).

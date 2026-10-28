@@ -117,9 +117,10 @@ Hesap varlığını ifşa etmeme: `sign-up` mevcut e-postada da kullanıcıya ge
 | GET | `/workspaces/{ws}` | Alan bilgisi + aktörün rolü | 404 kuralı |
 | PATCH | `/workspaces/{ws}` | Ad değiştirme | `workspace.update` |
 | GET | `/me/preferences` | Tercihler | |
-| PATCH | `/me/preferences` | Kısmi güncelleme | `version` zorunlu; JSON alanları Zod şemalı; geçersiz saat dilimi → 400. **Uygulandı (Faz 3):** alanlar `locale, timezone, theme, density, dateFormat, timeFormat, weekStart`; diğer alanlar ilgili fazlarda eklenir. Yanıt `{ data: { …tercihler, version } }`; `locale` değişince `aysly_locale` çerezi de güncellenir. |
+| PATCH | `/me/preferences` | Kısmi güncelleme | `version` zorunlu; JSON alanları Zod şemalı; geçersiz saat dilimi → 400. **Uygulandı (Faz 3):** alanlar `locale, timezone, theme, density, dateFormat, timeFormat, weekStart`; diğer alanlar ilgili fazlarda eklenir. Yanıt `{ data: { …tercihler, version } }`; `locale` değişince `aysly_locale` çerezi de güncellenir. Faz 4'te `dashboardLayout` (`{ v: 1, widgets: [{ id, visible }] }`, BR-DASH-001) eklendi. |
 | POST | `/me/onboarding` | Onboarding yanıtı | `{ intents: ('personal'|'work')[], createSamples: boolean }` → başlangıç projeleri (ONBOARDING §3) |
 | POST | `/me/onboarding/skip` | Atla | Atlama sayısını artırır (ONBOARDING §2) |
+| PATCH | `/me/onboarding/checklist` | İlk adımlar | `{ dismissed?: true, shortcutsSeen?: true }` (ONBOARDING §4; uygulandı, Faz 4) |
 | POST | `/me/onboarding/restart` | Ayarlar'dan yeniden başlatma | Örnek projeler yeniden oluşturulmaz (D-074) |
 
 **Uygulandı (Faz 3):** `POST /me/onboarding` (`intents` boş olabilir: varsayılan düzen), `/skip`, `/restart`; yanıt `{ data: onboardingDurumu }`.
@@ -171,6 +172,12 @@ Hesap varlığını ifşa etmeme: `sign-up` mevcut e-postada da kullanıcıya ge
 | POST | `/workspaces/{ws}/tasks/{id}/archive` / `unarchive` | Arşiv | `task.archive` | BR-DEL-002, BR-SUB-004 |
 | DELETE | `/workspaces/{ws}/tasks/{id}?scope=this|series` | Çöpe at | `task.delete` | BR-DEL-*, BR-SUB-004, BR-REC-006 |
 | POST | `/workspaces/{ws}/tasks/bulk` | Toplu işlem | işlem başına izin | BR-TASK-008 |
+
+**Uygulandı (Faz 4, 1. bölüm):** `GET/POST /workspaces/{ws}/tasks`, `GET/PATCH /workspaces/{ws}/tasks/{id}`, `POST …/complete`, `POST …/reopen`; ayrıca `GET /workspaces`. Oluşturma gövdesinde şimdilik `title, description, projectId, priority, startDate, due` desteklenir; `parentTaskId`, etiketler, hatırlatıcılar, tekrar ve `position` ilgili bölümlerde eklenir (o zamana kadar bilinmeyen alan olarak 400). Liste şimdilik `projectId` ve `status` filtrelerini destekler; üst düzey, arşivsiz görevler, `position` sırasıyla. `Idempotency-Key` başlığı zorunludur (yoksa 400). Yanıt nesnesinde `tags`, `subtaskCount`, `reminders`, `recurrence` henüz yoktur.
+
+**Uygulandı (Faz 4, 3. bölüm):** Oluşturmada `parentTaskId` ve `tagNames`; `PATCH` gövdesinde `tagNames` (görevin etiket kümesini verilen adlarla **değiştirir**; boş dizi tüm etiketleri kaldırır); `POST …/complete` gövdesinde `completeSubtasks`; `POST …/move` (`{ version, projectId }`, sıra hedefin sonu; sıra içi taşıma Faz 5'te), `POST …/detach`; `GET /workspaces/{ws}/my-tasks` (`[{ group: overdue|today|tomorrow|thisWeek|later|none, tasks }]`); `GET /workspaces/{ws}/projects` (salt okunur ilk sürüm: `{ id, name, kind }`, Inbox ilk); `GET /workspaces/{ws}/tags`. Liste ve detay yanıtlarında `project { id, name, kind }`, `tags`, `subtaskCount { total, done }`; detayda ayrıca `subtasks`. Etiket yönetimi uç noktaları (`POST/PATCH/DELETE /tags`, BR-TAG-002) henüz yok.
+
+**Uygulandı (Faz 4, 4. bölüm):** `POST …/archive`, `POST …/unarchive` (`{ version }`; alt görevler birlikte), `DELETE /workspaces/{ws}/tasks/{id}` (çöpe taşır; `{ data: { batchId, affected } }`), `GET /workspaces/{ws}/tasks/{id}?includeDeleted=true`, `GET /trash`, `POST /trash/restore`, `DELETE /trash/{batchId}` ve `DELETE /trash` (`{ confirm: true }`). Çöp kutusu şimdilik yalnızca görevleri içerir (proje çöpü Faz 5). Toplu işlem (`POST /tasks/bulk`) ve `GET /archive` Faz 5'te.
 
 ### 6.2. Liste sorgusu (`TaskFilter` v1)
 

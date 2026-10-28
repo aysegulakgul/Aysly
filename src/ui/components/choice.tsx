@@ -126,11 +126,11 @@ export function OptionCard({
   onChange: (checked: boolean) => void;
   children: ReactNode;
 }) {
-  const mark = type === 'radio' ? (checked ? '◉ ' : '○ ') : checked ? '☑ ' : '☐ ';
+  const mark = type === 'radio' ? (checked ? '◉' : '○') : checked ? '☑' : '☐';
   return (
     <label
       className={cn(
-        'flex min-h-11 w-full cursor-pointer items-center rounded-md p-3 text-base has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary',
+        'flex min-h-11 w-full cursor-pointer items-center gap-2 rounded-md p-3 text-base has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary',
         checked ? 'border-2 border-primary text-primary' : 'border border-border text-text',
       )}
     >

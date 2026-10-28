@@ -98,6 +98,7 @@ Sabit 12 renklik palet (`slate, red, orange, amber, green, teal, cyan, blue, ind
 - **Köşe yarıçapı:** `--radius-sm: 6px` (giriş, çip), `--radius-md: 10px` (kart, düğme), `--radius-lg: 14px` (modal).
 - **Gölge:** Yalnızca katman ayrımı için: `--shadow-popover`, `--shadow-modal`. Kartlar varsayılan olarak gölgesiz, kenarlıklı.
 - **Kırılım noktaları:** `sm 640`, `md 768`, `lg 1024`, `xl 1280`. Kenar çubuğu `lg` ve üstünde sabit; altında Figma'daki mobil düzen: alt navigasyon ve Menü ekranı (D-071).
+- **Açılır pencereler (Faz 4):** `src/ui/components/popover.tsx` (Radix Popover; Figma UI/Panel görünümü). Tarih seçici ve öncelik menüsü bunu kullanır.
 - **Tema ve yoğunluk (uygulandı, Faz 3):** `<html data-theme="light|dark|system" data-density="comfortable|compact">` kullanıcı tercihinden gelir; oturum yokken `system`. Satır yüksekliği `--row-height` (Tailwind `h-row`): rahat 44 px, sıkı yalnızca `lg` ve üstünde 32 px.
 - **İçerik genişliği:** Liste sayfalarında en fazla 960 px; takvim ve board tam genişlik.
 
@@ -227,6 +228,8 @@ Tüm metinler çeviri dosyasındadır; ton: samimi, kısa, suçlamayan ("Hatalı
 - Dil özniteliği (`lang="tr"`) ve Türkçe ekran okuyucu telaffuzu için doğru metin.
 
 ## 11. Klavye kısayolları (MVP temel seti)
+
+> **Uygulama durumu (Faz 4, D-080):** `Ctrl/Cmd + K` (Faz 7) ve `G C` / `G P` (Faz 5–6) dışındakiler uygulandı; ek olarak `G U` (Yaklaşanlar). Rehber `?` ile açılır.
 | Kısayol | Eylem |
 |---|---|
 | `Q` | Hızlı ekleme |

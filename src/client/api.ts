@@ -15,15 +15,19 @@ export type ApiResult<T> = { ok: true; data: T } | { ok: false; status: number; 
 type ApiPath = `/api/v1/${string}`;
 
 /** Kendi REST uç noktalarımıza (/api/v1) giden ince, tipli istemci. */
-async function apiRequest<T>(method: string, path: ApiPath, body?: unknown): Promise<ApiResult<T>> {
+async function apiRequest<T>(
+  method: string,
+  path: ApiPath,
+  body?: unknown,
+  headers: Record<string, string> = {},
+): Promise<ApiResult<T>> {
   let response: Response;
   try {
     response = await fetch(path, {
       method,
       credentials: 'same-origin',
-      ...(body === undefined
-        ? {}
-        : { headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }),
+      headers: body === undefined ? headers : { 'content-type': 'application/json', ...headers },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
   } catch {
     return { ok: false, status: 0, error: { code: 'NETWORK', message: '' } };
@@ -38,6 +42,7 @@ async function apiRequest<T>(method: string, path: ApiPath, body?: unknown): Pro
   };
 }
 
-export const apiPost = <T>(path: ApiPath, body: unknown) => apiRequest<T>('POST', path, body);
+export const apiPost = <T>(path: ApiPath, body: unknown, headers?: Record<string, string>) =>
+  apiRequest<T>('POST', path, body, headers);
 export const apiPatch = <T>(path: ApiPath, body: unknown) => apiRequest<T>('PATCH', path, body);
 export const apiDelete = (path: ApiPath) => apiRequest<void>('DELETE', path);

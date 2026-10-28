@@ -10,11 +10,20 @@
     "versionConflict": "This record was changed somewhere else.",
     "internal": "Something unexpected happened. Try again; if it persists, share this code with us.",
     "rateLimited": "Too many attempts. Please try again in a moment.",
-    "unauthenticated": "Your session has ended. Please sign in again."
+    "unauthenticated": "Your session has ended. Please sign in again.",
+    "idempotencyReused": "This request key was already used for a different request."
   },
   "rules": {
     "BR-ACC-001": "A new account can't be created with this email. If you have an account, sign in or reset your password.",
-    "BR-ACC-004": "Verify your email address first."
+    "BR-ACC-004": "Verify your email address first.",
+    "BR-PROJ-004": "Tasks can’t be added to an archived project. Unarchive the project first.",
+    "BR-DEL-002": "Archived items are read-only. Unarchive to change them.",
+    "BR-SUB-001": "A subtask can’t have its own subtasks.",
+    "BR-SUB-002": "A subtask can’t be moved on its own. Turn it into a standalone task first.",
+    "BR-SUB-005": "A task can have at most 100 subtasks.",
+    "BR-TAG-003": "A task can have at most 20 tags and a workspace at most 500.",
+    "BR-DEL-003": "The 30-day trash period is over; this item can’t be restored.",
+    "BR-SUB-004": "A subtask whose parent is in the trash must be restored together with its parent."
   },
   "ui": {
     "offline": "No connection. Your changes may not be saved.",
@@ -78,7 +87,9 @@
       "too_long": "This field is too long.",
       "too_common": "This password is too common; choose another one.",
       "incorrect": "Current password is incorrect.",
-      "same": "This is already your email address."
+      "same": "This is already your email address.",
+      "after_due_date": "Start date can’t be after the due date.",
+      "use_complete_or_reopen": "Use complete or reopen to change this."
     },
     "network": "Could not connect. Check your internet connection and try again."
   },
@@ -91,7 +102,16 @@
     "personal": "Personal",
     "personalSpace": "Your personal space",
     "signOut": "Sign out",
-    "menuFooter": "Only yours. Everything in one place."
+    "menuFooter": "Only yours. Everything in one place.",
+    "inbox": "Inbox",
+    "addTask": "Add task",
+    "add": "Add",
+    "inboxCount": "{count} open tasks",
+    "myTasks": "My tasks",
+    "myTasksCount": "{count} open tasks",
+    "upcoming": "Upcoming",
+    "todayCount": "{count} tasks",
+    "upcomingCount": "{count} tasks"
   },
   "dashboard": {
     "greeting": {
@@ -101,9 +121,37 @@
       "night": "Good night, {name}"
     },
     "subtitle": "Make some calm space for yourself.",
-    "emptyTitle": "Your day will take shape here",
-    "emptyDescription": "Adding tasks, the Inbox and the daily plan arrive in the next phase. For now you can adjust your appearance, language and time zone in settings.",
-    "toSettings": "Go to settings"
+    "edit": "Edit",
+    "editTitle": "Edit sections",
+    "editDescription": "Choose and order the sections you want to see.",
+    "moveUp": "Move {widget} up",
+    "moveDown": "Move {widget} down",
+    "save": "Save",
+    "cancel": "Cancel",
+    "widgets": {
+      "today": "Today",
+      "overdue": "Overdue",
+      "upcoming": "Upcoming",
+      "priority": "Priority"
+    },
+    "counts": {
+      "today": "{count} tasks",
+      "overdue": "{count} tasks",
+      "upcoming": "Next 7 days · {count}",
+      "priority": "High · {count}"
+    },
+    "empty": {
+      "today": "Nothing planned for today. Take a look at what’s upcoming.",
+      "overdue": "No overdue tasks.",
+      "upcoming": "No tasks in the next 7 days.",
+      "priority": "No open high-priority tasks."
+    },
+    "allUpcoming": "See all {count} tasks",
+    "toToday": "Move to today",
+    "toTomorrow": "Move to tomorrow",
+    "noTasksTitle": "Start planning your day with a task",
+    "noTasksDescription": "Write your first task with quick add; today’s, overdue and upcoming tasks gather here.",
+    "allHidden": "All sections are hidden. Use “Edit” to add one."
   },
   "settings": {
     "title": "Settings",
@@ -225,6 +273,176 @@
     "prefs": {
       "title": "Your basic preferences",
       "description": "Taken from your browser. Change them if needed; you can also edit them later in Settings."
+    }
+  },
+  "tasks": {
+    "quickAdd": {
+      "label": "Quick add",
+      "placeholder": "What’s on your mind?",
+      "titleLabel": "Task title",
+      "target": "Inbox",
+      "hint": "If you don’t pick a project, the task goes to the Inbox.",
+      "keys": "Enter to add · Esc to clear",
+      "submit": "Add task",
+      "failed": "Couldn’t save. Your text is still here; you can try again.",
+      "kept": "Your title and chosen fields were kept.",
+      "retry": "Try again",
+      "added": "Task added to the Inbox."
+    },
+    "date": {
+      "button": "Date",
+      "title": "Pick a date",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "nextWeek": "Next week",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "time": "Time",
+      "timezone": "Time zone",
+      "clear": "Remove date",
+      "apply": "Apply"
+    },
+    "priority": {
+      "0": "None",
+      "1": "Low",
+      "2": "Medium",
+      "3": "High",
+      "button": "Priority"
+    },
+    "row": {
+      "complete": "Complete: {title}",
+      "noDate": "No date",
+      "today": "Today",
+      "overdue": "Overdue",
+      "subtasks": "{done}/{total} subtasks",
+      "open": "Open: {title}"
+    },
+    "completed": "Task completed.",
+    "completeFailed": "The task couldn’t be completed. Try again.",
+    "inbox": {
+      "title": "Inbox",
+      "subtitle": "Capture first, find its place later. {count, plural, =0 {No open tasks.} one {# open task.} other {# open tasks.}}",
+      "group": "To process",
+      "emptyTitle": "Inbox is empty",
+      "emptyDescription": "Jot down whatever comes to mind with quick add; find its place later."
+    },
+    "groups": {
+      "overdue": "Overdue",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "thisWeek": "This week",
+      "later": "Later",
+      "none": "No date"
+    },
+    "myTasks": {
+      "title": "My tasks",
+      "subtitle": "{count, plural, =0 {No open tasks} one {# open task} other {# open tasks}} across your projects and Inbox.",
+      "emptyTitle": "No open tasks",
+      "emptyDescription": "Add a task with quick add; it appears here by its due date.",
+      "collapse": "Collapse {group}",
+      "expand": "Expand {group}"
+    },
+    "move": {
+      "button": "Move to project",
+      "title": "Move to project",
+      "search": "Search projects",
+      "placeholder": "Type a project name…",
+      "hint": "Dates and other fields are kept. Subtasks move with their parent.",
+      "empty": "No matching project.",
+      "moved": "“{title}” moved to {project}."
+    },
+    "giveDate": "Set date",
+    "inboxFooter": "Setting a date doesn’t take a task out of the Inbox. Move it to a project to organize it.",
+    "detail": {
+      "label": "Task details",
+      "close": "Close",
+      "title": "Title",
+      "complete": "Complete",
+      "reopen": "Reopen",
+      "project": "Project",
+      "status": "Status",
+      "statuses": {
+        "todo": "To do",
+        "in_progress": "In progress",
+        "done": "Done"
+      },
+      "priority": "Priority",
+      "start": "Start",
+      "due": "Due",
+      "noDate": "No date",
+      "tags": "Tags",
+      "tagsPlaceholder": "Type a tag, press Enter",
+      "removeTag": "Remove tag {tag}",
+      "description": "Description",
+      "descriptionPlaceholder": "Add details…",
+      "subtasks": "Subtasks",
+      "addSubtask": "Add subtask",
+      "detach": "Make standalone task",
+      "parent": "Parent task: {title}",
+      "footer": "Created: {date} · Field changes are saved instantly.",
+      "saved": "Saved",
+      "saveFailed": "Couldn’t save. Try again.",
+      "conflict": "This task was changed somewhere else.",
+      "keepMine": "Apply mine",
+      "takeTheirs": "Take the latest",
+      "notFound": "The task doesn’t exist or you don’t have access.",
+      "more": "More actions",
+      "archive": "Archive",
+      "unarchive": "Unarchive",
+      "delete": "Move to trash",
+      "archivedBand": "This task is archived. Unarchive it to edit.",
+      "deletedBand": "This task is in the trash. {days, plural, =0 {About to be deleted; it can’t be restored.} one {You can restore it within # day.} other {You can restore it within # days.}}",
+      "restore": "Restore",
+      "restoreFailed": "Couldn’t restore.",
+      "deleteConfirm": "The task and its subtasks will move to the trash. You can restore them within 30 days."
+    },
+    "completeDialog": {
+      "title": "Complete the subtasks too?",
+      "description": "{done} of {total} subtasks are done. You can complete the remaining {open} as well, or only the main task.",
+      "all": "Complete subtasks too",
+      "onlyParent": "Complete only the main task",
+      "cancel": "Cancel",
+      "footnote": "Completing all subtasks doesn’t complete the main task automatically."
+    }
+  },
+  "firstSteps": {
+    "title": "First steps",
+    "progress": "{done}/{total}",
+    "close": "Close the first steps list",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "items": {
+      "firstTask": "Add your first task",
+      "moveToProject": "Move a task to a project",
+      "setDate": "Give a task a date",
+      "shortcuts": "Discover keyboard shortcuts (?)"
+    }
+  },
+  "upcoming": {
+    "title": "Upcoming",
+    "subtitle": "{range} · Next 7 days · {count, plural, =0 {no open tasks} one {# open task} other {# open tasks}}",
+    "empty": "You have no open dated tasks in the next 7 days.",
+    "footer": "A date filter of My tasks. Tasks keep their project and status."
+  },
+  "shortcuts": {
+    "title": "Keyboard shortcuts",
+    "description": "Single-key shortcuts don’t work while a text field is focused.",
+    "close": "Close",
+    "items": {
+      "q": "Quick add",
+      "gd": "Go to Today",
+      "gi": "Go to Inbox",
+      "gm": "Go to My tasks",
+      "gu": "Go to Upcoming",
+      "jk": "Move through the list",
+      "enter": "Open task",
+      "complete": "Complete selected task",
+      "t": "Set date",
+      "m": "Move to project",
+      "l": "Add tag",
+      "del": "Move to trash",
+      "undo": "Undo last action (while the notice is shown)",
+      "help": "Open this guide"
     }
   }
 }

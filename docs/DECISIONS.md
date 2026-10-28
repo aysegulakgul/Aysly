@@ -349,6 +349,57 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Sonuçlar: Örnek projeler proje sayfaları gelene kadar (Faz 5) görünmez; onboarding bunu kullanıcıya açıkça söyler. Dashboard düzeni Faz 4'teki widget'larla birlikte görünür hale gelir. "İlk adımlar" kontrol listesi görevlerle birlikte Faz 4'te.
 - Uygulama ayrıntıları (Claude, §5.5): "Atla" sayısı tutulur; bir kez atlanan rehber yalnızca atlamadan sonra açılan bir oturumda ("sonraki giriş") bir kez daha önerilir, ikinci atlamadan sonra önerilmez. Yeniden başlatma Ayarlar · Profil'deki "Başlangıç rehberi" panelinden yapılır. Örnek projeler bir kez oluşturulur; rehber yeniden başlatılsa da tekrar oluşturulmaz.
 
+### D-075 — Tarayıcı testleri üretim derlemesine karşı; Secure çerez HTTPS adrese bağlı (teknik)
+- Durum: ONAYLI (teknik, CLAUDE.md §5.5) · Tarih: 2026-10-28 · Karar veren: Claude
+- Bağlam: Faz 3 kapanışında tarayıcı testleri aralıklı olarak toplu başarısız oldu. Geliştirme modunda sayfa saniyede bir yeniden yükleniyor, formlar JavaScript bağlanmadan gönderiliyordu. Proje OneDrive klasöründe olduğundan dosya izleyicisinin tetiklenmesi muhtemel neden; kesin tetikleyici bulunamadı.
+- Karar: Playwright uygulamanın üretim derlemesini başlatır (anlık yeniden yükleme yok; testler 2,7 dakikadan yaklaşık 1 dakikaya indi). `useSecureCookies` artık `NODE_ENV` yerine uygulama adresinin HTTPS olmasına bağlı; yayında adres HTTPS olacağından davranış değişmez. `/dev/ui` erişilebilirlik testi "üretimde kapalı" testiyle değiştirildi.
+
+### D-076 — Görev tablosu ve idempotency uygulama ayrıntıları (teknik)
+- Durum: ONAYLI (teknik, CLAUDE.md §5.5) · Tarih: 2026-10-28 · Karar veren: Claude
+- Kolonlar: Tekrar kolonları (Faz 6) ve arama vektörü (Faz 7) ilgili fazların migration'larıyla eklenir (CLAUDE.md §2.11: kullanılmayan kolon yok). `tasks.created_by`/`completed_by` isteğe bağlı ve `ON DELETE SET NULL` (D-068 ile aynı gerekçe).
+- Idempotency (D-019): Anahtar satırı görevle aynı veritabanı işleminde yazılır. Aynı anahtarlı eşzamanlı ikinci istek birincinin bitmesini birincil anahtar kilidinde bekler ve kaydedilmiş yanıtı döner. 2xx olmayan yanıtlar saklanmaz (işlem geri alınır). Başlık zorunludur. Temizlik işi saatlik (D-053).
+- Yetkilendirme: `WorkspaceScope` yalnızca üyelik çözümleyicisiyle üretilir; `authorize(scope, izin)` her use case'te çağrılır; MVP'de `owner` tüm izinlere sahiptir (ROLES_AND_PERMISSIONS §6.1, tablo tabanlı test).
+- Tarih/saat: ARCHITECTURE §3'teki `date-fns` + `@date-fns/tz` yerine yerleşik `Intl` API kullanıldı; yeni paket gerekmedi, yaz saati kuralları (BR-DATE-006) testlerle doğrulandı. İleride tarih aritmetiği karmaşıklaşırsa (takvim, tekrar) paket önerisi yeniden değerlendirilir.
+- Sıralama: `fractional-indexing` paketi eklendi (ARCHITECTURE §3 teknoloji tablosunda onaylı, D-058). Onboarding örnek projelerinin konumları da bu paketle üretilir.
+
+### D-077 — Inbox ve hızlı ekleme uygulama ayrıntıları (teknik/uygulama)
+- Durum: ONAYLI (teknik; D-071 ilkesi) · Tarih: 2026-10-28 · Karar veren: Claude
+- Inbox ekranı Figma 4:66650 / 4:68036, hızlı ekleme ve tarih seçici Figma akış çerçevelerine (4:69297, 4:69319, 4:69362) göre kuruldu.
+- Henüz çalışmayan öğeler gösterilmez (D-071): "Seç" (toplu işlem), satırdaki "Projeye taşı" ve "Tarih ver", hızlı eklemedeki "Etiket" ve proje seçimi Faz 4'ün 3–4. bölümlerinde ve Faz 5'te gelir. O zamana kadar hızlı eklemenin hedefi yalnızca yazı olarak "Inbox"tur. Figma'daki "Tarih vermek görevi Inbox'tan çıkarmaz… projeye taşı" alt notu da taşıma gelince eklenecek.
+- Hızlı ekleme kartı odak kaybında kapanmaz (yalnızca Esc veya başarılı eklemeyle). Kapanması altındaki listeyi kaydırıyor, tıklamalar yanlış hedefe düşüyordu.
+- Kayıt hatasında "Tekrar dene" aynı idempotency anahtarıyla gönderir (BR-TASK-007): yanıtı kaybolan istek tekrarlansa da tek görev oluşur (E2E ile doğrulandı).
+- Açılır pencereler için yığında onaylı Radix UI'dan `@radix-ui/react-popover` eklendi.
+
+### D-078 — Görevlerim, görev detayı, alt görev ve etiket uygulama ayrıntıları (teknik/uygulama)
+- Durum: ONAYLI (teknik; D-071 ilkesi) · Tarih: 2026-10-28 · Karar veren: Claude
+- Görevlerim (Figma 4:66732): yalnızca "Liste" ve "Son tarih" gruplaması. Pano/Takvim sekmeleri, "Filtrele" ve gruplama seçimi Faz 5–6'da gelir; o zamana kadar gösterilmez. "Görev ekle" Inbox'taki hızlı eklemeyi açar (BR-INBOX-001).
+- Görev detayı (Figma 4:66875): `?task=<id>` ile açılan panel; masaüstünde sağda, mobilde tam ekran. Tekrar, hatırlatıcı (Faz 6), bağlı kayıtlar (Faz 7) ve "…" menüsü (arşiv/çöp, 4. bölüm) gösterilmez. Açıklama düz metin olarak saklanır ve gösterilir; Markdown görüntüleme (SafeMarkdown) notlarla birlikte Faz 7'de.
+- Etiketler: `PATCH tagNames` kümeyi değiştirir. Normalleştirme uygulamada yapılır (BR-TAG-001). Etiket silme ve yeniden adlandırma (BR-TAG-002) ayrı bir yönetim ekranı gerektirdiğinden Faz 5'teki kayıtlı görünümlerle birlikte ele alınır.
+- Alt görevli görev tamamlanırken Figma "Görevi tamamla" (4:69469) penceresi çıkar (BR-SUB-003). İşlem ve alt görevlerin tamamlanması tek veritabanı işleminde; taşımada da alt görevler aynı işlemde taşınır.
+- Yeni paket: `@radix-ui/react-dialog` (yığında onaylı Radix). Figma'dan `chevron-down` ikonu indirildi.
+
+### D-079 — Arşiv ve çöp kutusu: Faz 4 kapsamı (teknik/uygulama)
+- Durum: ONAYLI (teknik; IMPLEMENTATION_PLAN faz sınırına uyum) · Tarih: 2026-10-28 · Karar veren: Claude
+- Plan, toplu işlemleri (BR-TASK-008) ve Arşiv/Çöp kutusu sayfalarını Faz 5'e koyar. Faz 4'te görev arşivleme, çöpe taşıma, geri yükleme, kalıcı silme API'leri ve 30 günlük temizlik işi (`trash.purge`, saatlik ve açılışta, D-053) uygulandı.
+- Arayüz (D-065, Figma'da yok): görev detayında "⋯" menüsü (Arşivle / Çöpe taşı). Arşivdeki veya çöpteki göreve gidilince salt okunur bant ve "Arşivden çıkar" / "Geri yükle" (kalan gün ile) gösterilir (BR-DEL-007). Çöpe taşıma sonrası panelde görünen bu bant "geri al" görevini görür.
+- Geri yükleme: ebeveyn tek başına geri yüklenince aynı gruptaki alt görevler de döner; ebeveyni çöpteki alt görev ebeveyniyle geri yüklenir (BR-SUB-004). Projesi artık yoksa görev Inbox'a döner; proje çöpü Faz 5'te geldiğinde "projeyi de geri yükle" seçimi eklenecek (BR-DEL-004).
+- Çöpe taşıma sürüm kontrolü yapmaz (tüm kaydı hedefler, geri alınabilir); arşivleme yapar.
+
+### D-080 — Bugün bölümleri, Yaklaşanlar, İlk adımlar ve kısayollar: Faz 4 kapsamı (teknik/uygulama)
+- Durum: ONAYLI (teknik; plan ve D-071 ilkesi) · Tarih: 2026-10-28 · Karar veren: Claude
+- Bugün (Figma 4:66490): Bugün, Geciken (tek tıkla "Bugüne taşı" / "Yarına taşı"), Yaklaşan (ilk 3 + "tümünü gör"), Öncelikli bölümleri; masaüstünde iki sütun. Projeler ve Hedefler bölümleri plan gereği Faz 7'de. "Düzenle" (FR-DASH-08) yalnızca çalışan bölümleri listeler; kayıttaki diğerlerinin yeri korunur. Düzenleme penceresi Figma'da yok (D-065).
+- Yaklaşanlar (Figma 4:67785): sonraki 7 gün, gün gün. Filtre çipleri, "Görünümü kaydet", Pano/Takvim sekmeleri kayıtlı görünümlerle (Faz 5).
+- İlk adımlar (ONBOARDING §4, Figma'da yok): şimdilik "İlk görevini ekle", "Bir görevi projeye taşı", "Bir göreve tarih ekle", "Klavye kısayollarını keşfet". Hatırlatıcı (Faz 6), tekrarlayan görev (Faz 6), pano (Faz 5) ve hedef (Faz 7) maddeleri ilgili fazlarda eklenir. Durum `user_preferences.onboarding.checklist` içinde.
+- Kısayollar (UI_UX §11): Q, G D/I/M/U, J/K ve ↑/↓, Enter, Ctrl/⌘+Enter, T/M/L (detay panelinde ilgili alana odaklanır), Del, Ctrl/⌘+Z (açık "Geri al" bildiriminde), ?. Ctrl/⌘+K (arama, Faz 7) ile G C / G P (Takvim, Projeler) ilgili fazlarda. Rehber penceresi Figma'da yok (D-065).
+- "Bugün" sunucuda kullanıcının saat diliminde hesaplanır (BR-DASH-002); kenar çubuğunda Bugün ve Yaklaşanlar sayıları.
+
+### D-081 — Faz 4 sonu değerlendirmeleri: TanStack Query gerekmedi; AC-02 ve test sunucusu (teknik)
+- Durum: ONAYLI (teknik, CLAUDE.md §5.5; ARCHITECTURE §3.7 değerlendirmesi) · Tarih: 2026-10-28 · Karar veren: Claude
+- TanStack Query: **eklenmedi.** Sunucu bileşenleri + `src/client` tipli istemci + değişiklik sonrası `router.refresh()` ve iyimser yerel durum (tamamlama, gizleme) yeterli; 1.000 görevle liste sorguları p95 ≈ 90 ms (sınır 300 ms). Takvim ve pano sürükle-bırak (Faz 5–6) yeniden değerlendirme noktasıdır.
+- AC-02 ("2 görev seçilip Ev'e taşınır"): çoklu seçim ve toplu işlemler (BR-TASK-008) planda Faz 5'te olduğundan Faz 4 kabul testinde iki görev tek tek taşındı; ölçülen sonuç aynı (Inbox sayacı, proje içeriği, korunan tarih ve etiketler). Çoklu seçimli sürüm Faz 5 kabulüne eklendi.
+- AC-09: sunucu saati tarayıcı testinde değiştirilemediği için sınır (23:30 / 00:01) domain birim testiyle doğrulandı.
+- Test sunucusu `--keepAliveTimeout 70000` ile başlatılır: test istemcisinin kapanmış bağlantıyı yeniden kullanmasından doğan aralıklı `ECONNRESET` giderildi.
+
 ---
 
 ## 5. Faz kapanış kayıtları

@@ -11,7 +11,6 @@ export default defineConfig({
   fullyParallel: true,
   retries: 0,
   reporter: [['list']],
-  // Geliştirme modunda ilk istekte sayfa/rota derlenir; ilk açılış birkaç saniye sürebilir.
   expect: { timeout: 15_000 },
   use: {
     baseURL: E2E_BASE_URL,
@@ -26,10 +25,13 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Pixel 7'], viewport: { width: 390, height: 844 } } },
   ],
   webServer: {
-    command: `pnpm next dev -p ${E2E_PORT}`,
+    // Üretim derlemesi: geliştirme modunun anlık yeniden yüklemesi (HMR) testleri kararsızlaştırıyordu;
+    // uzun keep-alive, test istemcisinin kapanmış bağlantıyı yeniden kullanmasını (ECONNRESET) önler.
+    // derlenmiş sayfalar ayrıca daha hızlı açılır. Derleme ayrı klasöre (.next-e2e) yapılır.
+    command: `pnpm next build && pnpm next start -p ${E2E_PORT} --keepAliveTimeout 70000`,
     url: `${E2E_BASE_URL}/api/health`,
     env: E2E_SERVER_ENV,
     reuseExistingServer: false,
-    timeout: 180_000,
+    timeout: 300_000,
   },
 });

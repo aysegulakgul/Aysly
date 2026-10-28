@@ -38,6 +38,8 @@ flowchart TD
 Örnek projelerde **örnek görev oluşturulmaz** (ÖNERİ) — kullanıcının kendi verisini kirletmemek için. Bunun yerine boş durum ekranları rehberlik eder.
 
 ## 4. "İlk adımlar" kontrol listesi
+
+> **Uygulama durumu (Faz 4, D-080):** 1, 2, "Bir göreve tarih ekle" ve 6. maddeler uygulandı; hatırlatıcı, tekrar, pano ve hedef maddeleri ilgili fazlarda eklenir.
 Dashboard'da katlanabilir kart; tamamlanan maddeler otomatik işaretlenir; tümü bitince veya kapatılınca kaybolur.
 1. İlk görevini ekle
 2. Bir görevi projeye taşı

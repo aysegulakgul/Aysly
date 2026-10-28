@@ -23,20 +23,31 @@ function NavLabel({ glyph, children }: { glyph?: string | undefined; children: R
   );
 }
 
+/** `count`: Figma'daki sağa yaslı 12 px sayı (ör. Inbox rozeti, BR-INBOX-003); `countLabel` ekran okuyucu metnidir. */
 export function NavItem({
   href,
   glyph,
   active = false,
+  count,
+  countLabel,
   children,
 }: {
   href: Route;
   glyph?: string;
   active?: boolean;
+  count?: string | undefined;
+  countLabel?: string | undefined;
   children: ReactNode;
 }) {
   return (
     <Link href={href} aria-current={active ? 'page' : undefined} className={navItemClass(active)}>
       <NavLabel glyph={glyph}>{children}</NavLabel>
+      {count ? (
+        <span className="text-xs font-normal text-text-secondary">
+          <span aria-hidden="true">{count}</span>
+          {countLabel ? <span className="sr-only">{countLabel}</span> : null}
+        </span>
+      ) : null}
     </Link>
   );
 }
@@ -70,11 +81,14 @@ export function BottomNavItem({
   href,
   glyph,
   active = false,
+  accent = false,
   children,
 }: {
   href: Route;
   glyph: string;
   active?: boolean;
+  /** Figma'da "Ekle" öğesi her zaman birincil renktedir (4:69079). */
+  accent?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -83,7 +97,7 @@ export function BottomNavItem({
       aria-current={active ? 'page' : undefined}
       className={cn(
         'flex min-h-11 flex-1 flex-col items-center text-center',
-        active ? 'text-primary' : 'text-text-secondary',
+        active || accent ? 'text-primary' : 'text-text-secondary',
       )}
     >
       <span aria-hidden="true" className="text-[22px] leading-6">

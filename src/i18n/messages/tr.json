@@ -10,11 +10,20 @@
     "versionConflict": "Bu kayıt başka bir yerde değiştirildi.",
     "internal": "Beklenmeyen bir sorun oluştu. Tekrar dene; sorun sürerse bize şu kodu ilet.",
     "rateLimited": "Çok fazla deneme yaptın. Lütfen biraz sonra tekrar dene.",
-    "unauthenticated": "Oturumun sona erdi. Lütfen yeniden giriş yap."
+    "unauthenticated": "Oturumun sona erdi. Lütfen yeniden giriş yap.",
+    "idempotencyReused": "Bu istek anahtarı farklı bir istekle zaten kullanıldı."
   },
   "rules": {
     "BR-ACC-001": "Bu e-posta adresiyle yeni hesap açılamıyor. Hesabın varsa giriş yap ya da şifreni sıfırla.",
-    "BR-ACC-004": "Önce e-posta adresini doğrula."
+    "BR-ACC-004": "Önce e-posta adresini doğrula.",
+    "BR-PROJ-004": "Arşivlenmiş projeye görev eklenemez. Önce projeyi arşivden çıkar.",
+    "BR-DEL-002": "Arşivdeki kayıt salt okunurdur. Değiştirmek için önce arşivden çıkar.",
+    "BR-SUB-001": "Alt görevin alt görevi olamaz.",
+    "BR-SUB-002": "Alt görev tek başına taşınamaz. Önce bağımsız göreve dönüştür.",
+    "BR-SUB-005": "Bir görevin en fazla 100 alt görevi olabilir.",
+    "BR-TAG-003": "Bir görevde en fazla 20, çalışma alanında en fazla 500 etiket olabilir.",
+    "BR-DEL-003": "Çöp kutusundaki 30 günlük süre doldu; bu kayıt geri yüklenemez.",
+    "BR-SUB-004": "Ana görevi çöpte olan alt görev, ana göreviyle birlikte geri yüklenmelidir."
   },
   "ui": {
     "offline": "Bağlantı yok. Değişikliklerin kaydedilemeyebilir.",
@@ -78,7 +87,9 @@
       "too_long": "Bu alan çok uzun.",
       "too_common": "Bu şifre çok yaygın; başka bir şifre seç.",
       "incorrect": "Mevcut şifre yanlış.",
-      "same": "Bu zaten kullandığın e-posta adresi."
+      "same": "Bu zaten kullandığın e-posta adresi.",
+      "after_due_date": "Başlangıç tarihi son tarihten sonra olamaz.",
+      "use_complete_or_reopen": "Tamamlamak veya yeniden açmak için ilgili işlemi kullan."
     },
     "network": "Bağlantı kurulamadı. İnternet bağlantını kontrol edip tekrar dene."
   },
@@ -91,7 +102,16 @@
     "personal": "Kişisel",
     "personalSpace": "Kişisel alanın",
     "signOut": "Çıkış yap",
-    "menuFooter": "Sadece sana ait. Her şey tek bir yerde."
+    "menuFooter": "Sadece sana ait. Her şey tek bir yerde.",
+    "inbox": "Inbox",
+    "addTask": "Görev ekle",
+    "add": "Ekle",
+    "inboxCount": "{count} açık görev",
+    "myTasks": "Görevlerim",
+    "myTasksCount": "{count} açık görev",
+    "upcoming": "Yaklaşanlar",
+    "todayCount": "{count} görev",
+    "upcomingCount": "{count} görev"
   },
   "dashboard": {
     "greeting": {
@@ -101,9 +121,37 @@
       "night": "İyi geceler, {name}"
     },
     "subtitle": "Kendine sakin bir alan aç.",
-    "emptyTitle": "Günün burada şekillenecek",
-    "emptyDescription": "Görev ekleme, Inbox ve günlük plan bir sonraki aşamada geliyor. Şimdilik ayarlardan görünümünü, dilini ve saat dilimini düzenleyebilirsin.",
-    "toSettings": "Ayarlara git"
+    "edit": "Düzenle",
+    "editTitle": "Bölümleri düzenle",
+    "editDescription": "Göstermek istediğin bölümleri seç ve sırala.",
+    "moveUp": "{widget} yukarı taşı",
+    "moveDown": "{widget} aşağı taşı",
+    "save": "Kaydet",
+    "cancel": "Vazgeç",
+    "widgets": {
+      "today": "Bugün",
+      "overdue": "Geciken",
+      "upcoming": "Yaklaşan",
+      "priority": "Öncelikli"
+    },
+    "counts": {
+      "today": "{count} görev",
+      "overdue": "{count} görev",
+      "upcoming": "Sonraki 7 gün · {count}",
+      "priority": "Yüksek · {count}"
+    },
+    "empty": {
+      "today": "Bugün için planlanmış iş yok. Yaklaşanlara göz at.",
+      "overdue": "Geciken görev yok.",
+      "upcoming": "Sonraki 7 günde görev yok.",
+      "priority": "Yüksek öncelikli açık görev yok."
+    },
+    "allUpcoming": "{count} görevin tümünü gör",
+    "toToday": "Bugüne taşı",
+    "toTomorrow": "Yarına taşı",
+    "noTasksTitle": "Gününü planlamaya bir görevle başla",
+    "noTasksDescription": "Hızlı eklemeyle ilk görevini yaz; bugün, geciken ve yaklaşan görevlerin burada toplanır.",
+    "allHidden": "Tüm bölümler gizli. “Düzenle” ile bölüm ekleyebilirsin."
   },
   "settings": {
     "title": "Ayarlar",
@@ -225,6 +273,176 @@
     "prefs": {
       "title": "Temel tercihlerin",
       "description": "Tarayıcından aldığımız ayarlar. Gerekirse değiştir; sonra Ayarlar’dan da düzenleyebilirsin."
+    }
+  },
+  "tasks": {
+    "quickAdd": {
+      "label": "Hızlı ekle",
+      "placeholder": "Aklında ne var?",
+      "titleLabel": "Görev başlığı",
+      "target": "Inbox",
+      "hint": "Bir proje seçmediğinde görev Inbox’a eklenir.",
+      "keys": "Enter ile ekle · Esc ile temizle",
+      "submit": "Görev ekle",
+      "failed": "Kaydedilemedi. Metnin burada, tekrar deneyebilirsin.",
+      "kept": "Başlık ve seçtiğin alanlar korundu.",
+      "retry": "Tekrar dene",
+      "added": "Görev Inbox’a eklendi."
+    },
+    "date": {
+      "button": "Tarih",
+      "title": "Tarih seç",
+      "today": "Bugün",
+      "tomorrow": "Yarın",
+      "nextWeek": "Gelecek hafta",
+      "prevMonth": "Önceki ay",
+      "nextMonth": "Sonraki ay",
+      "time": "Saat",
+      "timezone": "Saat dilimi",
+      "clear": "Tarihi kaldır",
+      "apply": "Uygula"
+    },
+    "priority": {
+      "0": "Yok",
+      "1": "Düşük",
+      "2": "Orta",
+      "3": "Yüksek",
+      "button": "Öncelik"
+    },
+    "row": {
+      "complete": "Tamamla: {title}",
+      "noDate": "Tarihsiz",
+      "today": "Bugün",
+      "overdue": "Gecikti",
+      "subtasks": "{done}/{total} alt görev",
+      "open": "Aç: {title}"
+    },
+    "completed": "Görev tamamlandı.",
+    "completeFailed": "Görev tamamlanamadı. Tekrar dene.",
+    "inbox": {
+      "title": "Inbox",
+      "subtitle": "Önce yakala, sonra yerini bul. {count, plural, =0 {Açık görev yok.} other {# açık görev.}}",
+      "group": "İşlenecekler",
+      "emptyTitle": "Inbox boş",
+      "emptyDescription": "Aklına geleni hızlı eklemeyle buraya yaz; sonra yerini bul."
+    },
+    "groups": {
+      "overdue": "Geciken",
+      "today": "Bugün",
+      "tomorrow": "Yarın",
+      "thisWeek": "Bu hafta",
+      "later": "Daha sonra",
+      "none": "Tarihsiz"
+    },
+    "myTasks": {
+      "title": "Görevlerim",
+      "subtitle": "Tüm projelerin ve Inbox’tan {count, plural, =0 {açık görev yok.} other {# açık görev.}}",
+      "emptyTitle": "Açık görevin yok",
+      "emptyDescription": "Hızlı eklemeyle bir görev ekle; burada son tarihine göre görünür.",
+      "collapse": "{group} grubunu daralt",
+      "expand": "{group} grubunu genişlet"
+    },
+    "move": {
+      "button": "Projeye taşı",
+      "title": "Projeye taşı",
+      "search": "Proje ara",
+      "placeholder": "Proje adı yaz…",
+      "hint": "Tarih ve diğer görev alanları korunur. Alt görevler ana görevle birlikte taşınır.",
+      "empty": "Eşleşen proje yok.",
+      "moved": "“{title}” {project} projesine taşındı."
+    },
+    "giveDate": "Tarih ver",
+    "inboxFooter": "Tarih vermek görevi Inbox’tan çıkarmaz. Düzenlemek için bir projeye taşı.",
+    "detail": {
+      "label": "Görev detayı",
+      "close": "Kapat",
+      "title": "Başlık",
+      "complete": "Tamamla",
+      "reopen": "Yeniden aç",
+      "project": "Proje",
+      "status": "Durum",
+      "statuses": {
+        "todo": "Yapılacak",
+        "in_progress": "Devam ediyor",
+        "done": "Tamamlandı"
+      },
+      "priority": "Öncelik",
+      "start": "Başlangıç",
+      "due": "Son tarih",
+      "noDate": "Tarih yok",
+      "tags": "Etiketler",
+      "tagsPlaceholder": "Etiket yaz, Enter’a bas",
+      "removeTag": "{tag} etiketini kaldır",
+      "description": "Açıklama",
+      "descriptionPlaceholder": "Ayrıntı ekle…",
+      "subtasks": "Alt görevler",
+      "addSubtask": "Alt görev ekle",
+      "detach": "Bağımsız göreve dönüştür",
+      "parent": "Ana görev: {title}",
+      "footer": "Oluşturuldu: {date} · Alan değişiklikleri anında kaydedilir.",
+      "saved": "Kaydedildi",
+      "saveFailed": "Kaydedilemedi. Tekrar dene.",
+      "conflict": "Bu görev başka bir yerde değiştirildi.",
+      "keepMine": "Benimkini uygula",
+      "takeTheirs": "Güncel olanı al",
+      "notFound": "Görev bulunamadı ya da erişimin yok.",
+      "more": "Diğer işlemler",
+      "archive": "Arşivle",
+      "unarchive": "Arşivden çıkar",
+      "delete": "Çöpe taşı",
+      "archivedBand": "Bu görev arşivde. Düzenlemek için arşivden çıkar.",
+      "deletedBand": "Bu görev çöp kutusunda. {days, plural, =0 {Silinmek üzere; geri yüklenemez.} other {# gün içinde geri yükleyebilirsin.}}",
+      "restore": "Geri yükle",
+      "restoreFailed": "Geri yüklenemedi.",
+      "deleteConfirm": "Görev ve alt görevleri çöp kutusuna taşınacak. 30 gün içinde geri yükleyebilirsin."
+    },
+    "completeDialog": {
+      "title": "Alt görevler de tamamlansın mı?",
+      "description": "{total} alt görevin {done} tanesi tamamlandı. Kalan {open} alt görevi de tamamlayabilir veya yalnızca ana görevi tamamlayabilirsin.",
+      "all": "Alt görevleri de tamamla",
+      "onlyParent": "Yalnızca ana görevi tamamla",
+      "cancel": "Vazgeç",
+      "footnote": "Alt görevlerin tamamlanması ana görevi kendiliğinden tamamlamaz."
+    }
+  },
+  "firstSteps": {
+    "title": "İlk adımlar",
+    "progress": "{done}/{total}",
+    "close": "İlk adımlar listesini kapat",
+    "collapse": "Daralt",
+    "expand": "Genişlet",
+    "items": {
+      "firstTask": "İlk görevini ekle",
+      "moveToProject": "Bir görevi projeye taşı",
+      "setDate": "Bir göreve tarih ekle",
+      "shortcuts": "Klavye kısayollarını keşfet (?)"
+    }
+  },
+  "upcoming": {
+    "title": "Yaklaşanlar",
+    "subtitle": "{range} · Bugünden sonraki 7 gün · {count, plural, =0 {açık görev yok} other {# açık görev}}",
+    "empty": "Sonraki 7 günde tarihi olan açık görevin yok.",
+    "footer": "Görevlerim’in tarih filtresi. Mevcut görevler aynı proje ve durumlarıyla gösterilir."
+  },
+  "shortcuts": {
+    "title": "Klavye kısayolları",
+    "description": "Metin alanı odaktayken tek harfli kısayollar çalışmaz.",
+    "close": "Kapat",
+    "items": {
+      "q": "Hızlı ekleme",
+      "gd": "Bugün’e git",
+      "gi": "Inbox’a git",
+      "gm": "Görevlerim’e git",
+      "gu": "Yaklaşanlar’a git",
+      "jk": "Listede gezin",
+      "enter": "Görevi aç",
+      "complete": "Seçili görevi tamamla",
+      "t": "Tarih ata",
+      "m": "Projeye taşı",
+      "l": "Etiket ekle",
+      "del": "Çöpe taşı",
+      "undo": "Son eylemi geri al (bildirim açıkken)",
+      "help": "Bu rehberi aç"
     }
   }
 }

@@ -28,6 +28,13 @@ export default async function MenuPage() {
       </div>
       <div className="h-px w-full bg-border" />
       <nav aria-label={t('menu')} className="flex w-full flex-col gap-2">
+        <NavItem href="/my-tasks" glyph="✓">
+          {t('myTasks')}
+        </NavItem>
+        <NavItem href="/upcoming" glyph="▦">
+          {t('upcoming')}
+        </NavItem>
+        <div className="h-px w-full bg-border" />
         <NavItem href="/settings" glyph="⚙">
           {t('settings')}
         </NavItem>

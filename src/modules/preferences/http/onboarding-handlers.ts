@@ -2,7 +2,12 @@ import { z } from 'zod';
 import { db } from '@/shared/db/client';
 import type { ApiContext } from '@/shared/http/api-route';
 import { systemClock } from '@/shared/kernel/clock';
-import { completeOnboarding, restartOnboarding, skipOnboarding } from '../application/onboarding';
+import {
+  completeOnboarding,
+  restartOnboarding,
+  skipOnboarding,
+  updateChecklist,
+} from '../application/onboarding';
 import { INTENTS, shouldOfferOnboarding } from '../domain/onboarding';
 import { createDrizzleOnboardingStore } from '../infrastructure/drizzle-onboarding-store';
 
@@ -39,4 +44,17 @@ export async function findOnboardingOffer(userId: string, sessionStartedAt: Date
 
 export async function findOnboardingState(userId: string) {
   return (await createDrizzleOnboardingStore(db()).find(userId))?.state ?? null;
+}
+
+const ChecklistBody = z.strictObject({
+  dismissed: z.literal(true).optional(),
+  shortcutsSeen: z.literal(true).optional(),
+});
+
+/** PATCH /me/onboarding/checklist (ONBOARDING §4). */
+export async function patchChecklist(ctx: ApiContext): Promise<Response> {
+  const body = await ctx.parse(ChecklistBody);
+  if (!body.ok) return body.response;
+  const result = await updateChecklist(deps(), ctx.actor, body.data);
+  return result.ok ? ctx.json(200, { data: result.value }) : ctx.fail(result.error);
 }

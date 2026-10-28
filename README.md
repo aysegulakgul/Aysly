@@ -8,13 +8,28 @@ Aysly; görevleri, projeleri, günlük planı, notları ve hedefleri tek, sakin 
 
 | | |
 |---|---|
-| Mevcut faz | **Faz 4 — Görevler, Inbox, My Tasks, dashboard** (planlanıyor) |
-| Uygulama kodu | Altyapı ve temel bileşenler var; kullanıcıya açık özellik henüz yok |
+| Mevcut faz | **Faz 4 — Görevler, Inbox, My Tasks, dashboard** (tamamlandı, kapanış onayı bekliyor) |
+| Uygulama kodu | Hesap, onboarding, tercihler ve görev yönetimi çalışıyor (aşağıdaki "Özellikler") |
 | Çalışma ortamı | Yalnızca yerel bilgisayar; hosting ve ücretli servis yok |
 | Teknoloji | Next.js, TypeScript, PostgreSQL, Drizzle, Better Auth |
-| Sonraki adım | Faz 4 planının onayı |
+| Sonraki adım | Faz 4 kapanış onayı, ardından Faz 5 (projeler ve görünümler) |
 
 Ayrıntılı durum: [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
+
+## Özellikler
+
+Şu an çalışanlar (Faz 1–4):
+- **Hesap:** E-posta doğrulamalı kayıt, giriş, şifre sıfırlama, oturum ve cihaz yönetimi, profil.
+- **İlk kullanım:** Kullanım amacı ve tercihlere göre kurulum rehberi; "İlk adımlar" listesi.
+- **Tercihler:** Dil, saat dilimi, hafta başlangıcı, saat biçimi, tema.
+- **Görevler:** Inbox ve hızlı ekleme; tarih/saat (saat dilimi ve yaz saati geçişleri dahil), öncelik, açıklama, etiketler, alt görevler; projeye taşıma; tamamlama ve 5 saniyelik "Geri al".
+- **Görünümler:** Bugün (Bugün, Geciken, Yaklaşan, Öncelikli bölümleri; düzenlenebilir), Görevlerim (tarihe göre gruplu), Yaklaşanlar (7 gün), görev detay paneli.
+- **Arşiv ve çöp kutusu:** Arşivleme, geri yükleme, 30 gün sonra otomatik kalıcı silme.
+- **Klavye kısayolları:** `Q`, `G D/I/M/U`, `J/K`, `T/M/L`, `Ctrl/⌘+Z`, `?` rehberi.
+
+Plan gereği sonraki fazlarda: projeler ve pano görünümü, toplu işlemler, kayıtlı görünümler (Faz 5); hatırlatıcılar, tekrarlayan görevler, takvim (Faz 6); notlar, hedefler, arama (Faz 7).
+
+**Mimari özet:** Modüler monolit (`src/modules/<modül>/{domain,application,infrastructure,http}`), yetkilendirme her istekte sunucuda, Zod ile doğrulama, REST API (`/api/v1`), `pnpm verify` ile 13 adımlı yerel kalite kontrolü (birim, entegrasyon ve Playwright testleri dahil).
 
 ## Belgeler
 

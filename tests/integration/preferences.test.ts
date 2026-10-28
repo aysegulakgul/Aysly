@@ -61,6 +61,14 @@ describe('tercihler (veritabanı)', () => {
       dateFormat: 'DD.MM.YYYY',
       timeFormat: '24h',
       weekStart: 1,
+      // BR-DASH-001: kayıtta varsayılan sıra, hepsi görünür
+      dashboardLayout: {
+        v: 1,
+        widgets: ['today', 'overdue', 'upcoming', 'priority', 'projects', 'goals'].map((id) => ({
+          id,
+          visible: true,
+        })),
+      },
       version: 1,
     });
   });

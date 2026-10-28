@@ -80,3 +80,22 @@ export async function restartOnboarding(
   await deps.store.save(actor.userId, state, {}, deps.clock.now());
   return ok(state);
 }
+
+/** ONBOARDING §4: "İlk adımlar" listesini kapatma ve kısayol rehberinin görüldüğünü kaydetme. */
+export async function updateChecklist(
+  deps: OnboardingDeps,
+  actor: { userId: string },
+  command: { dismissed?: boolean | undefined; shortcutsSeen?: boolean | undefined },
+): Promise<Result<OnboardingState, DomainError>> {
+  const found = await load(deps, actor.userId);
+  if (!found) return err(notFound());
+  const state: OnboardingState = {
+    ...found.state,
+    checklist: {
+      dismissed: command.dismissed ?? found.state.checklist.dismissed,
+      shortcutsSeen: command.shortcutsSeen ?? found.state.checklist.shortcutsSeen,
+    },
+  };
+  await deps.store.save(actor.userId, state, {}, deps.clock.now());
+  return ok(state);
+}

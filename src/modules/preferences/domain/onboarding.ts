@@ -19,6 +19,10 @@ export const OnboardingState = z.object({
   completedAt: z.string().optional(),
   /** Örnek projeler bir kez oluşturulur; onboarding yeniden başlatılsa da tekrarlanmaz. */
   samplesCreated: z.boolean().default(false),
+  /** ONBOARDING §4: "İlk adımlar" kapatıldı mı, kısayol rehberi açıldı mı. */
+  checklist: z
+    .object({ dismissed: z.boolean().default(false), shortcutsSeen: z.boolean().default(false) })
+    .default({ dismissed: false, shortcutsSeen: false }),
 });
 export type OnboardingState = z.infer<typeof OnboardingState>;
 
@@ -47,6 +51,7 @@ export function restartOnboarding(state: OnboardingState): OnboardingState {
     intents: [],
     skips: 0,
     samplesCreated: state.samplesCreated,
+    checklist: state.checklist,
   };
 }
 

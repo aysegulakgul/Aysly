@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { getViewer } from '../viewer';
+import { findInboxCount, findMyTasksCount } from '@/modules/tasks';
+import { getDashboard, getPersonalScope, getViewer } from '../viewer';
+import { KeyboardShortcuts } from './shortcuts';
 import { MobileNavigation, Sidebar } from './navigation';
 
 /**
@@ -9,13 +11,25 @@ import { MobileNavigation, Sidebar } from './navigation';
  * Yalnızca çalışan bölümler gösterilir; diğer menü öğeleri ait oldukları fazda eklenir.
  */
 export default async function AppLayout({ children }: { children: ReactNode }) {
-  const viewer = await getViewer();
-  if (!viewer) redirect('/sign-in');
+  const [viewer, scope] = await Promise.all([getViewer(), getPersonalScope()]);
+  if (!viewer || !scope) redirect('/sign-in');
+  const [inboxCount, myTasksCount, dashboard] = await Promise.all([
+    findInboxCount(scope),
+    findMyTasksCount(scope),
+    getDashboard(),
+  ]);
+  const counts = {
+    inbox: inboxCount,
+    myTasks: myTasksCount,
+    today: dashboard?.today.length ?? 0,
+    upcoming: dashboard?.upcoming.length ?? 0,
+  };
   return (
     <div className="flex min-h-dvh">
-      <Sidebar userName={viewer.user.name} />
+      <Sidebar userName={viewer.user.name} counts={counts} />
       <div className="flex min-w-0 flex-1 flex-col pb-[84px] lg:pb-0">{children}</div>
       <MobileNavigation />
+      <KeyboardShortcuts workspaceId={scope.workspaceId} />
     </div>
   );
 }

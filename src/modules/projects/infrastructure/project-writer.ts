@@ -1,10 +1,12 @@
-import { count, eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
+import { generateNKeysBetween } from 'fractional-indexing';
 import type { DbExecutor } from '@/shared/db/client';
 import { projects } from './schema';
 
 /**
  * Standart proje kaydı (ör. onboarding örnek projeleri, ONBOARDING §3). Proje yönetimi Faz 5'te gelir; o zamana
- * kadar yalnızca bu yazıcı vardır. Çağıranın işlemi içinde çalışır.
+ * kadar yalnızca bu yazıcı vardır. Yeni projeler son projenin ardına kesirli sıralama anahtarıyla eklenir
+ * (BR-TASK-006 ile aynı yöntem). Çağıranın işlemi içinde çalışır.
  */
 export async function insertProjects(
   db: DbExecutor,
@@ -16,13 +18,13 @@ export async function insertProjects(
   },
 ): Promise<void> {
   if (input.projects.length === 0) return;
-  const [existing] = await db
-    .select({ n: count() })
+  const [last] = await db
+    .select({ position: projects.position })
     .from(projects)
-    .where(eq(projects.workspaceId, input.workspaceId));
-  // Konumlar sözlük sırasıyla karşılaştırılır: Inbox "a0", sonrakiler sabit uzunlukta "a0001", "a0002"…
-  // Faz 5'te sürükle-bırak için kesirli sıralama bu değerlerin arasına yerleşir.
-  const start = existing?.n ?? 0;
+    .where(eq(projects.workspaceId, input.workspaceId))
+    .orderBy(desc(projects.position))
+    .limit(1);
+  const positions = generateNKeysBetween(last?.position ?? null, null, input.projects.length);
   await db.insert(projects).values(
     input.projects.map((p, i) => ({
       id: p.id,
@@ -32,7 +34,7 @@ export async function insertProjects(
       description: p.description ?? null,
       color: 'slate',
       status: 'active',
-      position: `a${String(start + i).padStart(4, '0')}`,
+      position: positions[i]!,
       createdBy: input.createdBy,
       createdAt: input.now,
       updatedAt: input.now,

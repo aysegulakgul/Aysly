@@ -1,6 +1,12 @@
 import { cache } from 'react';
 import { getCurrentUser, type CurrentUser } from '@/modules/identity';
 import { findUserPreferences, type Preferences } from '@/modules/preferences';
+import {
+  findPersonalWorkspaceId,
+  resolveWorkspaceScope,
+  type WorkspaceScope,
+} from '@/modules/workspaces';
+import { findDashboard } from '@/modules/tasks';
 import { db } from '@/shared/db/client';
 
 export type Viewer = { user: CurrentUser; preferences: Preferences };
@@ -11,4 +17,19 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
   if (!user) return null;
   const preferences = await findUserPreferences(db(), user.id);
   return preferences ? { user, preferences } : null;
+});
+
+/** Kullanıcının kişisel çalışma alanı kapsamı (MVP'de tek alan, BR-WS-001); üyelik doğrulanarak üretilir. */
+export const getPersonalScope = cache(async (): Promise<WorkspaceScope | null> => {
+  const user = await getCurrentUser();
+  if (!user) return null;
+  const workspaceId = await findPersonalWorkspaceId(db(), user.id);
+  return workspaceId ? resolveWorkspaceScope(db(), user.id, workspaceId) : null;
+});
+
+/** Bugün bölümleri; düzen (kenar çubuğu sayıları) ve Bugün sayfası aynı istekte paylaşır. */
+export const getDashboard = cache(async () => {
+  const [viewer, scope] = await Promise.all([getViewer(), getPersonalScope()]);
+  if (!viewer || !scope) return null;
+  return findDashboard(scope, viewer.preferences);
 });

@@ -43,7 +43,7 @@ Her madde **[MVP]** (lansman öncesi zorunlu) veya **[SONRA]** olarak işaretlid
 - Süreler ve geçersiz kılma: BR-ACC-006. Girişte oturum kimliği yenilenir (session fixation önlemi).
 
 **Uygulama notları (Faz 3):**
-- Oturum çerezi `aysly.session_token`: HttpOnly, SameSite=Lax, 30 gün kayan süre (BR-ACC-006). Secure ve `__Host-` öneki yalnızca üretimde. E2E testiyle doğrulandı.
+- Oturum çerezi `aysly.session_token`: HttpOnly, SameSite=Lax, 30 gün kayan süre (BR-ACC-006). Secure bayrağı ve `__Secure-` öneki uygulama adresi HTTPS olduğunda uygulanır (D-075); yerel http://localhost'ta uygulanmaz. E2E testiyle doğrulandı.
 - **Bilinen sapma:** Better Auth oturum token'ını veritabanında açık metin olarak saklar; §4.2 ise yalnızca özetinin saklanmasını öngörür. Çerezdeki değer imzalıdır; veritabanına erişen biri oturumları kullanabilir. Yerel, tek kullanıcılı ortamda kabul edilebilir; yayına alma öncesi ele alınacak (OQ-032 listesine eklendi).
 - **90 günlük mutlak oturum sınırı** Better Auth'ta yerleşik değil; şu an yalnızca 30 günlük kayan süre uygulanıyor. Yayına alma öncesi ele alınacak.
 - Origin kontrolü: Better Auth uç noktalarında kütüphanenin kendi kontrolü (`trustedOrigins`), kayıt uç noktasında `shared/http/origin.ts`.

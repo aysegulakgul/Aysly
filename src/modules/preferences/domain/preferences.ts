@@ -1,4 +1,5 @@
 import type { FieldIssue } from '@/shared/kernel/errors';
+import type { DashboardLayout } from './dashboard';
 import { isValidTimezone, type Locale } from './defaults';
 
 /** Kullanıcının değiştirebildiği tercihler (DATA_MODEL §3.5). Diğer alanlar ilgili fazlarda eklenir. */
@@ -22,6 +23,8 @@ export type Preferences = {
   dateFormat: DateFormat;
   timeFormat: TimeFormat;
   weekStart: WeekStart;
+  /** BR-DASH-001: widget sırası ve görünürlüğü. */
+  dashboardLayout: DashboardLayout;
   version: number;
 };
 

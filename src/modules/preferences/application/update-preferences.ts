@@ -1,6 +1,7 @@
 import type { Clock } from '@/shared/kernel/clock';
 import { notFound, validationError, type DomainError } from '@/shared/kernel/errors';
 import { err, ok, type Result } from '@/shared/kernel/result';
+import { normalizeLayout } from '../domain/dashboard';
 import {
   validatePreferenceChanges,
   type PreferenceChanges,
@@ -32,12 +33,10 @@ export async function updatePreferences(
   const issues = validatePreferenceChanges(command.changes);
   if (issues.length > 0) return err(validationError(issues));
 
-  const updated = await deps.store.update(
-    actor.userId,
-    command.version,
-    command.changes,
-    deps.clock.now(),
-  );
+  const changes = command.changes.dashboardLayout
+    ? { ...command.changes, dashboardLayout: normalizeLayout(command.changes.dashboardLayout) }
+    : command.changes;
+  const updated = await deps.store.update(actor.userId, command.version, changes, deps.clock.now());
   if (updated) return ok(updated);
 
   const current = await deps.store.find(actor.userId);
