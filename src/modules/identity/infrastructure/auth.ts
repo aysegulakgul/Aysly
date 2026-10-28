@@ -53,8 +53,9 @@ function createAuth() {
     advanced: {
       database: { generateId: () => uuidv7() }, // D-015
       cookiePrefix: 'aysly',
-      // Yerelde http://localhost; Secure çerez yayında zorunlu (SECURITY §4.2, ARCHITECTURE §12.3).
-      useSecureCookies: config.NODE_ENV === 'production',
+      // Secure çerez ve __Secure- öneki HTTPS adreslerde zorunlu (SECURITY §4.2, ARCHITECTURE §12.3). Yerelde
+      // http://localhost olduğundan (üretim derlemesiyle çalışan testler dahil) uygulanmaz.
+      useSecureCookies: config.APP_BASE_URL.startsWith('https://'),
     },
     emailAndPassword: {
       enabled: true,

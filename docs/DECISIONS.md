@@ -349,6 +349,11 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Sonuçlar: Örnek projeler proje sayfaları gelene kadar (Faz 5) görünmez; onboarding bunu kullanıcıya açıkça söyler. Dashboard düzeni Faz 4'teki widget'larla birlikte görünür hale gelir. "İlk adımlar" kontrol listesi görevlerle birlikte Faz 4'te.
 - Uygulama ayrıntıları (Claude, §5.5): "Atla" sayısı tutulur; bir kez atlanan rehber yalnızca atlamadan sonra açılan bir oturumda ("sonraki giriş") bir kez daha önerilir, ikinci atlamadan sonra önerilmez. Yeniden başlatma Ayarlar · Profil'deki "Başlangıç rehberi" panelinden yapılır. Örnek projeler bir kez oluşturulur; rehber yeniden başlatılsa da tekrar oluşturulmaz.
 
+### D-075 — Tarayıcı testleri üretim derlemesine karşı; Secure çerez HTTPS adrese bağlı (teknik)
+- Durum: ONAYLI (teknik, CLAUDE.md §5.5) · Tarih: 2026-10-28 · Karar veren: Claude
+- Bağlam: Faz 3 kapanışında tarayıcı testleri aralıklı olarak toplu başarısız oldu. Geliştirme modunda sayfa saniyede bir yeniden yükleniyor, formlar JavaScript bağlanmadan gönderiliyordu. Proje OneDrive klasöründe olduğundan dosya izleyicisinin tetiklenmesi muhtemel neden; kesin tetikleyici bulunamadı.
+- Karar: Playwright uygulamanın üretim derlemesini başlatır (anlık yeniden yükleme yok; testler 2,7 dakikadan yaklaşık 1 dakikaya indi). `useSecureCookies` artık `NODE_ENV` yerine uygulama adresinin HTTPS olmasına bağlı; yayında adres HTTPS olacağından davranış değişmez. `/dev/ui` erişilebilirlik testi "üretimde kapalı" testiyle değiştirildi.
+
 ---
 
 ## 5. Faz kapanış kayıtları

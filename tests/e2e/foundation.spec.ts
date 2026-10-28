@@ -1,4 +1,3 @@
-import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 test.describe('Faz 2 temel', () => {
@@ -21,18 +20,11 @@ test.describe('Faz 2 temel', () => {
     await context.close();
   });
 
-  for (const path of ['/dev/ui']) {
-    test(`${path} sayfasında kritik/ciddi erişilebilirlik ihlali yok (AC-11)`, async ({ page }) => {
-      await page.goto(path);
-      const results = await new AxeBuilder({ page })
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
-        .analyze();
-      const serious = results.violations.filter(
-        (v) => v.impact === 'critical' || v.impact === 'serious',
-      );
-      expect(serious.map((v) => `${v.id}: ${v.nodes.length}`)).toEqual([]);
-    });
-  }
+  test('geliştirme bileşen sayfası (/dev/ui) üretim derlemesinde kapalıdır', async ({ page }) => {
+    // Bileşenlerin erişilebilirliği gerçek sayfalardaki axe taramalarıyla denetlenir (auth, shell, account, onboarding).
+    const response = await page.goto('/dev/ui');
+    expect(response?.status()).toBe(404);
+  });
 
   test('sağlık uç noktaları ve güvenlik başlıkları', async ({ request }) => {
     const live = await request.get('/api/health');
