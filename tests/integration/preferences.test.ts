@@ -69,6 +69,8 @@ describe('tercihler (veritabanı)', () => {
           visible: true,
         })),
       },
+      allDayReminderTime: '09:00',
+      notificationSettings: { v: 1, reminder: { inApp: true } },
       version: 1,
     });
   });

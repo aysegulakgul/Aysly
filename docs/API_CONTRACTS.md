@@ -1,6 +1,6 @@
 # API Sözleşmeleri
 
-> Durum: v0.5 · Son güncelleme: 2026-10-29 · Uygulama durumu: Faz 3–5 uç noktaları uygulandı (her bölümdeki "Uygulandı" notları); diğerleri ilgili fazlarda.
+> Durum: v0.6 · Son güncelleme: 2026-10-29 · Uygulama durumu: Faz 3–6 uç noktaları uygulandı (her bölümdeki "Uygulandı" notları); diğerleri ilgili fazlarda.
 > Yaklaşım: Sürümlü REST, JSON (D-013, ONAYLI — D-060). Bu belge, Zod şemaları yazıldıktan sonra şemalarla tutarlı tutulur; ileride OpenAPI belgesi şemalardan otomatik üretilir.
 
 ## 1. İçindekiler
@@ -294,6 +294,8 @@ Yanıt: `{ data: { task, nextOccurrence: Task | null, completedSubtaskIds: [] } 
 
 Hatırlatıcılar görev detayında döner; ayrı listeleme yoktur.
 
+**Uygulandı (Faz 6, D-088):** `POST` gövdesi `{ kind: 'absolute', remindAt: ISO }` veya `{ kind: 'relative', offsetMinutes }` → `201 { data: { id, kind, offsetMinutes, remindAt, status } }`; `DELETE` → 204. Görev oluşturmada `reminders` (≤ 5) ve `recurrence` (`{ rule, mode? }`) desteklenir; `PATCH`'te `recurrence` (`null` seriyi durdurur) ve `recurrenceScope`. Görev nesnesinde `recurrence: { rule, mode, seriesId, index } | null`; detayda `reminders`. `POST …/complete` yanıtı görev + `nextOccurrence`; `POST …/reopen` yanıtı görev + `keptNextOccurrence`; `DELETE /tasks/{id}?scope=this|series` (varsayılan `series`; `this` yanıtında `nextOccurrenceId`).
+
 ## 9. Notlar
 
 | Metot | Yol | Kural |
@@ -356,6 +358,8 @@ Yalnızca kullanıcının görünür widget'larının verisi döner.
 | POST | `/notifications/read-all` | | |
 
 Bildirimler kullanıcıya aittir; başka kullanıcının bildirim kimliği → 404.
+
+**Uygulandı (Faz 6, D-088):** Listeleme `?unreadOnly=true&before=<createdAt>` (20'li sayfa, imleç olarak son kaydın `createdAt`'i); `unread-count` → `{ count }`; `read`/`unread` → 204; `read-all` → `{ updated }`. Bildirim nesnesi `{ id, type: 'reminder', workspaceId, entityType, entityId, payload: { taskId, title, remindAt, late }, readAt, createdAt }`. `GET /me/preferences` ve `PATCH` artık `allDayReminderTime` (HH:MM) ve `notificationSettings` (`{ v: 1, reminder: { inApp } }`) içerir.
 MVP'de yalnızca uygulama içi bildirim vardır (D-037). D-053 gereği `unread-count` ve liste istekleri, kullanıcının zamanı gelmiş hatırlatıcılarını önce bildirime dönüştürür (BR-REM-005); istemci bu uç noktayı uygulama açıkken ~60 sn'de bir yoklar.
 
 ## 13. Arşiv ve çöp

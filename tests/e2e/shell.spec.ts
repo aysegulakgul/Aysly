@@ -43,9 +43,10 @@ test.describe('Uygulama kabuğu ve ayarlar', () => {
       ? page.getByRole('navigation', { name: 'Alt menü' })
       : page.getByRole('navigation', { name: 'Ana menü' });
     await expect(nav.getByRole('link', { name: 'Bugün' })).toHaveAttribute('aria-current', 'page');
-    // Henüz yapılmamış bölümler menüde yer almaz (D-071); Projeler Faz 5'te eklendi.
+    // Henüz yapılmamış bölümler menüde yer almaz (D-071); Projeler Faz 5'te, Takvim Faz 6'da eklendi.
     if (!isMobile()) await expect(nav.getByRole('link', { name: /^Projeler/ })).toBeVisible();
-    for (const missing of ['Takvim', 'Hedefler', 'Notlar']) {
+    await expect(nav.getByRole('link', { name: /Takvim/ })).toBeVisible();
+    for (const missing of ['Hedefler', 'Notlar']) {
       await expect(page.getByRole('link', { name: missing })).toHaveCount(0);
     }
   });

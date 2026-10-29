@@ -11,7 +11,14 @@ import { Dialog } from '@/ui/components/dialog';
 /** Geri alma isteği: açık "Geri al" bildirimi olan bileşen dinler (BR-TASK-004). */
 export const UNDO_EVENT = 'aysly:undo';
 
-const GO: Record<string, Route> = { d: '/', i: '/inbox', m: '/my-tasks', u: '/upcoming' };
+const GO: Record<string, Route> = {
+  d: '/',
+  i: '/inbox',
+  m: '/my-tasks',
+  u: '/upcoming',
+  c: '/calendar',
+  p: '/projects',
+};
 const FIELD: Record<string, string> = { t: 'due', m: 'project', l: 'tags' };
 
 const isTyping = (target: EventTarget | null) =>
@@ -30,6 +37,8 @@ const LIST: [string, string][] = [
   ['G I', 'gi'],
   ['G M', 'gm'],
   ['G U', 'gu'],
+  ['G C', 'gc'],
+  ['G P', 'gp'],
   ['J / K · ↓ / ↑', 'jk'],
   ['Enter', 'enter'],
   ['Ctrl/⌘ + Enter', 'complete'],

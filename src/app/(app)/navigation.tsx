@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { Icon } from '@/ui/components/icon';
 import { BottomNav, BottomNavItem, NavItem } from '@/ui/components/nav';
 import { badge } from './badge';
+import { NotificationBell } from './notifications/notification-center';
 import { ProjectDot } from './projects/project-color';
 import { SignOutButton } from './sign-out-button';
 
@@ -17,6 +18,7 @@ function useSection() {
     inbox: pathname === '/inbox',
     myTasks: pathname === '/my-tasks',
     upcoming: pathname === '/upcoming',
+    calendar: pathname === '/calendar',
     projects: pathname === '/projects',
     project: (id: string) => pathname === `/projects/${id}`,
     view: (id: string) => pathname === `/views/${id}`,
@@ -47,8 +49,10 @@ export function Sidebar({
   counts,
   projects,
   views,
+  timezone,
 }: {
   userName: string;
+  timezone: string;
   counts: { inbox: number; myTasks: number; today: number; upcoming: number };
   projects: SidebarProject[];
   views: SidebarView[];
@@ -60,6 +64,7 @@ export function Sidebar({
       <div className="flex h-11 w-full items-center gap-2.5">
         <Icon name="moon" tone="primary" />
         <p className="flex-1 text-xl font-semibold text-text">aysly</p>
+        <NotificationBell timezone={timezone} />
       </div>
       {/* Figma UI/Button/Secondary "Görev ekle" (4:71820): Inbox'taki hızlı eklemeyi açar. */}
       <Link
@@ -105,6 +110,9 @@ export function Sidebar({
           countLabel={t('upcomingCount', { count: counts.upcoming })}
         >
           {t('upcoming')}
+        </NavItem>
+        <NavItem href="/calendar" glyph="▦" active={section.calendar}>
+          {t('calendar')}
         </NavItem>
         <NavItem
           href="/projects"
@@ -202,7 +210,7 @@ export function Sidebar({
   );
 }
 
-/** Figma UI/BottomNav (4:69074). Ekle, Inbox ve Takvim öğeleri ait oldukları fazda eklenir. */
+/** Figma UI/BottomNav (4:69074): Bugün, Inbox, Ekle, Takvim, Menü. */
 export function MobileNavigation() {
   const t = useTranslations('shell');
   const section = useSection();
@@ -217,6 +225,9 @@ export function MobileNavigation() {
         </BottomNavItem>
         <BottomNavItem href="/inbox?add=1" glyph="⊕" accent>
           {t('add')}
+        </BottomNavItem>
+        <BottomNavItem href="/calendar" glyph="▦" active={section.calendar}>
+          {t('calendar')}
         </BottomNavItem>
         <BottomNavItem href="/menu" glyph="☰" active={section.menu}>
           {t('menu')}

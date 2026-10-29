@@ -3,7 +3,9 @@ import { businessRule, notFound, validationError, type DomainError } from '@/sha
 import { err, ok, type Result } from '@/shared/kernel/result';
 import type { Task } from '../domain/task';
 import { daysLeft, isExpired, purgeAt } from '../domain/trash';
-import { checkWritable, type TaskDeps } from './tasks';
+import { checkWritable } from './guards';
+import type { TaskDeps } from './ports';
+import { generateNextOccurrence } from './recurring';
 
 const conflict = (current: Task): DomainError => ({ kind: 'version_conflict', current });
 
@@ -24,7 +26,9 @@ export async function archiveTask(
   if (task.version !== command.version) return err(conflict(task));
   const subtasks = (await deps.tasks.listSubtasks(scope, task.id)).filter((s) => !s.archivedAt);
   const now = deps.clock.now();
-  await deps.tasks.setArchived(scope, [task.id, ...subtasks.map((s) => s.id)], now, now);
+  const ids = [task.id, ...subtasks.map((s) => s.id)];
+  await deps.tasks.setArchived(scope, ids, now, now);
+  await deps.reminders.cancel(scope, ids, now); // BR-REM-003
   return ok((await deps.tasks.findById(scope, id))!);
 }
 
@@ -51,7 +55,9 @@ export async function unarchiveTask(
     const parent = await deps.tasks.findById(scope, task.parentTaskId);
     if (parent?.archivedAt) ids.push(parent.id);
   }
-  await deps.tasks.setArchived(scope, ids, null, deps.clock.now());
+  const now = deps.clock.now();
+  await deps.tasks.setArchived(scope, ids, null, now);
+  await deps.reminders.reactivate(scope, ids, now); // BR-REM-003
   return ok((await deps.tasks.findById(scope, id))!);
 }
 
@@ -59,13 +65,16 @@ export async function unarchiveTask(
  * Çöpe taşıma (BR-DEL-001/006, BR-SUB-004): görev ve alt görevleri tek silme grubuyla çöpe gider; 30 gün içinde
  * geri yüklenebilir. Sürüm kontrolü yapılmaz: silme tüm kaydı hedefler ve "Geri al" ile geri alınabilir.
  * BR-PROJ-004: arşivli projedeki görev tek başına çöpe atılamaz. Toplu silmede grup kimliği dışarıdan gelir.
+ * BR-REC-006: tekrarlayan açık örnekte `this` yalnızca bu örneği siler ve seri sonraki örnekle sürer; `series`
+ * (varsayılan) bu örnekle birlikte seriyi bitirir. BR-REM-003: bekleyen hatırlatıcılar iptal olur.
  */
 export async function deleteTask(
   deps: TaskDeps,
   scope: WorkspaceScope,
   id: string,
   batchId: string = deps.newId(),
-): Promise<Result<{ batchId: string; affected: number }, DomainError>> {
+  options: { recurrenceScope?: 'this' | 'series' | undefined } = {},
+): Promise<Result<{ batchId: string; affected: number; nextOccurrenceId?: string }, DomainError>> {
   const allowed = authorize(scope, 'task.delete');
   if (!allowed.ok) return allowed;
   const task = await deps.tasks.findById(scope, id);
@@ -73,12 +82,14 @@ export async function deleteTask(
   const blocked = await checkWritable(deps, scope, task, { allowArchivedTask: true });
   if (blocked) return err(blocked);
   const subtasks = await deps.tasks.listSubtasks(scope, task.id);
-  const affected = await deps.tasks.trash(
-    scope,
-    [task.id, ...subtasks.map((s) => s.id)],
-    batchId,
-    deps.clock.now(),
-  );
+  const ids = [task.id, ...subtasks.map((s) => s.id)];
+  const now = deps.clock.now();
+  const affected = await deps.tasks.trash(scope, ids, batchId, now);
+  await deps.reminders.cancel(scope, ids, now);
+  if (options.recurrenceScope === 'this' && task.recurrence && task.status !== 'done') {
+    const next = await generateNextOccurrence(deps, scope, task);
+    if (next) return ok({ batchId, affected, nextOccurrenceId: next.id });
+  }
   return ok({ batchId, affected });
 }
 
@@ -189,6 +200,11 @@ export async function restoreFromTrash(
     tasks.map((t) => t.id),
     now,
   );
+  await deps.reminders.reactivate(
+    scope,
+    tasks.filter((t) => t.status !== 'done' && !t.archivedAt).map((t) => t.id),
+    now,
+  ); // BR-REM-003
   // Projesi artık olmayan (kalıcı silinmiş) veya kullanıcının Inbox'ı seçtiği görevler Inbox'a döner.
   let movedToInbox = 0;
   const inbox = await deps.projects.inbox(scope);

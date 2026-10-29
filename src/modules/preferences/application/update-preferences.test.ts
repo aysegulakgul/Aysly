@@ -12,6 +12,8 @@ const base: Preferences = {
   timeFormat: '24h',
   weekStart: 1,
   dashboardLayout: { v: 1, widgets: [] },
+  allDayReminderTime: '09:00',
+  notificationSettings: { v: 1, reminder: { inApp: true } },
   version: 1,
 };
 

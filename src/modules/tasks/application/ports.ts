@@ -1,6 +1,9 @@
 import type { Progress, Project, ProjectRepository } from '@/modules/projects';
 import type { WorkspaceScope } from '@/modules/workspaces';
+import type { Clock } from '@/shared/kernel/clock';
+import type { Reminder, ReminderKind, ReminderStatus } from '@/modules/reminders';
 import type { Due } from '../domain/due';
+import type { Recurrence } from '../domain/recurrence';
 import type { Priority, Task, TaskStatus } from '../domain/task';
 
 /** Yazılabilir görev alanları (DATA_MODEL §3.7). */
@@ -16,6 +19,7 @@ export type TaskChanges = Partial<{
   projectId: string;
   parentTaskId: string | null;
   position: string;
+  recurrence: Recurrence | null;
 }>;
 
 export type NewTask = {
@@ -28,6 +32,7 @@ export type NewTask = {
   startDate: string | null;
   due: Due | null;
   position: string;
+  recurrence?: Recurrence | null | undefined;
   createdBy: string;
   now: Date;
 };
@@ -139,6 +144,10 @@ export type TaskRepository = {
   restore(scope: WorkspaceScope, ids: readonly string[], now: Date): Promise<number>;
   batchMembers(scope: WorkspaceScope, batchId: string): Promise<Task[]>;
   listTrash(scope: WorkspaceScope): Promise<Task[]>;
+  /** BR-REC-007: bu görevin tamamlanmasıyla üretilmiş, çöpte olmayan sonraki örnek. */
+  findGeneratedFrom(scope: WorkspaceScope, id: string): Promise<Task | null>;
+  /** BR-REC-007: hiç değiştirilmemiş sonraki örnek kalıcı silinir (alt görevler ve bağlantılar birlikte). */
+  hardDelete(scope: WorkspaceScope, id: string): Promise<void>;
   /** BR-DEL-005: yalnızca çöpteki kayıtlar kalıcı silinir; grup verilmezse tüm çöp. */
   purge(scope: WorkspaceScope, batchId: string | null): Promise<number>;
 };
@@ -190,4 +199,48 @@ export type ProjectDirectory = {
   restore(scope: WorkspaceScope, ids: readonly string[], now: Date): Promise<number>;
   listTrashed(scope: WorkspaceScope, batchId?: string): Promise<Project[]>;
   purge(scope: WorkspaceScope, batchId: string | null): Promise<number>;
+};
+
+/** Hatırlatıcılar (reminders modülünden; BR-REM-001..005). */
+export type ReminderPort = {
+  forTasks(scope: WorkspaceScope, taskIds: readonly string[]): Promise<Map<string, Reminder[]>>;
+  insert(
+    scope: WorkspaceScope,
+    r: {
+      id: string;
+      taskId: string;
+      kind: ReminderKind;
+      offsetMinutes: number | null;
+      remindAt: Date;
+      status: ReminderStatus;
+      now: Date;
+    },
+  ): Promise<Reminder>;
+  remove(scope: WorkspaceScope, taskId: string, id: string): Promise<boolean>;
+  retime(
+    scope: WorkspaceScope,
+    id: string,
+    remindAt: Date,
+    status: ReminderStatus,
+    now: Date,
+  ): Promise<void>;
+  removeRelative(scope: WorkspaceScope, taskId: string): Promise<void>;
+  cancel(scope: WorkspaceScope, taskIds: readonly string[], now: Date): Promise<void>;
+  reactivate(scope: WorkspaceScope, taskIds: readonly string[], now: Date): Promise<void>;
+};
+
+/** Kullanıcının takvim tercihleri (preferences modülünden): "bugün", tüm gün hatırlatıcı saati. */
+export type CalendarPort = {
+  of(userId: string): Promise<{ timezone: string; allDayReminderTime: string; weekStart: number }>;
+};
+
+/** Görev kullanım senaryolarının bağımlılıkları (CODING_STANDARDS §2.1: elle bağlanır). */
+export type TaskDeps = {
+  tasks: TaskRepository;
+  projects: ProjectDirectory;
+  tags: TagPort;
+  reminders: ReminderPort;
+  calendar: CalendarPort;
+  clock: Clock;
+  newId: () => string;
 };

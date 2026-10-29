@@ -5,7 +5,8 @@ import { err, ok, type Result } from '@/shared/kernel/result';
 import { DUE_GROUPS, dueGroup, isUpcoming, type DueGroup } from '../domain/schedule';
 import type { Task } from '../domain/task';
 import type { ProjectRef } from './ports';
-import { checkWritable, type TaskDeps } from './tasks';
+import { checkWritable } from './guards';
+import type { TaskDeps } from './ports';
 
 type Tag = { id: string; name: string; color: string };
 export type TaskSummary = {

@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { getViewer } from '../viewer';
+import { NotificationBell } from './notifications/notification-center';
 import { longDate, timeZoneCity } from './time-display';
 
 /**
@@ -8,7 +9,16 @@ import { longDate, timeZoneCity } from './time-display';
  * saat dilimi şehri; içerik 32 px boşluklu, en fazla 960 px. Mobil: Figma "Page header" (4:69029) — 64 px başlık,
  * içerik 20 px boşluklu.
  */
-export async function PageFrame({ title, children }: { title: string; children: ReactNode }) {
+export async function PageFrame({
+  title,
+  wide = false,
+  children,
+}: {
+  title: string;
+  /** UI_UX §4: takvim ve pano tam genişlik; liste sayfaları en fazla 960 px. */
+  wide?: boolean;
+  children: ReactNode;
+}) {
   const [viewer, locale, t] = await Promise.all([
     getViewer(),
     getLocale(),
@@ -26,9 +36,17 @@ export async function PageFrame({ title, children }: { title: string; children: 
       </header>
       <header className="flex h-16 w-full shrink-0 items-center gap-3 border-b border-border px-5 lg:hidden">
         <p className="flex-1 text-xl font-semibold text-text">{title}</p>
+        {/* Bildirim merkezi mobilde başlıkta (FR-NOTIF-01; Figma mobil başlıkta zil yok, D-065). */}
+        <NotificationBell timezone={timeZone} />
       </header>
       <main className="flex w-full flex-col items-center p-5 lg:p-8">
-        <div className="flex w-full max-w-[960px] flex-col gap-6">{children}</div>
+        <div
+          className={
+            wide ? 'flex w-full flex-col gap-6' : 'flex w-full max-w-[960px] flex-col gap-6'
+          }
+        >
+          {children}
+        </div>
       </main>
     </>
   );

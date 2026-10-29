@@ -1,7 +1,9 @@
 /** tasks modülünün dışa açık yüzü (ARCHITECTURE §4.2). */
 export {
   deleteOneProject,
+  deleteOneReminder,
   deleteOneTask,
+  dispatchRemindersFor,
   deleteTrash,
   getArchive,
   getMyTasks,
@@ -18,6 +20,7 @@ export {
   postDetach,
   postMove,
   postProjectComplete,
+  postReminder,
   postReopen,
   postRestore,
   postTask,

@@ -11,3 +11,5 @@ export * from '@/modules/tasks/infrastructure/schema';
 export * from '@/shared/http/idempotency-schema';
 export * from '@/modules/tags/infrastructure/schema';
 export * from '@/modules/views/infrastructure/schema';
+export * from '@/modules/reminders/infrastructure/schema';
+export * from '@/modules/notifications/infrastructure/schema';

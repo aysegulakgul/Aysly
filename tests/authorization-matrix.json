@@ -380,6 +380,49 @@
       "path": "/api/v1/workspaces/[ws]/tags/[id]",
       "access": "workspace",
       "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tags/01900000-0000-7000-8000-000000000002"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/tasks/[id]/reminders",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tasks/01900000-0000-7000-8000-000000000002/reminders",
+      "body": {
+        "kind": "relative",
+        "offsetMinutes": 30
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/workspaces/[ws]/tasks/[id]/reminders/[reminderId]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tasks/01900000-0000-7000-8000-000000000002/reminders/01900000-0000-7000-8000-000000000002"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/notifications",
+      "access": "self"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/notifications/unread-count",
+      "access": "self"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/notifications/[id]/read",
+      "access": "self",
+      "sample": "/api/v1/notifications/01900000-0000-7000-8000-000000000002/read"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/notifications/[id]/unread",
+      "access": "self",
+      "sample": "/api/v1/notifications/01900000-0000-7000-8000-000000000002/unread"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/notifications/read-all",
+      "access": "self"
     }
   ]
 }

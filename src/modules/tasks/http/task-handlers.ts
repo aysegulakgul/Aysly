@@ -23,11 +23,26 @@ import {
   taskIdsWithTags,
 } from '@/modules/tags';
 import { VIEW_TYPES, parseTaskFilter } from '@/modules/views';
+import { createNotificationStore } from '@/modules/notifications';
+import {
+  cancelPendingReminders,
+  deleteRelativeReminders,
+  deleteReminder,
+  findDueReminders,
+  findRemindersForTasks,
+  insertReminder,
+  reactivateReminders,
+  transitionReminder,
+  updateReminderTime,
+  type Reminder,
+} from '@/modules/reminders';
+import { RECURRENCE_MODES } from '../domain/recurrence';
+import { addReminder, dispatchDueReminders, removeReminder } from '../application/reminders';
 import { resolveWorkspaceScope, type WorkspaceScope } from '@/modules/workspaces';
-import { db, type DbExecutor } from '@/shared/db/client';
+import { db, type Database, type DbExecutor } from '@/shared/db/client';
 import type { ApiContext } from '@/shared/http/api-route';
 import { idempotent } from '@/shared/http/idempotency';
-import { systemClock } from '@/shared/kernel/clock';
+import { systemClock, type Clock } from '@/shared/kernel/clock';
 import type { DomainError } from '@/shared/kernel/errors';
 import { uuidv7 } from '@/shared/kernel/id';
 import type { Result } from '@/shared/kernel/result';
@@ -75,6 +90,15 @@ const Due = z.strictObject({
 });
 const Priority = z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]);
 const TagNames = z.array(z.string().max(200)).max(100);
+const RecurrenceBody = z.strictObject({
+  rule: z.string().min(1).max(300),
+  mode: z.enum(RECURRENCE_MODES).optional(),
+});
+/** API_CONTRACTS §8: mutlak (ISO an) veya göreli (son tarihe göre dakika). */
+const ReminderBody = z.discriminatedUnion('kind', [
+  z.strictObject({ kind: z.literal('absolute'), remindAt: z.string().max(40) }),
+  z.strictObject({ kind: z.literal('relative'), offsetMinutes: z.number().int() }),
+]);
 const Fields = {
   title: z.string().max(2000),
   description: z.string().max(40_000).nullable(),
@@ -91,6 +115,8 @@ const CreateBody = z.strictObject({
   startDate: Fields.startDate.optional(),
   due: Fields.due.optional(),
   tagNames: TagNames.optional(),
+  recurrence: RecurrenceBody.nullable().optional(),
+  reminders: z.array(ReminderBody).max(5).optional(),
 });
 const PatchBody = z.strictObject({
   version: z.number().int().positive(),
@@ -101,6 +127,8 @@ const PatchBody = z.strictObject({
   startDate: Fields.startDate.optional(),
   due: Fields.due.optional(),
   tagNames: TagNames.optional(),
+  recurrence: RecurrenceBody.nullable().optional(),
+  recurrenceScope: z.enum(['this', 'following']).optional(),
 });
 const VersionBody = z.strictObject({ version: z.number().int().positive() });
 const CompleteBody = z.strictObject({
@@ -167,6 +195,14 @@ export function toTaskJson(task: Task) {
     due: task.due ? { ...task.due, at: task.due.at?.toISOString() ?? null } : null,
     completedAt: task.completedAt?.toISOString() ?? null,
     position: task.position,
+    recurrence: task.recurrence
+      ? {
+          rule: task.recurrence.rule,
+          mode: task.recurrence.mode,
+          seriesId: task.recurrence.seriesId,
+          index: task.recurrence.index,
+        }
+      : null,
     archivedAt: task.archivedAt?.toISOString() ?? null,
     deletedAt: task.deletedAt?.toISOString() ?? null,
     version: task.version,
@@ -184,8 +220,38 @@ export function toSummaryJson(summary: TaskSummary) {
   };
 }
 
+export function toReminderJson(r: Reminder) {
+  return {
+    id: r.id,
+    kind: r.kind,
+    offsetMinutes: r.offsetMinutes,
+    remindAt: r.remindAt.toISOString(),
+    status: r.status,
+  };
+}
+
 export function taskDeps(executor: DbExecutor): TaskDeps {
   return {
+    reminders: {
+      forTasks: (scope, ids) => findRemindersForTasks(executor, scope, ids),
+      insert: (scope, r) => insertReminder(executor, scope, r),
+      remove: (scope, taskId, id) => deleteReminder(executor, scope, taskId, id),
+      retime: (scope, id, at, status, now) =>
+        updateReminderTime(executor, scope, id, at, status, now),
+      removeRelative: (scope, taskId) => deleteRelativeReminders(executor, scope, taskId),
+      cancel: (scope, ids, now) => cancelPendingReminders(executor, scope, ids, now),
+      reactivate: (scope, ids, now) => reactivateReminders(executor, scope, ids, now),
+    },
+    calendar: {
+      async of(userId) {
+        const prefs = await findUserPreferences(executor, userId);
+        return {
+          timezone: prefs?.timezone ?? 'UTC',
+          allDayReminderTime: prefs?.allDayReminderTime ?? '09:00',
+          weekStart: prefs?.weekStart ?? 1,
+        };
+      },
+    },
     tasks: createDrizzleTaskRepository(executor),
     projects: {
       find: (scope, id) => findProjectRef(executor, scope, id),
@@ -292,10 +358,12 @@ export const getOneTask = (ctx: ApiContext) =>
       includeDeleted,
     });
     if (!result.ok) return fail(ctx, result.error);
+    const reminders = await findRemindersForTasks(db(), scope, [result.value.task.id]);
     return ctx.json(200, {
       data: {
         ...toSummaryJson(result.value),
         subtasks: result.value.subtaskList.map(toSummaryJson),
+        reminders: (reminders.get(result.value.task.id) ?? []).map(toReminderJson),
       },
     });
   });
@@ -314,17 +382,29 @@ export const postComplete = (ctx: ApiContext) =>
   withScope(ctx, async (scope) => {
     const body = await ctx.parse(CompleteBody);
     if (!body.ok) return body.response;
-    return reply(
-      ctx,
-      await inTransaction((deps) => completeTask(deps, scope, ctx.params.id ?? '', body.data)),
+    const result = await inTransaction((deps) =>
+      completeTask(deps, scope, ctx.params.id ?? '', body.data),
     );
+    if (!result.ok) return fail(ctx, result.error);
+    // API_CONTRACTS §6.5: tekrarlayan görevde üretilen sonraki örnek (BR-REC-002).
+    const next = result.value.nextOccurrence;
+    return ctx.json(200, {
+      data: { ...toTaskJson(result.value), nextOccurrence: next ? toTaskJson(next) : null },
+    });
   });
 
 export const postReopen = (ctx: ApiContext) =>
   withScope(ctx, async (scope) => {
     const body = await ctx.parse(VersionBody);
     if (!body.ok) return body.response;
-    return reply(ctx, await reopenTask(taskDeps(db()), scope, ctx.params.id ?? '', body.data));
+    const result = await inTransaction((deps) =>
+      reopenTask(deps, scope, ctx.params.id ?? '', body.data),
+    );
+    if (!result.ok) return fail(ctx, result.error);
+    // BR-REC-007: üretilmiş sonraki örnek değiştirildiği için korunduysa kullanıcı bilgilendirilir.
+    return ctx.json(200, {
+      data: { ...toTaskJson(result.value), keptNextOccurrence: !!result.value.keptNextOccurrence },
+    });
   });
 
 export const postMove = (ctx: ApiContext) =>
@@ -395,7 +475,15 @@ export const postUnarchive = (ctx: ApiContext) =>
 /** DELETE /tasks/{id}: çöpe taşır (BR-DEL-001/006); yanıt `{ batchId, affected }`. */
 export const deleteOneTask = (ctx: ApiContext) =>
   withScope(ctx, async (scope) => {
-    const result = await inTransaction((deps) => deleteTask(deps, scope, ctx.params.id ?? ''));
+    const recurrenceScope = new URL(ctx.request.url).searchParams.get('scope');
+    if (recurrenceScope !== null && recurrenceScope !== 'this' && recurrenceScope !== 'series') {
+      return ctx.fail({ kind: 'validation', issues: [{ field: 'scope', reason: 'invalid' }] });
+    }
+    const result = await inTransaction((deps) =>
+      deleteTask(deps, scope, ctx.params.id ?? '', undefined, {
+        recurrenceScope: recurrenceScope ?? undefined,
+      }),
+    );
     return result.ok ? ctx.json(200, { data: result.value }) : fail(ctx, result.error);
   });
 
@@ -563,3 +651,81 @@ export const getArchive = (ctx: ApiContext) =>
       },
     });
   });
+
+/** POST /tasks/{id}/reminders (API_CONTRACTS §8, BR-REM-001/002). */
+export const postReminder = (ctx: ApiContext) =>
+  withScope(ctx, async (scope) => {
+    const body = await ctx.parse(ReminderBody);
+    if (!body.ok) return body.response;
+    const result = await inTransaction((deps) =>
+      addReminder(deps, scope, ctx.params.id ?? '', body.data),
+    );
+    return result.ok
+      ? ctx.json(201, { data: toReminderJson(result.value) })
+      : fail(ctx, result.error);
+  });
+
+export const deleteOneReminder = (ctx: ApiContext) =>
+  withScope(ctx, async (scope) => {
+    const result = await removeReminder(
+      taskDeps(db()),
+      scope,
+      ctx.params.id ?? '',
+      ctx.params.reminderId ?? '',
+    );
+    return result.ok ? new Response(null, { status: 204 }) : fail(ctx, result.error);
+  });
+
+/**
+ * BR-REM-005 / D-053: bildirim uç noktaları okunmadan önce aktörün zamanı gelmiş hatırlatıcıları bildirime
+ * dönüştürülür (uygulama açıkken ~60 sn'lik yoklamayla). Tek veritabanı işleminde çalışır.
+ */
+export async function dispatchRemindersFor(
+  userId: string,
+  database: Database = db(),
+  clock: Clock = systemClock,
+): Promise<void> {
+  const prefs = await findUserPreferences(database, userId);
+  await database.transaction(async (tx) => {
+    const deps = taskDeps(tx);
+    const store = createNotificationStore(tx);
+    await dispatchDueReminders(
+      {
+        clock,
+        newId: uuidv7,
+        enabled: prefs?.notificationSettings.reminder.inApp !== false,
+        due: (user, now) => findDueReminders(tx, user, now),
+        transition: (id, status, now) => transitionReminder(tx, id, status, now),
+        async task(workspaceId, taskId) {
+          const scope = await resolveWorkspaceScope(tx, userId, workspaceId);
+          if (!scope) return null;
+          const task = await deps.tasks.findById(scope, taskId);
+          if (!task) return null;
+          const project = await deps.projects.find(scope, task.projectId);
+          return {
+            title: task.title,
+            active: task.status !== 'done' && !task.archivedAt && !!project && !project.archived,
+          };
+        },
+        notify: (n) =>
+          store.create({
+            id: n.id,
+            userId: n.userId,
+            workspaceId: n.workspaceId,
+            type: 'reminder',
+            entityType: 'task',
+            entityId: n.taskId,
+            payload: {
+              taskId: n.taskId,
+              title: n.title,
+              remindAt: n.remindAt.toISOString(),
+              late: n.late,
+            },
+            dedupeKey: `reminder:${n.reminderId}`,
+            now: n.now,
+          }),
+      },
+      userId,
+    );
+  });
+}

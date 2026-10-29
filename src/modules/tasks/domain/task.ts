@@ -1,6 +1,7 @@
 import type { FieldIssue } from '@/shared/kernel/errors';
 import { err, ok, type Result } from '@/shared/kernel/result';
 import type { Due } from './due';
+import type { Recurrence } from './recurrence';
 
 /** BR-TASK-003 (D-041): durumlar. `done`'a yalnızca tamamlama işlemiyle geçilir. */
 export const TASK_STATUSES = ['todo', 'in_progress', 'done'] as const;
@@ -24,6 +25,8 @@ export type Task = {
   completedAt: Date | null;
   completedBy: string | null;
   position: string;
+  /** BR-REC-*: tekrarlayan serinin bilgisi; tekrar yoksa null. */
+  recurrence: Recurrence | null;
   createdBy: string | null;
   archivedAt: Date | null;
   deletedAt: Date | null;

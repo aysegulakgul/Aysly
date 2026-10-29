@@ -1,10 +1,12 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 import type { TaskView } from '@/modules/tasks';
 import type { TaskFilter, ViewSettings, ViewType } from '@/modules/views/domain/task-filter';
 import { Banner } from '@/ui/components/feedback';
+import { Calendar } from '../calendar/calendar';
 import type { TaskUiContext } from '../tasks/task-context';
 import { Board } from './board';
 import { BulkBar, SelectionToggle, useSelection } from './bulk-bar';
@@ -42,6 +44,9 @@ export function TaskViewSection({
 }) {
   const t = useTranslations('views');
   const selection = useSelection();
+  const params = useSearchParams();
+  const cal = params.get('cal');
+  const date = params.get('date');
   return (
     <>
       <ViewTabs filter={filter} settings={settings} viewType={viewType} task={task} />
@@ -64,7 +69,14 @@ export function TaskViewSection({
       <p className="sr-only" role="status">
         {t('count', { count: tasks.length })}
       </p>
-      {viewType === 'board' ? (
+      {viewType === 'calendar' ? (
+        <Calendar
+          tasks={tasks}
+          context={context}
+          mode={cal === 'month' || cal === 'week' || cal === 'day' ? cal : null}
+          date={date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : context.today}
+        />
+      ) : viewType === 'board' ? (
         <Board
           tasks={tasks}
           context={context}

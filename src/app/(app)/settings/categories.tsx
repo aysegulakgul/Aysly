@@ -15,6 +15,8 @@ const CATEGORIES = [
   { href: '/settings/profile', glyph: '○', key: 'profile' },
   { href: '/settings/appearance', glyph: '☾', key: 'appearance' },
   { href: '/settings/date-time', glyph: '◷', key: 'dateTime' },
+  // FR-NOTIF-04 (Figma'da yok, D-065).
+  { href: '/settings/notifications', glyph: '◔', key: 'notifications' },
   { href: '/settings/security', glyph: '▣', key: 'security' },
   // D-085: etiket yönetimi (Figma'da yok, D-065).
   { href: '/settings/tags', glyph: '#', key: 'tags' },

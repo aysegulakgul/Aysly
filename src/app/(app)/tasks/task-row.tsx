@@ -35,6 +35,8 @@ export function useTaskMeta(context: TaskUiContext) {
       parts.push(t('row.subtasks', task.subtaskCount));
     }
     if (task.priority > 0) parts.push(`⚑ ${t(`priority.${task.priority}`)}`);
+    // Figma mobil Takvim (4:68640): tekrarlayan görevde ↻ işareti.
+    if (task.recurrence) parts.push('↻');
     return parts.join(' · ');
   };
 }

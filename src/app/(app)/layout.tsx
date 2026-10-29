@@ -5,6 +5,7 @@ import { findViews } from '@/modules/views';
 import { getDashboard, getPersonalScope, getViewer } from '../viewer';
 import { KeyboardShortcuts } from './shortcuts';
 import { MobileNavigation, Sidebar } from './navigation';
+import { NotificationProvider } from './notifications/notification-center';
 
 /**
  * Uygulama kabuğu (Figma UI/Sidebar 4:66491, UI/BottomNav 4:69074). Kenar çubuğu `lg` (1024 px) ve üstünde;
@@ -28,24 +29,27 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     upcoming: dashboard?.upcoming.length ?? 0,
   };
   return (
-    <div className="flex min-h-dvh">
-      <Sidebar
-        userName={viewer.user.name}
-        counts={counts}
-        projects={projects.map((p) => ({
-          id: p.id,
-          name: p.name,
-          color: p.color,
-          // BR-PROJ-003: görev yoksa ilerleme gösterilmez.
-          percent: p.progress?.total
-            ? Math.round((p.progress.done / p.progress.total) * 100)
-            : null,
-        }))}
-        views={views.map((v) => ({ id: v.id, name: v.name }))}
-      />
-      <div className="flex min-w-0 flex-1 flex-col pb-[84px] lg:pb-0">{children}</div>
-      <MobileNavigation />
-      <KeyboardShortcuts workspaceId={scope.workspaceId} />
-    </div>
+    <NotificationProvider>
+      <div className="flex min-h-dvh">
+        <Sidebar
+          userName={viewer.user.name}
+          timezone={viewer.preferences.timezone}
+          counts={counts}
+          projects={projects.map((p) => ({
+            id: p.id,
+            name: p.name,
+            color: p.color,
+            // BR-PROJ-003: görev yoksa ilerleme gösterilmez.
+            percent: p.progress?.total
+              ? Math.round((p.progress.done / p.progress.total) * 100)
+              : null,
+          }))}
+          views={views.map((v) => ({ id: v.id, name: v.name }))}
+        />
+        <div className="flex min-w-0 flex-1 flex-col pb-[84px] lg:pb-0">{children}</div>
+        <MobileNavigation />
+        <KeyboardShortcuts workspaceId={scope.workspaceId} />
+      </div>
+    </NotificationProvider>
   );
 }

@@ -17,6 +17,10 @@ const PatchPreferencesBody = z.strictObject({
   dateFormat: z.enum(DATE_FORMATS).optional(),
   timeFormat: z.enum(TIME_FORMATS).optional(),
   weekStart: z.union(WEEK_STARTS.map((n) => z.literal(n))).optional(),
+  allDayReminderTime: z.string().max(5).optional(),
+  notificationSettings: z
+    .strictObject({ v: z.literal(1), reminder: z.strictObject({ inApp: z.boolean() }) })
+    .optional(),
   // BR-DASH-001: sürümlü JSON; bilinmeyen kimlikler sunucuda atılır.
   dashboardLayout: z
     .strictObject({

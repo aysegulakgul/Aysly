@@ -1,6 +1,6 @@
 # Merkezi İş Kuralları
 
-> Durum: v0.4 · Son güncelleme: 2026-10-29 · Uygulama durumu: Faz 3–5 kuralları uygulanıyor; hangi kuralın kodda ve testte olduğu `node scripts/br-coverage.mjs` çıktısındadır.
+> Durum: v0.4 · Son güncelleme: 2026-10-29 · Uygulama durumu: Faz 3–6 kuralları uygulanıyor; hangi kuralın kodda ve testte olduğu `node scripts/br-coverage.mjs` çıktısındadır.
 > v0.3: OQ-024..OQ-031 kararları işlendi (D-053..D-060). OQ-030 ile teknik öneriler onaylandı; "gereksiz karmaşıklık" ölçütüyle çıkarılanlar D-061 kaydındadır. OQ-033 kapandı (D-062): BR-ACC-005 için onay e-postası MVP'de yok.
 
 Bu dosya Aysly'deki iş kurallarının **tek gerçek kaynağıdır**. Diğer belgeler kuralları kimlikleriyle referans verir; kuralı yeniden tanımlamaz. Kod içinde bir kuralı uygulayan yer, yorumla kural kimliğini belirtir (ör. `// BR-TASK-004`). Testler kural kimliğini test adında taşır.
@@ -602,3 +602,4 @@ Bir kayıt hem arşivli hem çöpte olabilir; geri yüklenince arşivli durumuna
 | 2026-10-27 | BR-PERM-005 | SONRA'ya alındı (EntitlementService yazılmayacak) | D-061 |
 | 2026-10-27 | BR-SUB-001 | DB trigger kaldırıldı; uygulama + test yeterli | D-061 |
 | 2026-10-29 | BR-TASK-008 | Toplu yapılabilen işlemler listelendi | D-084 |
+| 2026-10-29 | BR-REC-003, BR-REC-006, BR-REM-005 | Uygulama ayrıntıları (RRULE alt kümesi, seri kapsamı, dağıtım) | D-087, D-088 |

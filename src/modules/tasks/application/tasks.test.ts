@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Project } from '@/modules/projects';
+import type { Reminder } from '@/modules/reminders';
 import { EMPTY_FILTER, type TaskFilter } from '@/modules/views';
 import type { WorkspaceScope } from '@/modules/workspaces';
 import { fixedClock } from '@/shared/kernel/clock';
@@ -22,6 +23,7 @@ import {
   projectOverview,
 } from './projects';
 import { queryTasks } from './query';
+import { addReminder, dispatchDueReminders } from './reminders';
 import type { ProjectRef, TaskRepository } from './ports';
 import {
   completeTask,
@@ -68,6 +70,7 @@ function setup(projects: ProjectRef[] = [], tagCount = 0) {
     return p && !p.deletedAt ? p : null;
   };
   const rows = new Map<string, Task>();
+  const reminderRows = new Map<string, Reminder>();
   const tagLinks = new Map<string, string[]>();
   let seq = 0;
   const repo: TaskRepository = {
@@ -86,6 +89,7 @@ function setup(projects: ProjectRef[] = [], tagCount = 0) {
         completedAt: null,
         completedBy: null,
         position: t.position,
+        recurrence: t.recurrence ?? null,
         createdBy: t.createdBy,
         archivedAt: null,
         deletedAt: null,
@@ -269,6 +273,13 @@ function setup(projects: ProjectRef[] = [], tagCount = 0) {
       }
     },
     listArchived: async () => [...rows.values()].filter((t) => !t.deletedAt && t.archivedAt),
+    findGeneratedFrom: async (_s, id) =>
+      [...rows.values()].find((t) => !t.deletedAt && t.recurrence?.generatedFrom === id) ?? null,
+    hardDelete: async (_s, id) => {
+      rows.delete(id);
+      for (const t of [...rows.values()]) if (t.parentTaskId === id) rows.delete(t.id);
+      reminderRows.forEach((r, key) => r.taskId === id && reminderRows.delete(key));
+    },
     moveSubtasks: async (_s, parentId, projectId) => {
       for (const t of rows.values()) {
         if (t.parentTaskId === parentId)
@@ -365,10 +376,57 @@ function setup(projects: ProjectRef[] = [], tagCount = 0) {
             .map(([taskId]) => taskId),
         ),
     },
+    reminders: {
+      forTasks: async (_s, ids) => {
+        const map = new Map<string, Reminder[]>();
+        for (const r of [...reminderRows.values()].sort((a, b) => +a.remindAt - +b.remindAt)) {
+          if (ids.includes(r.taskId)) map.set(r.taskId, [...(map.get(r.taskId) ?? []), r]);
+        }
+        return map;
+      },
+      insert: async (_s, r) => {
+        const reminder: Reminder = {
+          id: r.id,
+          taskId: r.taskId,
+          kind: r.kind,
+          offsetMinutes: r.offsetMinutes,
+          remindAt: r.remindAt,
+          status: r.status,
+          sentAt: null,
+        };
+        reminderRows.set(r.id, reminder);
+        return reminder;
+      },
+      remove: async (_s, taskId, id) =>
+        reminderRows.get(id)?.taskId === taskId ? reminderRows.delete(id) : false,
+      retime: async (_s, id, remindAt, status) => {
+        reminderRows.set(id, { ...reminderRows.get(id)!, remindAt, status });
+      },
+      removeRelative: async (_s, taskId) => {
+        reminderRows.forEach(
+          (r, key) => r.taskId === taskId && r.kind === 'relative' && reminderRows.delete(key),
+        );
+      },
+      cancel: async (_s, ids) => {
+        reminderRows.forEach((r, key) => {
+          if (ids.includes(r.taskId) && r.status === 'pending')
+            reminderRows.set(key, { ...r, status: 'canceled' });
+        });
+      },
+      reactivate: async (_s, ids, now) => {
+        reminderRows.forEach((r, key) => {
+          if (ids.includes(r.taskId) && r.status === 'canceled' && r.remindAt > now)
+            reminderRows.set(key, { ...r, status: 'pending' });
+        });
+      },
+    },
+    calendar: {
+      of: async () => ({ timezone: 'Europe/Istanbul', allDayReminderTime: '09:00', weekStart: 1 }),
+    },
     clock: fixedClock(new Date('2026-10-28T09:00:00Z')),
     newId: () => `t${++seq}`,
   };
-  return { deps, rows, tagLinks, projectRows };
+  return { deps, rows, tagLinks, projectRows, reminderRows };
 }
 
 const value = <T>(r: { ok: boolean; value?: T }) => {
@@ -1071,5 +1129,256 @@ describe('Faz 5 — toplu işlemler (BR-TASK-008, D-084)', () => {
     });
     expect(tagLinks.get(a.id)).toEqual(['ev', 'acil']);
     expect(BULK_LIMIT).toBe(200);
+  });
+});
+
+describe('Faz 6 — tekrarlayan görevler (BR-REC-001..007)', () => {
+  it('BR-REC-001: tekrar yalnızca son tarihli üst düzey görevde; geçersiz kural 400', async () => {
+    const { deps } = setup();
+    expect(
+      failure(await createTask(deps, scope, { title: 'X', recurrence: { rule: 'FREQ=DAILY' } })),
+    ).toMatchObject({ rule: 'BR-REC-001' });
+    expect(
+      failure(
+        await createTask(deps, scope, {
+          title: 'X',
+          due: { date: '2026-10-28' },
+          recurrence: { rule: 'FREQ=HOURLY' },
+        }),
+      ),
+    ).toMatchObject({ kind: 'validation' });
+  });
+
+  it('AC-04 / BR-REC-002 / BR-REC-004: tamamlanınca sonraki örnek; alanlar, etiketler, alt görevler ve göreli hatırlatıcı kopyalanır', async () => {
+    const { deps, rows, tagLinks, reminderRows } = setup([EV]);
+    const t = value(
+      await createTask(deps, scope, {
+        title: 'Haftalık rapor',
+        projectId: 'ev',
+        priority: 2,
+        startDate: '2026-11-01',
+        due: { date: '2026-11-02', time: '09:30', timezone: 'Europe/Istanbul' },
+        tagNames: ['iş'],
+        recurrence: { rule: 'FREQ=WEEKLY;BYDAY=MO' },
+        reminders: [{ kind: 'relative', offsetMinutes: 30 }],
+      }),
+    );
+    value(await createTask(deps, scope, { title: 'Alt', parentTaskId: t.id }));
+    const done = value(await completeTask(deps, scope, t.id, { version: t.version }));
+    const next = done.nextOccurrence!;
+    expect(next).toMatchObject({
+      title: 'Haftalık rapor',
+      projectId: 'ev',
+      priority: 2,
+      status: 'todo',
+      startDate: '2026-11-08',
+      due: { date: '2026-11-09', time: '09:30', timezone: 'Europe/Istanbul' },
+      recurrence: { index: 2, anchor: '2026-11-09', generatedFrom: t.id },
+    });
+    expect(next.due?.at?.toISOString()).toBe('2026-11-09T06:30:00.000Z');
+    expect(tagLinks.get(next.id)).toEqual(['iş']);
+    expect([...rows.values()].filter((x) => x.parentTaskId === next.id)).toHaveLength(1);
+    const reminders = [...reminderRows.values()];
+    expect(reminders.find((r) => r.taskId === t.id)?.status).toBe('canceled');
+    expect(reminders.find((r) => r.taskId === next.id)).toMatchObject({
+      kind: 'relative',
+      offsetMinutes: 30,
+      status: 'pending',
+    });
+  });
+
+  it('BR-REC-007: geri alınınca değiştirilmemiş sonraki örnek silinir; değiştirilmişse korunur ve tekrar üretilmez', async () => {
+    const { deps, rows } = setup();
+    const t = value(
+      await createTask(deps, scope, {
+        title: 'Su iç',
+        due: { date: '2026-10-28' },
+        recurrence: { rule: 'FREQ=DAILY' },
+      }),
+    );
+    const c1 = value(await completeTask(deps, scope, t.id, { version: t.version }));
+    const r1 = value(await reopenTask(deps, scope, t.id, { version: c1.version }));
+    expect(rows.has(c1.nextOccurrence!.id)).toBe(false);
+    expect(r1.keptNextOccurrence).toBe(false);
+
+    const c2 = value(await completeTask(deps, scope, t.id, { version: r1.version }));
+    const next = c2.nextOccurrence!;
+    value(await updateTask(deps, scope, next.id, { version: next.version, title: 'Su iç (2 L)' }));
+    const r2 = value(await reopenTask(deps, scope, t.id, { version: c2.version }));
+    expect(r2.keptNextOccurrence).toBe(true);
+    expect(rows.has(next.id)).toBe(true);
+    const c3 = value(await completeTask(deps, scope, t.id, { version: r2.version }));
+    expect(c3.nextOccurrence).toBeNull();
+  });
+
+  it('BR-REC-006: tarih değişikliğinde kapsam gerekir; "bu ve sonraki" planlanan tarihi taşır, kural kaldırılınca seri durur', async () => {
+    const { deps } = setup();
+    const t = value(
+      await createTask(deps, scope, {
+        title: 'T',
+        due: { date: '2026-10-26' },
+        recurrence: { rule: 'FREQ=WEEKLY' },
+      }),
+    );
+    expect(
+      failure(await updateTask(deps, scope, t.id, { version: 1, due: { date: '2026-10-27' } })),
+    ).toMatchObject({ kind: 'validation' });
+    const onlyThis = value(
+      await updateTask(deps, scope, t.id, {
+        version: 1,
+        due: { date: '2026-10-27' },
+        recurrenceScope: 'this',
+      }),
+    );
+    expect(onlyThis.recurrence?.anchor).toBe('2026-10-26');
+    const following = value(
+      await updateTask(deps, scope, t.id, {
+        version: onlyThis.version,
+        due: { date: '2026-10-28' },
+        recurrenceScope: 'following',
+      }),
+    );
+    expect(following.recurrence?.anchor).toBe('2026-10-28');
+    expect(
+      failure(await updateTask(deps, scope, t.id, { version: following.version, due: null })),
+    ).toMatchObject({ rule: 'BR-REC-001' });
+    const stopped = value(
+      await updateTask(deps, scope, t.id, { version: following.version, recurrence: null }),
+    );
+    expect(stopped.recurrence).toBeNull();
+    const done = value(await completeTask(deps, scope, t.id, { version: stopped.version }));
+    expect(done.nextOccurrence).toBeNull();
+  });
+
+  it('BR-REC-006: "yalnızca bu örneği sil" seriyi sonraki örnekle sürdürür', async () => {
+    const { deps, rows } = setup();
+    const t = value(
+      await createTask(deps, scope, {
+        title: 'Spor',
+        due: { date: '2026-10-28' },
+        recurrence: { rule: 'FREQ=DAILY;INTERVAL=2' },
+      }),
+    );
+    const result = value(
+      await deleteTask(deps, scope, t.id, undefined, { recurrenceScope: 'this' }),
+    );
+    expect(rows.get(result.nextOccurrenceId!)?.due?.date).toBe('2026-10-30');
+  });
+});
+
+describe('Faz 6 — hatırlatıcılar (BR-REM-001..005)', () => {
+  it('BR-REM-001/002: göreli için son tarih gerekir; en fazla 5; geçmiş ve aynı an reddedilir', async () => {
+    const { deps } = setup();
+    const undated = value(await createTask(deps, scope, { title: 'A' }));
+    expect(
+      failure(await addReminder(deps, scope, undated.id, { kind: 'relative', offsetMinutes: 10 })),
+    ).toMatchObject({ rule: 'BR-REM-001' });
+    expect(
+      failure(
+        await addReminder(deps, scope, undated.id, {
+          kind: 'absolute',
+          remindAt: '2026-10-28T09:00:30Z',
+        }),
+      ),
+    ).toMatchObject({ rule: 'BR-REM-002' });
+    const dated = value(await createTask(deps, scope, { title: 'B', due: { date: '2026-11-05' } }));
+    for (const offset of [0, 10, 30, 60, 1440]) {
+      value(await addReminder(deps, scope, dated.id, { kind: 'relative', offsetMinutes: offset }));
+    }
+    expect(
+      failure(await addReminder(deps, scope, dated.id, { kind: 'relative', offsetMinutes: 5 })),
+    ).toMatchObject({ rule: 'BR-REM-002' });
+    const other = value(await createTask(deps, scope, { title: 'C', due: { date: '2026-11-05' } }));
+    value(await addReminder(deps, scope, other.id, { kind: 'relative', offsetMinutes: 0 }));
+    expect(
+      failure(await addReminder(deps, scope, other.id, { kind: 'relative', offsetMinutes: 0 })),
+    ).toMatchObject({ rule: 'BR-REM-002' });
+  });
+
+  it('BR-REM-001: tüm gün görevde referans, kullanıcının tüm gün saati (09:00 İstanbul)', async () => {
+    const { deps } = setup();
+    const t = value(await createTask(deps, scope, { title: 'A', due: { date: '2026-11-05' } }));
+    const r = value(await addReminder(deps, scope, t.id, { kind: 'relative', offsetMinutes: 60 }));
+    expect(r.remindAt.toISOString()).toBe('2026-11-05T05:00:00.000Z');
+  });
+
+  it('BR-REM-004: son tarih değişince göreli yeniden hesaplanır, kaldırılınca silinir; mutlak etkilenmez', async () => {
+    const { deps, reminderRows } = setup();
+    const t = value(await createTask(deps, scope, { title: 'A', due: { date: '2026-11-05' } }));
+    value(await addReminder(deps, scope, t.id, { kind: 'relative', offsetMinutes: 0 }));
+    value(
+      await addReminder(deps, scope, t.id, { kind: 'absolute', remindAt: '2026-11-01T10:00:00Z' }),
+    );
+    const moved = value(
+      await updateTask(deps, scope, t.id, { version: 1, due: { date: '2026-11-06' } }),
+    );
+    const relative = [...reminderRows.values()].find((r) => r.kind === 'relative')!;
+    expect(relative.remindAt.toISOString()).toBe('2026-11-06T06:00:00.000Z');
+    value(await updateTask(deps, scope, t.id, { version: moved.version, due: null }));
+    expect([...reminderRows.values()].map((r) => r.kind)).toEqual(['absolute']);
+  });
+
+  it('BR-REM-003: tamamlanınca, arşivlenince ve çöpe gidince iptal; geri gelince geleceğe ait olan bekler', async () => {
+    const { deps, reminderRows } = setup();
+    const t = value(await createTask(deps, scope, { title: 'A', due: { date: '2026-11-05' } }));
+    value(await addReminder(deps, scope, t.id, { kind: 'relative', offsetMinutes: 0 }));
+    const status = () => [...reminderRows.values()][0]!.status;
+    const done = value(await completeTask(deps, scope, t.id, { version: 1 }));
+    expect(status()).toBe('canceled');
+    const back = value(await reopenTask(deps, scope, t.id, { version: done.version }));
+    expect(status()).toBe('pending');
+    const archived = value(await archiveTask(deps, scope, t.id, { version: back.version }));
+    expect(status()).toBe('canceled');
+    value(await unarchiveTask(deps, scope, t.id, { version: archived.version }));
+    expect(status()).toBe('pending');
+    const del = value(await deleteTask(deps, scope, t.id));
+    expect(status()).toBe('canceled');
+    value(await restoreFromTrash(deps, scope, { batchId: del.batchId }));
+    expect(status()).toBe('pending');
+  });
+
+  it('BR-REM-005 / BR-NOTIF-002: zamanı gelen hatırlatıcı bir kez gönderilir; geciken işaretlenir, eskisi atlanır', async () => {
+    const now = new Date('2026-10-28T09:00:00Z');
+    const reminders = [
+      { id: 'r1', minutesAgo: 1 },
+      { id: 'r2', minutesAgo: 30 },
+      { id: 'r3', minutesAgo: 60 * 25 },
+      { id: 'r4', minutesAgo: 2 },
+    ].map(({ id, minutesAgo }) => ({
+      id,
+      taskId: id === 'r4' ? 'done-task' : 't1',
+      workspaceId: 'w1',
+      kind: 'absolute' as const,
+      offsetMinutes: null,
+      remindAt: new Date(now.getTime() - minutesAgo * 60_000),
+      status: 'pending' as 'pending' | 'sent' | 'canceled' | 'skipped',
+      sentAt: null,
+    }));
+    const notified: { late: boolean; reminderId: string }[] = [];
+    const deps = {
+      clock: fixedClock(now),
+      newId: () => 'n',
+      enabled: true,
+      due: async () => reminders.filter((r) => r.status === 'pending'),
+      transition: async (id: string, status: 'sent' | 'canceled' | 'skipped') => {
+        const r = reminders.find((x) => x.id === id)!;
+        if (r.status !== 'pending') return false;
+        r.status = status;
+        return true;
+      },
+      task: async (_w: string, taskId: string) => ({ title: 'X', active: taskId !== 'done-task' }),
+      notify: async (n: { late: boolean; reminderId: string }) => {
+        notified.push({ late: n.late, reminderId: n.reminderId });
+        return true;
+      },
+    };
+    const first = await dispatchDueReminders(deps, 'u1');
+    expect(first).toEqual({ sent: 2, skipped: 1, canceled: 1 });
+    expect(notified).toEqual([
+      { late: false, reminderId: 'r1' },
+      { late: true, reminderId: 'r2' },
+    ]);
+    expect(await dispatchDueReminders(deps, 'u1')).toEqual({ sent: 0, skipped: 0, canceled: 0 });
+    expect(notified).toHaveLength(2);
   });
 });

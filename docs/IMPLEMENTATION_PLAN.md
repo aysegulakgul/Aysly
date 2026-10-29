@@ -12,7 +12,7 @@
 | 3 | Kimlik doğrulama, hesap, tercihler, onboarding | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
 | 4 | Görev yönetimi, Inbox, My Tasks, dashboard | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
 | 5 | Projeler ve görev görünümleri | **Kapandı** | — | 2026-10-29 | 2026-10-29 |
-| 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | Devam ediyor | — | 2026-10-29 | — |
+| 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | Kapı kontrolünde | — | 2026-10-29 | — |
 | 7 | Notlar, hedefler, arama | Başlamadı | Not editörü paketi seçimi (Faz 7 başında sunulur) | — | — |
 | 8 | Test, güvenlik, kalite; dışa aktarma, hesap silme | Başlamadı | — | — | — |
 | 9 | Kullanım geri bildirimine göre iyileştirmeler | Başlamadı | — | — | — |
@@ -130,6 +130,15 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
 - **Bağımlılık:** Faz 5.
 - **Kapsam:** FR-CAL-01..06 (masaüstü hafta/ay sürükle-bırak, mobilde tarih seçici — D-047), BR-REM-001..005, BR-REC-001..007 (iki mod, tamamlanınca üretim — D-033), BR-DATE-006, uygulama içi bildirimler (D-037), FR-NOTIF-01, 02, 04, 05.
 - **Kabul:** AC-04, AC-05; tekrar kuralı özellik tabanlı testleri; paralel bildirim oluşturma testi (tek bildirim); uygulama kapalıyken geçen hatırlatıcılar (E18); DST testleri.
+- **İlerleme (2026-10-29):**
+  - Kararlar D-087 (tekrar), D-088 (hatırlatıcı ve bildirim), D-089 (takvim). Ürün sahibi Faz 6 kararlarını önceden onayladı.
+  - Migration 0006: `tasks.recurrence_*`, `reminders`, `notifications`, `saved_views` için `calendar` türü.
+  - Tekrarlayan görevler (BR-REC-001..007), hatırlatıcılar (BR-REM-001..005), uygulama içi bildirimler (BR-NOTIF-001..004), 90 günlük bildirim temizliği.
+  - Takvim: Ay / Hafta / Gün, Tarihsiz paneli, sürükle-bırak, proje ve kayıtlı görünümlerde Takvim sekmesi.
+  - Bildirim zili, `/notifications`, Ayarlar · Bildirimler, tüm gün hatırlatıcı saati.
+  - Not: Tekrar kuralı testleri örnek tabanlıdır (ay sonu, artık yıl, n. hafta günü, bitiş koşulları). Özellik tabanlı test paketi (fast-check) eklenmedi (D-058: yeni paket ancak gerekirse).
+  - Kapsam dışı: FR-CAL-05 (P2).
+  - Doğrulama (2026-10-29): `pnpm verify` 13/13 yeşil — birim 173, entegrasyon 60, tarayıcı 281 (1 atlandı: AC-05 yalnızca masaüstünde). Faz 6 kabulü: AC-04 (iki mod), AC-05 (tek bildirim, tıklanınca görev), paralel dağıtımda tek bildirim, E18 gecikmeli/atlanan, New York yaz saati sonrası seri saati, takvim sürükle-bırak, yeni sayfaların erişilebilirlik taraması. Kapanış ürün sahibinin onayını bekliyor.
 
 ### Faz 7 — Notlar, hedefler, arama
 - **Bağımlılık:** Faz 5; not editörü paketinin onayı.

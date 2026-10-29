@@ -7,6 +7,7 @@ import { createInProcessScheduler, type Scheduler } from '@/shared/jobs/schedule
 import { idempotencyCleanupJob } from '@/shared/http/idempotency';
 import { logger } from '@/shared/observability/logger';
 import { listExpiredTrashedProjects, purgeExpiredProjects } from '@/modules/projects';
+import { purgeOldNotifications } from '@/modules/notifications';
 import { purgeExpiredTasks, reassignTrashedTasks } from '@/modules/tasks';
 import { db } from '@/shared/db/client';
 import type { JobDefinition } from '@/shared/jobs/scheduler';
@@ -34,13 +35,14 @@ export function getEmailSender(): EmailSender {
 let scheduler: Scheduler | undefined;
 /**
  * Bakım işleri (D-053). Kayıtlı: idempotency temizliği (D-019), 30 günlük çöp temizliği (BR-DEL-003).
- * Hesap silme Faz 8'de, bildirim temizliği Faz 6'da buraya kaydedilir.
+ * 90 günlük bildirim temizliği (BR-NOTIF-003). Hesap silme Faz 8'de buraya kaydedilir.
  */
 export function getScheduler(): Scheduler {
   if (!scheduler) {
     scheduler = createInProcessScheduler(createPgAdvisoryLock(sqlClientInstance()), logger());
     scheduler.register(idempotencyCleanupJob());
     scheduler.register(trashPurgeJob());
+    scheduler.register(notificationPurgeJob());
   }
   return scheduler;
 }
@@ -58,6 +60,21 @@ export function trashPurgeJob(): JobDefinition {
         return (await purgeExpiredTasks(tx, before)) + (await purgeExpiredProjects(tx, before));
       });
       if (purged > 0) logger().info({ purged }, 'süresi dolan çöp kayıtları silindi');
+    },
+  };
+}
+
+/** BR-NOTIF-003 / D-053: 90 günden eski bildirimleri günde bir siler; açılışta da çalışır. */
+export function notificationPurgeJob(): JobDefinition {
+  return {
+    name: 'notifications.purge',
+    intervalMs: 24 * 60 * 60 * 1000,
+    run: async () => {
+      const purged = await purgeOldNotifications(
+        db(),
+        new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+      );
+      if (purged > 0) logger().info({ purged }, 'eski bildirimler silindi');
     },
   };
 }

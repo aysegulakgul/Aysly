@@ -28,6 +28,7 @@ export function useTaskCompletion(context: TaskUiContext) {
   const [asking, setAsking] = useState<Completable | null>(null);
   const [undo, setUndo] = useState<{ id: string; version: number } | null>(null);
   const [failed, setFailed] = useState(false);
+  const [kept, setKept] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
   // Ctrl/⌘ + Z (UI_UX §11): bildirim açıkken son tamamlamayı geri alır.
@@ -76,9 +77,14 @@ export function useTaskCompletion(context: TaskUiContext) {
     clearTimeout(timer.current);
     const { id, version } = undo;
     setUndo(null);
-    const result = await apiPost(`${base}/${id}/reopen`, { version });
-    if (result.ok) show(id);
-    else setFailed(true);
+    const result = await apiPost<{ keptNextOccurrence?: boolean }>(`${base}/${id}/reopen`, {
+      version,
+    });
+    if (result.ok) {
+      show(id);
+      // BR-REC-007: değiştirilmiş sonraki örnek korunduysa kullanıcı bilgilendirilir.
+      if (result.data.keptNextOccurrence) setKept(true);
+    } else setFailed(true);
     router.refresh();
   }
 
@@ -90,6 +96,7 @@ export function useTaskCompletion(context: TaskUiContext) {
   const ui = (
     <>
       {failed ? <Banner>{t('completeFailed')}</Banner> : null}
+      {kept ? <Banner>{t('recurrence.keptNext')}</Banner> : null}
       <Dialog
         open={asking !== null}
         onOpenChange={(open) => !open && setAsking(null)}

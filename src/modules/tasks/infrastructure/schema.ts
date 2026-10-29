@@ -18,7 +18,7 @@ import { projects } from '@/modules/projects/infrastructure/schema';
 import { workspaces } from '@/modules/workspaces/infrastructure/schema';
 
 /**
- * Görevler (DATA_MODEL §3.7). Tekrar alanları Faz 6'da, arama vektörü Faz 7'de eklenir (kullanılmayan kolon
+ * Görevler (DATA_MODEL §3.7). Tekrar alanları Faz 6'da eklendi (D-087); arama vektörü Faz 7'de eklenir (kullanılmayan kolon
  * eklenmez, CLAUDE.md §2.11). Proje ve ebeveyn bağlantıları `workspace_id` ile bileşiktir: görev başka çalışma
  * alanındaki projeye veya göreve bağlanamaz (BR-WS-002).
  */
@@ -44,6 +44,13 @@ export const tasks = pgTable(
     // Hesap silinince kişi bilgisi boşalır; kayıt sahibi çalışma alanıdır (D-068 ile aynı ilke).
     completedBy: uuid('completed_by').references(() => users.id, { onDelete: 'set null' }),
     position: text('position').notNull(),
+    // BR-REC-* (D-087): tekrar kuralı yalnızca son tarihli üst düzey görevde.
+    recurrenceRule: text('recurrence_rule'),
+    recurrenceMode: text('recurrence_mode'),
+    recurrenceSeriesId: uuid('recurrence_series_id'),
+    recurrenceAnchor: date('recurrence_anchor'),
+    recurrenceIndex: integer('recurrence_index'),
+    recurrenceGeneratedFrom: uuid('recurrence_generated_from'),
     createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
     archivedAt: timestamp('archived_at', { withTimezone: true }),
     deletedAt: timestamp('deleted_at', { withTimezone: true }),
@@ -89,6 +96,14 @@ export const tasks = pgTable(
       sql`${t.dueTime} is null or (${t.dueDate} is not null and ${t.timezone} is not null and ${t.dueAt} is not null)`,
     ),
     check('tasks_not_own_parent', sql`${t.parentTaskId} is null or ${t.parentTaskId} <> ${t.id}`),
+    // BR-REC-001
+    check(
+      'tasks_recurrence_valid',
+      sql`${t.recurrenceRule} is null or (${t.dueDate} is not null and ${t.parentTaskId} is null and ${t.recurrenceMode} in ('fixed_schedule','after_completion') and ${t.recurrenceSeriesId} is not null and ${t.recurrenceAnchor} is not null and ${t.recurrenceIndex} >= 1)`,
+    ),
+    index('tasks_recurrence_generated_idx')
+      .on(t.recurrenceGeneratedFrom)
+      .where(sql`${t.recurrenceGeneratedFrom} is not null`),
     index('tasks_project_list_idx')
       .on(t.workspaceId, t.projectId, t.status, t.position)
       .where(sql`${t.deletedAt} is null`),

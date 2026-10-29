@@ -84,7 +84,12 @@ export async function bulkTasks(
             : await updateTask(deps, scope, id, { version, status: command.status });
         break;
       case 'setDue':
-        result = await updateTask(deps, scope, id, { version, due: command.due });
+        // BR-REC-006: toplu tarih değişikliği tekrarlayan görevde yalnızca bu örneği taşır.
+        result = await updateTask(deps, scope, id, {
+          version,
+          due: command.due,
+          ...(task.recurrence ? { recurrenceScope: 'this' as const } : {}),
+        });
         break;
       case 'setPriority':
         result = await updateTask(deps, scope, id, { version, priority: command.priority });

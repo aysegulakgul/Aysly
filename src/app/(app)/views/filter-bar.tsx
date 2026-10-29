@@ -41,7 +41,7 @@ export function viewHref(
   task?: string,
 ): Route {
   const params = taskFilterToParams(filter, settings);
-  if (viewType === 'board') params.set('view', 'board');
+  if (viewType !== 'list') params.set('view', viewType);
   if (task) params.set('task', task);
   const query = params.toString();
   return `${pathname}${query ? `?${query}` : ''}` as Route;
@@ -49,7 +49,7 @@ export function viewHref(
 
 /**
  * Figma "Liste · Pano · Takvim" sekmeleri (4:67132, 4:67253). BR-VIEW-002 / FR-VIEW-06: görünüm değişince filtre,
- * sıralama ve seçili görev korunur. Takvim görünümü Faz 6'da eklenir (D-071: yalnızca çalışan bölümler).
+ * sıralama ve seçili görev korunur. Takvim sekmesi FR-VIEW-03 (Faz 6).
  */
 export function ViewTabs({
   filter,
@@ -66,7 +66,7 @@ export function ViewTabs({
   const pathname = usePathname();
   return (
     <nav aria-label={t('tabs')} className="flex w-full gap-1 border-b border-border">
-      {(['list', 'board'] as const).map((type) => (
+      {(['list', 'board', 'calendar'] as const).map((type) => (
         <Link
           key={type}
           href={viewHref(pathname, filter, settings, type, task)}

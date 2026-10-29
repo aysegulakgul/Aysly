@@ -5,7 +5,7 @@ import { workspaces } from '@/modules/workspaces/infrastructure/schema';
 
 /**
  * Kayıtlı görünümler (DATA_MODEL §3.13, D-051): kişiseldir; filtre ve sıralama tanımını saklar, sonuç listesini
- * saklamaz (BR-VIEW-001). Takvim türü Faz 6'da eklenir; sabitleme kullanılmadığı için kolonu yoktur.
+ * saklamaz (BR-VIEW-001). Takvim türü Faz 6'da eklendi; sabitleme kullanılmadığı için kolonu yoktur.
  */
 export const savedViews = pgTable(
   'saved_views',
@@ -29,7 +29,7 @@ export const savedViews = pgTable(
   },
   (t) => [
     check('saved_views_name_length', sql`char_length(btrim(${t.name})) between 1 and 60`),
-    check('saved_views_view_type', sql`${t.viewType} in ('list','board')`),
+    check('saved_views_view_type', sql`${t.viewType} in ('list','board','calendar')`),
     index('saved_views_owner_idx').on(t.workspaceId, t.ownerUserId, t.position),
   ],
 );

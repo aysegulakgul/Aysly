@@ -11,10 +11,11 @@ import { Chip } from '@/ui/components/chip';
 import { Banner } from '@/ui/components/feedback';
 import { Popover, PopoverClose } from '@/ui/components/popover';
 import { cn } from '@/ui/cn';
-import { DatePickerPanel } from './date-picker';
+import { DatePickerPanel, type DueValue } from './date-picker';
 import { longDay, offsetLabel, shortTime } from './dates';
 import { useTaskCompletion } from './task-actions';
 import type { TaskUiContext } from './task-context';
+import { RecurrenceField, RecurrenceScopeDialog, RemindersSection } from './schedule-fields';
 
 type Patch = Record<string, unknown>;
 type Status = 'idle' | 'saved' | 'failed' | 'conflict';
@@ -96,7 +97,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 const selectClass =
   'min-h-11 w-full appearance-none rounded-sm bg-transparent px-2 text-sm text-text hover:bg-surface-muted';
 
-/** Figma "Görev detayı" paneli (4:66875). Tekrar, hatırlatıcı ve bağlı kayıtlar ilgili fazlarda eklenir. */
+/** Figma "Görev detayı" paneli (4:66875). Tekrar ve hatırlatıcılar Faz 6'da (D-087/D-088); bağlı kayıtlar Faz 7'de. */
 export function TaskDetailPanel({
   detail,
   context,
@@ -149,6 +150,7 @@ function DetailBody({ detail, context }: { detail: TaskDetailView; context: Task
   const [tagInput, setTagInput] = useState('');
   const [subtask, setSubtask] = useState('');
   const [dateOpen, setDateOpen] = useState(false);
+  const [pendingDue, setPendingDue] = useState<DueValue | null | undefined>(undefined);
   const done = detail.status === 'done';
   const readOnly = detail.archivedAt !== null || detail.deletedAt !== null;
   // Kısayollar T / M / L (UI_UX §11): ilgili alana odaklan.
@@ -252,6 +254,8 @@ function DetailBody({ detail, context }: { detail: TaskDetailView; context: Task
         ) : null}
 
         <div className="flex flex-col border-b border-border pb-3">
+          <RemindersSection detail={detail} context={context} />
+
           {detail.parentTaskId ? null : (
             <Field label={t('detail.project')}>
               <select
@@ -331,7 +335,9 @@ function DetailBody({ detail, context }: { detail: TaskDetailView; context: Task
                 weekStart={context.weekStart}
                 onApply={(due) => {
                   setDateOpen(false);
-                  void save({ due });
+                  // BR-REC-006: tekrarlayan görevde kapsam sorulur.
+                  if (detail.recurrence) setPendingDue(due);
+                  else void save({ due });
                 }}
               />
             </Popover>
@@ -341,6 +347,18 @@ function DetailBody({ detail, context }: { detail: TaskDetailView; context: Task
               {`${detail.due.timezone} · ${offsetLabel(detail.due.timezone, new Date())}`}
             </p>
           ) : null}
+          <Field label={t('recurrence.title')}>
+            <RecurrenceField detail={detail} onSave={(recurrence) => void save({ recurrence })} />
+          </Field>
+          <RecurrenceScopeDialog
+            open={pendingDue !== undefined}
+            onCancel={() => setPendingDue(undefined)}
+            onChoose={(recurrenceScope) => {
+              const due = pendingDue;
+              setPendingDue(undefined);
+              void save({ due, recurrenceScope });
+            }}
+          />
           <Field label={t('detail.tags')}>
             <div className="flex flex-wrap items-center gap-1 px-2 py-1">
               {detail.tags.map((tag) => (
@@ -500,6 +518,21 @@ function LifecycleMenu({ detail, context }: { detail: TaskDetailView; context: T
             {t('delete')}
           </button>
         </PopoverClose>
+        {detail.recurrence && detail.status !== 'done' ? (
+          <PopoverClose asChild>
+            <button
+              type="button"
+              className="flex min-h-11 items-center rounded-sm px-3 text-left text-sm text-danger"
+              onClick={async () => {
+                // BR-REC-006: yalnızca bu örnek silinir; seri sonraki örnekle sürer.
+                await apiDelete(`${url}?scope=this`);
+                router.refresh();
+              }}
+            >
+              {t('deleteOccurrence')}
+            </button>
+          </PopoverClose>
+        ) : null}
         <p className="max-w-[240px] px-3 pt-2 text-xs text-text-secondary">{t('deleteConfirm')}</p>
       </div>
     </Popover>

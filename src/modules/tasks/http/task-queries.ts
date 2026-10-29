@@ -15,14 +15,18 @@ import { queryTasks } from '../application/query';
 import { inboxBadge, listTasks } from '../application/tasks';
 import { todayIn } from '../domain/schedule';
 import { TASK_STATUSES } from '../domain/task';
-import { taskDeps, toSummaryJson, toTaskJson } from './task-handlers';
+import { findRemindersForTasks } from '@/modules/reminders';
+import { taskDeps, toReminderJson, toSummaryJson, toTaskJson } from './task-handlers';
 
 /**
  * Sunucu bileşenleri için okuma sorguları; uç noktalarla aynı use case'leri kullanır (yetki dahil).
  * Bileşene API ile aynı biçimde (JSON) veri verilir.
  */
 export type TaskView = ReturnType<typeof toSummaryJson>;
-export type TaskDetailView = TaskView & { subtasks: TaskView[] };
+export type TaskDetailView = TaskView & {
+  subtasks: TaskView[];
+  reminders: ReturnType<typeof toReminderJson>[];
+};
 
 export async function findInboxTasks(scope: WorkspaceScope): Promise<TaskView[]> {
   const deps = taskDeps(db());
@@ -56,9 +60,13 @@ export async function findTaskDetail(
 ): Promise<TaskDetailView | null> {
   // BR-DEL-007: çöpteki göreve doğrudan gidilirse "çöp kutusunda" bandıyla gösterilir.
   const result = await getTaskDetail(taskDeps(db()), scope, id, { includeDeleted: true });
-  return result.ok
-    ? { ...toSummaryJson(result.value), subtasks: result.value.subtaskList.map(toSummaryJson) }
-    : null;
+  if (!result.ok) return null;
+  const reminders = await findRemindersForTasks(db(), scope, [result.value.task.id]);
+  return {
+    ...toSummaryJson(result.value),
+    subtasks: result.value.subtaskList.map(toSummaryJson),
+    reminders: (reminders.get(result.value.task.id) ?? []).map(toReminderJson),
+  };
 }
 
 export async function findMyTasksCount(scope: WorkspaceScope): Promise<number> {

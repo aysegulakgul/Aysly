@@ -106,7 +106,7 @@ export function GiveDate({
   task,
   context,
 }: {
-  task: Pick<TaskView, 'id' | 'version' | 'due'>;
+  task: Pick<TaskView, 'id' | 'version' | 'due' | 'recurrence'>;
   context: TaskUiContext;
 }) {
   const t = useTranslations('tasks');
@@ -132,6 +132,8 @@ export function GiveDate({
           await apiPatch(`/api/v1/workspaces/${context.workspaceId}/tasks/${task.id}`, {
             version: task.version,
             due,
+            // BR-REC-006: satırdan tarih değişikliği yalnızca bu örneği taşır.
+            ...(task.recurrence ? { recurrenceScope: 'this' } : {}),
           });
           router.refresh();
         }}

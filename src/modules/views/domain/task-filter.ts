@@ -7,7 +7,7 @@ import { z } from 'zod';
  */
 export const TASK_FILTER_VERSION = 1;
 
-export const VIEW_TYPES = ['list', 'board'] as const;
+export const VIEW_TYPES = ['list', 'board', 'calendar'] as const;
 export type ViewType = (typeof VIEW_TYPES)[number];
 
 /** FR-VIEW-05 */

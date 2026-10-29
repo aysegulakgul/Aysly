@@ -85,6 +85,16 @@ export function DateTimeForm({
             </option>
           ))}
         </Select>
+        {/* BR-REM-001: tüm gün görevlerde göreli hatırlatıcının referans saati. */}
+        <label className="flex w-full flex-col gap-2 text-sm text-text-secondary">
+          {t('allDayReminderTime')}
+          <input
+            type="time"
+            value={preferences.allDayReminderTime}
+            onChange={(e) => e.target.value && void save({ allDayReminderTime: e.target.value })}
+            className="min-h-11 w-full rounded-sm border border-border bg-page p-3 text-base text-text"
+          />
+        </label>
         <p className="text-sm text-text-secondary">{t('formats.hint')}</p>
       </Panel>
       <SaveStatusText status={status} />

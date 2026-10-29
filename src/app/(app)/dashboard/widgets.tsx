@@ -40,6 +40,8 @@ export function DashboardWidgets({
     await apiPatch(`/api/v1/workspaces/${context.workspaceId}/tasks/${task.id}`, {
       version: task.version,
       due: { date, time: task.due?.time ?? null, timezone: task.due?.timezone ?? null },
+      // BR-REC-006: "Bugüne/Yarına taşı" tekrarlayan görevde yalnızca bu örneği taşır.
+      ...(task.recurrence ? { recurrenceScope: 'this' } : {}),
     });
     router.refresh();
   }

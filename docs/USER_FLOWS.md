@@ -145,6 +145,7 @@ Ayrıntı: [ONBOARDING_AND_PERSONALIZATION.md](ONBOARDING_AND_PERSONALIZATION.md
 | İşlemler | Göreve tıkla → detay; boş güne tıkla → o tarihli hızlı ekleme; sürükle-bırak: masaüstünde hafta ve ay görünümlerinde; mobilde tarih seçici (D-047) |
 | Mobil | Varsayılan gün/liste görünümü; ay görünümünde nokta göstergeleri |
 | Kurallar | BR-DATE-001..006, FR-CAL |
+| Uygulama (Faz 6, D-089) | Ay görünümü Figma'da yok (D-065). Boş güne ekleme Gün görünümündeki "Bu güne görev ekle" alanıyla (Inbox'a). Proje ve etiket seçimi URL'de. |
 
 ### 2.9. Hedefler (`/goals`, `/goals/:id`)
 | | |
@@ -170,6 +171,7 @@ Ayrıntı: [ONBOARDING_AND_PERSONALIZATION.md](ONBOARDING_AND_PERSONALIZATION.md
 
 ### 2.12. Bildirimler
 Zil simgesi açılır paneli (son 20) + tam sayfa `/notifications`. Okunmamış vurgusu, "Tümünü okundu say". Tıklama → ilgili kayıt.
+Uygulama (Faz 6, D-088): zil kenar çubuğu başlığında ve mobil sayfa başlığında; sayaç ~60 sn'de bir yenilenir; Menü'de "Bildirimler". Ayarlar · Bildirimler: hatırlatıcı bildirimleri aç/kapat.
 
 ### 2.13. Arşiv (`/archive`) ve Çöp kutusu (`/trash`)
 - **Arşiv:** Tür sekmeleri; her satırda "Arşivden çıkar". Salt okunur önizleme.

@@ -435,6 +435,30 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - **Çöp ve proje:** Proje grubu kalıcı silinirken, o projede başka grupla çöpte kalan görevler önce Inbox'a bağlanır (BR-DEL-004, yabancı anahtar onları silmesin diye); aynısı 30 günlük temizlik işinde yapılır.
 - **Kapsam notları:** `POST /tags` (etiket oluşturma uç noktası) eklenmedi; etiketler görevden oluşturulur. FR-VIEW-08 (P1) kısmi: varsayılan görünüm Liste, proje bazında son görünüm hatırlanmıyor. Figma'da olmayan ekranlar (proje formu, filtre paneli, kayıtlı görünüm pencereleri, Arşiv, Çöp kutusu, Ayarlar · Etiketler) mevcut bileşenlerle kuruldu ve onaya sunuldu (D-065).
 
+### D-087 — Tekrarlayan görevlerin uygulama ayrıntıları (Faz 6)
+- Durum: ONAYLI · Tarih: 2026-10-29 · Karar veren: Claude; ürün sahibi Faz 6 boyunca Claude'un kararlarını önceden onayladı ("faz 6 yı bitirene kadar bütün kararlarını onaylıyorum")
+- **Kural biçimi (BR-REC-003):** RRULE alt kümesi kendi kodumuzla ayrıştırılır ve hesaplanır (ek paket yok): `FREQ=DAILY|WEEKLY|MONTHLY|YEARLY`, `INTERVAL` 1–365, haftalıkta `BYDAY`, aylıkta `BYMONTHDAY` veya `BYDAY=<1..4|-1><GÜN>`, `UNTIL` ya da `COUNT` (1–999). Kayıtta kanonik metin tutulur.
+- **Veri:** `tasks` tablosuna `recurrence_rule`, `recurrence_mode`, `recurrence_series_id`, `recurrence_anchor` (BR-REC-002'deki "planlanan tarih"), `recurrence_index` (COUNT için sıra) ve `recurrence_generated_from` (BR-REC-007) eklendi.
+- **Sonraki örnek:** Tamamlamayla aynı işlemde üretilir. `fixed_schedule` planlanan tarihten hesaplar, geçmişte kalanları atlar. `after_completion` kullanıcının saat dilimindeki tamamlanma gününden hesaplar. Bir tamamlamadan en fazla bir örnek üretilir.
+- **Seri düzenleme (BR-REC-006):** Tarih değişikliğinde `recurrenceScope` zorunludur. `this` planlanan tarihi korur, `following` onu taşır. Diğer alan değişiklikleri sonraki örneğe kopyalanır (BR-REC-004), bu yüzden kapsam sormaz. Kuralı değiştirmek "bu ve sonraki" demektir. `recurrence: null` seriyi durdurur. Silmede `?scope=this` yalnızca bu örneği siler ve seri sonraki örnekle sürer. `series` (varsayılan) seriyi bitirir.
+- **Hızlı tarih değişiklikleri:** Satırdaki "Tarih ver", Bugün'deki "Bugüne/Yarına taşı", toplu tarih ve takvimde sürükleme tekrarlayan görevde yalnızca bu örneği taşır.
+- **Kapsam dışı:** FR-CAL-05 (P2, gelecek örnek önizlemesi).
+
+### D-088 — Hatırlatıcılar ve uygulama içi bildirimler (Faz 6)
+- Durum: ONAYLI · Tarih: 2026-10-29 · Karar veren: Claude (ürün sahibinin Faz 6 ön onayıyla)
+- **Modüller:** `reminders` (tablo ve veri erişimi) ve `notifications` (tablo, okuma/okundu işlemleri, 90 günlük temizlik). Kurallar `tasks` modülündeki kullanım senaryolarındadır. Dağıtım (BR-REM-005) bildirim uç noktalarının rotasında, okumadan önce çalışır (`dispatchRemindersFor`). Böylece `tasks → reminders, notifications` yönü korunur.
+- **Durumlar:** `pending/sent/canceled/skipped`. `failed` yoktur (e-posta kanalı SONRA). Tamamlama, arşivleme ve çöpe taşıma `canceled` yapar. Geri gelişte zamanı gelecekte olanlar `pending` olur. Projesi sonradan arşivlenen görevin hatırlatıcısı zamanı geldiğinde `canceled` olur; projects modülü hatırlatıcıya dokunmaz.
+- **Arayüz (Figma'da yok, D-065):** Görev detayında Hatırlatıcılar bölümü var. Hazır göreli seçenekler: zamanında, 10 dk, 30 dk, 1 saat, 1 gün önce. Mutlak hatırlatıcı kullanıcının saat diliminde tarih ve saatle girilir. Bildirim zili kenar çubuğu başlığında (Figma'da zil var) ve mobil sayfa başlığında. Panelde son 20 bildirim ve "Tümünü okundu say" bulunur. `/notifications` sayfası ve Ayarlar · Bildirimler (hatırlatıcı bildirimlerini aç/kapat) eklendi. Tüm gün hatırlatıcı saati Ayarlar · Tarih ve saat'te.
+- **Bildirime tıklama:** Görev Görevlerim sayfasının detay panelinde açılır (`/my-tasks?task=`). Görev silinmişse BR-DEL-007 bandı görünür.
+
+### D-089 — Takvim ve görev görünümlerinde takvim (Faz 6)
+- Durum: ONAYLI · Tarih: 2026-10-29 · Karar veren: Claude (ürün sahibinin Faz 6 ön onayıyla)
+- `/calendar`: Ay / Hafta / Gün görünümleri. Varsayılan masaüstünde Hafta, dar ekranda Gün (Figma). Görünüm ve tarih URL'de (`cal`, `date`); proje ve etiket filtreleri `TaskFilter` ile. Saatli görevler kullanıcının saat diliminde yerleşir (FR-CAL-06). Hafta ızgarası 24 saattir ve 08:00'e kaydırılmış açılır.
+- **Sürükle-bırak (D-047):** HTML5 sürükle-bırak, masaüstünde Ay ve Hafta görünümlerinde. Güne bırakınca saat korunur; saat dilimine bırakınca o saat atanır. Mobilde ve klavyede alternatif: görev detayı veya Gün görünümündeki "Tarih ver". Tarihsiz paneli masaüstünde (FR-CAL-04, P1) ve Gün görünümünde.
+- **Görünüm türü:** `calendar` `VIEW_TYPES`'a ve `saved_views` kısıtına eklendi. Proje ve kayıtlı görünüm sayfalarında "Takvim" sekmesi var (FR-VIEW-03).
+- Kenar çubuğuna ve alt menüye Takvim, kısayollara `G C` (Takvim) ve `G P` (Projeler) eklendi.
+- Takvim, Hafta ve Gün görünümleri Figma 4:67372 ve 4:68640 düzenini izler. Ay görünümü Figma'da yoktur; mevcut token'larla kuruldu (D-065).
+
 ---
 
 ## 5. Faz kapanış kayıtları

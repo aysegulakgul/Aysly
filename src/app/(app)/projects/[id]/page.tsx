@@ -58,7 +58,9 @@ export default async function ProjectPage({
   });
   const scoped = { ...filter, projectId: [project.id] };
   const [list, context, tags, detail] = await Promise.all([
-    findTaskList(scope, viewer.preferences, scoped, settings, viewType, { includeDone: true }),
+    findTaskList(scope, viewer.preferences, scoped, settings, viewType, {
+      includeDone: viewType === 'list',
+    }),
     buildTaskContext(viewer, scope),
     findManagedTags(scope),
     task ? findTaskDetail(scope, task) : null,

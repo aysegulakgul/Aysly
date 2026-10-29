@@ -28,7 +28,10 @@
     "BR-PROJ-006": "Inbox yeniden adlandırılamaz, arşivlenemez veya silinemez.",
     "BR-DEL-004": "Görevin projesi çöp kutusunda. Projeyi de geri yükle ya da görevi Inbox’a geri yükle.",
     "BR-VIEW-001": "En fazla 50 kayıtlı görünüm oluşturabilirsin.",
-    "BR-TAG-001": "Bu adla bir etiket zaten var."
+    "BR-TAG-001": "Bu adla bir etiket zaten var.",
+    "BR-REC-001": "Tekrar için görevin son tarihi olmalı; alt görevler tekrarlanamaz.",
+    "BR-REM-001": "Göreli hatırlatıcı için görevin son tarihi olmalı.",
+    "BR-REM-002": "Hatırlatıcı en az 1 dakika sonrası olmalı; bir görevde en fazla 5 ve aynı anda tek hatırlatıcı olabilir."
   },
   "ui": {
     "offline": "Bağlantı yok. Değişikliklerin kaydedilemeyebilir.",
@@ -125,7 +128,9 @@
     "newView": "Yeni görünüm",
     "archive": "Arşiv",
     "trash": "Çöp kutusu",
-    "projectProgress": "{name} · %{percent}"
+    "projectProgress": "{name} · %{percent}",
+    "calendar": "Takvim",
+    "notifications": "Bildirimler"
   },
   "dashboard": {
     "greeting": {
@@ -260,7 +265,14 @@
     "onboardingTitle": "Başlangıç rehberi",
     "onboardingDescription": "Kullanım amacını ve başlangıç düzenini yeniden seçmek için rehberi baştan başlat.",
     "onboardingRestart": "Rehberi yeniden başlat",
-    "tags": "Etiketler"
+    "tags": "Etiketler",
+    "notifications": "Bildirimler",
+    "allDayReminderTime": "Tüm gün hatırlatıcı saati",
+    "notificationSettings": {
+      "title": "Uygulama içi bildirimler",
+      "reminders": "Hatırlatıcı bildirimleri",
+      "hint": "Bildirimler yalnızca uygulama açıkken oluşturulur. Kapatırsan zamanı gelen hatırlatıcılar bildirim üretmez."
+    }
   },
   "onboarding": {
     "title": "Aysly’ye hoş geldin",
@@ -409,7 +421,8 @@
       "deletedBand": "Bu görev çöp kutusunda. {days, plural, =0 {Silinmek üzere; geri yüklenemez.} other {# gün içinde geri yükleyebilirsin.}}",
       "restore": "Geri yükle",
       "restoreFailed": "Geri yüklenemedi.",
-      "deleteConfirm": "Görev ve alt görevleri çöp kutusuna taşınacak. 30 gün içinde geri yükleyebilirsin."
+      "deleteConfirm": "Görev ve alt görevleri çöp kutusuna taşınacak. 30 gün içinde geri yükleyebilirsin.",
+      "deleteOccurrence": "Yalnızca bu örneği sil"
     },
     "completeDialog": {
       "title": "Alt görevler de tamamlansın mı?",
@@ -418,6 +431,98 @@
       "onlyParent": "Yalnızca ana görevi tamamla",
       "cancel": "Vazgeç",
       "footnote": "Alt görevlerin tamamlanması ana görevi kendiliğinden tamamlamaz."
+    },
+    "recurrence": {
+      "title": "Tekrar",
+      "none": "Tekrar yok",
+      "custom": "Özel tekrar",
+      "needsDue": "Tekrar için önce son tarih ver",
+      "frequency": "Sıklık",
+      "interval": "Her",
+      "weekdays": "Haftanın günleri",
+      "monthly": "Ayda",
+      "monthDay": "ayın {day}. günü",
+      "mode": "Sonraki örnek",
+      "modes": {
+        "fixed_schedule": "Planlanan tarihe göre",
+        "after_completion": "Tamamlandıktan sonra"
+      },
+      "end": "Bitiş",
+      "ends": {
+        "never": "Hiçbir zaman",
+        "until": "Tarihte",
+        "count": "Tekrar sayısından sonra"
+      },
+      "apply": "Uygula",
+      "every": {
+        "DAILY": "Her gün",
+        "WEEKLY": "Her hafta",
+        "MONTHLY": "Her ay",
+        "YEARLY": "Her yıl"
+      },
+      "everyN": {
+        "DAILY": "Her {n} günde bir",
+        "WEEKLY": "Her {n} haftada bir",
+        "MONTHLY": "Her {n} ayda bir",
+        "YEARLY": "Her {n} yılda bir"
+      },
+      "nth": {
+        "1": "ilk",
+        "2": "ikinci",
+        "3": "üçüncü",
+        "4": "dördüncü",
+        "-1": "son"
+      },
+      "days": {
+        "MO": "Pzt",
+        "TU": "Sal",
+        "WE": "Çar",
+        "TH": "Per",
+        "FR": "Cum",
+        "SA": "Cmt",
+        "SU": "Paz"
+      },
+      "daysLong": {
+        "MO": "Pazartesi",
+        "TU": "Salı",
+        "WE": "Çarşamba",
+        "TH": "Perşembe",
+        "FR": "Cuma",
+        "SA": "Cumartesi",
+        "SU": "Pazar"
+      },
+      "scopeTitle": "Tekrarlayan görev",
+      "scopeDescription": "Tarih değişikliği hangi örnekleri etkilesin?",
+      "scopeThis": "Yalnızca bu örnek",
+      "scopeFollowing": "Bu ve sonraki örnekler",
+      "cancel": "Vazgeç",
+      "keptNext": "Sonraki örnek değiştirildiği için silinmedi; iki örnek de duruyor."
+    },
+    "reminders": {
+      "title": "Hatırlatıcılar",
+      "add": "Hatırlatıcı ekle",
+      "empty": "Hatırlatıcı yok.",
+      "relativeNeedsDue": "Son tarihe göre hatırlatma için önce son tarih ver.",
+      "absolute": "Belirli bir zaman ({zone})",
+      "date": "Hatırlatma tarihi",
+      "time": "Hatırlatma saati",
+      "addAbsolute": "Bu zamanda hatırlat",
+      "offset": {
+        "0": "Zamanında",
+        "10": "10 dakika önce",
+        "30": "30 dakika önce",
+        "60": "1 saat önce",
+        "1440": "1 gün önce",
+        "other": "{minutes} dakika önce"
+      },
+      "status": {
+        "sent": "gönderildi",
+        "canceled": "iptal",
+        "skipped": "atlandı",
+        "pending": "bekliyor"
+      },
+      "remove": "{when} hatırlatıcısını kaldır",
+      "failed": "Hatırlatıcı kaydedilemedi. Tekrar dene."
     }
   },
   "firstSteps": {
@@ -457,7 +562,9 @@
       "l": "Etiket ekle",
       "del": "Çöpe taşı",
       "undo": "Son eylemi geri al (bildirim açıkken)",
-      "help": "Bu rehberi aç"
+      "help": "Bu rehberi aç",
+      "gc": "Takvim’e git",
+      "gp": "Projeler’e git"
     }
   },
   "projects": {
@@ -556,7 +663,8 @@
     "when": {
       "today": "Bugün, {time}",
       "yesterday": "Dün, {time}"
-    }
+    },
+    "calendar": "Takvim"
   },
   "views": {
     "filter": "Filtrele",
@@ -716,5 +824,45 @@
     "saved": "Kaydedildi",
     "duplicate": "Bu adla bir etiket zaten var.",
     "failed": "Kaydedilemedi. Tekrar dene."
+  },
+  "notifications": {
+    "title": "Bildirimler",
+    "description": "Hatırlatıcı bildirimleri. 90 gün sonra silinir.",
+    "bell": "Bildirimler",
+    "bellUnread": "Bildirimler, {count} okunmamış",
+    "readAll": "Tümünü okundu say",
+    "empty": "Bildirim yok.",
+    "emptyHint": "Görevlerine hatırlatıcı eklediğinde zamanı gelince burada görünür.",
+    "loading": "Yükleniyor…",
+    "seeAll": "Tümünü gör",
+    "late": "gecikmeli",
+    "unread": "okunmadı",
+    "markRead": "Okundu yap",
+    "markUnread": "Okunmadı yap",
+    "more": "Daha fazla"
+  },
+  "calendar": {
+    "title": "Takvim",
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "today": "Bugün",
+    "views": "Takvim görünümü",
+    "month": "Ay",
+    "week": "Hafta",
+    "day": "Gün",
+    "allDay": "Tüm gün",
+    "dayPlan": "Günün planı",
+    "none": "Bu gün için tüm gün görev yok.",
+    "undated": "Tarihsiz",
+    "undatedHint": "Bu görevler henüz takvimde değil. Tarih vererek ya da sürükleyerek ekleyebilirsin.",
+    "count": "{count, plural, =0 {görev yok} other {# görev}}",
+    "more": "+{count} daha",
+    "addOnDay": "Bu güne görev ekle",
+    "moveFailed": "Görevin tarihi değiştirilemedi. Tekrar dene.",
+    "project": "Proje",
+    "allProjects": "Tüm projeler",
+    "tags": "Etiketler",
+    "allTags": "Etiketler",
+    "hours": "Saatler"
   }
 }

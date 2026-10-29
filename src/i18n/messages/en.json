@@ -28,7 +28,10 @@
     "BR-PROJ-006": "Inbox can’t be renamed, archived or deleted.",
     "BR-DEL-004": "The task’s project is in the trash. Restore the project too, or restore the task to Inbox.",
     "BR-VIEW-001": "You can create up to 50 saved views.",
-    "BR-TAG-001": "A tag with this name already exists."
+    "BR-TAG-001": "A tag with this name already exists.",
+    "BR-REC-001": "A repeating task needs a due date; subtasks can’t repeat.",
+    "BR-REM-001": "A relative reminder needs a due date.",
+    "BR-REM-002": "A reminder must be at least 1 minute ahead; a task can have up to 5 and only one at the same time."
   },
   "ui": {
     "offline": "No connection. Your changes may not be saved.",
@@ -125,7 +128,9 @@
     "newView": "New view",
     "archive": "Archive",
     "trash": "Trash",
-    "projectProgress": "{name} · {percent}%"
+    "projectProgress": "{name} · {percent}%",
+    "calendar": "Calendar",
+    "notifications": "Notifications"
   },
   "dashboard": {
     "greeting": {
@@ -260,7 +265,14 @@
     "onboardingTitle": "Getting started guide",
     "onboardingDescription": "Restart the guide to choose your purpose and starting layout again.",
     "onboardingRestart": "Restart guide",
-    "tags": "Tags"
+    "tags": "Tags",
+    "notifications": "Notifications",
+    "allDayReminderTime": "All-day reminder time",
+    "notificationSettings": {
+      "title": "In-app notifications",
+      "reminders": "Reminder notifications",
+      "hint": "Notifications are created only while the app is open. If you turn them off, due reminders won’t create notifications."
+    }
   },
   "onboarding": {
     "title": "Welcome to Aysly",
@@ -409,7 +421,8 @@
       "deletedBand": "This task is in the trash. {days, plural, =0 {About to be deleted; it can’t be restored.} one {You can restore it within # day.} other {You can restore it within # days.}}",
       "restore": "Restore",
       "restoreFailed": "Couldn’t restore.",
-      "deleteConfirm": "The task and its subtasks will move to the trash. You can restore them within 30 days."
+      "deleteConfirm": "The task and its subtasks will move to the trash. You can restore them within 30 days.",
+      "deleteOccurrence": "Delete only this occurrence"
     },
     "completeDialog": {
       "title": "Complete the subtasks too?",
@@ -418,6 +431,98 @@
       "onlyParent": "Complete only the main task",
       "cancel": "Cancel",
       "footnote": "Completing all subtasks doesn’t complete the main task automatically."
+    },
+    "recurrence": {
+      "title": "Repeat",
+      "none": "Doesn’t repeat",
+      "custom": "Custom repeat",
+      "needsDue": "Set a due date to repeat",
+      "frequency": "Frequency",
+      "interval": "Every",
+      "weekdays": "Weekdays",
+      "monthly": "Monthly on",
+      "monthDay": "day {day}",
+      "mode": "Next occurrence",
+      "modes": {
+        "fixed_schedule": "From the planned date",
+        "after_completion": "After completion"
+      },
+      "end": "Ends",
+      "ends": {
+        "never": "Never",
+        "until": "On date",
+        "count": "After a number of times"
+      },
+      "apply": "Apply",
+      "every": {
+        "DAILY": "Every day",
+        "WEEKLY": "Every week",
+        "MONTHLY": "Every month",
+        "YEARLY": "Every year"
+      },
+      "everyN": {
+        "DAILY": "Every {n} days",
+        "WEEKLY": "Every {n} weeks",
+        "MONTHLY": "Every {n} months",
+        "YEARLY": "Every {n} years"
+      },
+      "nth": {
+        "1": "first",
+        "2": "second",
+        "3": "third",
+        "4": "fourth",
+        "-1": "last"
+      },
+      "days": {
+        "MO": "Mon",
+        "TU": "Tue",
+        "WE": "Wed",
+        "TH": "Thu",
+        "FR": "Fri",
+        "SA": "Sat",
+        "SU": "Sun"
+      },
+      "daysLong": {
+        "MO": "Monday",
+        "TU": "Tuesday",
+        "WE": "Wednesday",
+        "TH": "Thursday",
+        "FR": "Friday",
+        "SA": "Saturday",
+        "SU": "Sunday"
+      },
+      "scopeTitle": "Repeating task",
+      "scopeDescription": "Which occurrences should the date change affect?",
+      "scopeThis": "Only this occurrence",
+      "scopeFollowing": "This and following",
+      "cancel": "Cancel",
+      "keptNext": "The next occurrence was changed, so it was kept; both occurrences remain."
+    },
+    "reminders": {
+      "title": "Reminders",
+      "add": "Add reminder",
+      "empty": "No reminders.",
+      "relativeNeedsDue": "Set a due date to remind relative to it.",
+      "absolute": "At a specific time ({zone})",
+      "date": "Reminder date",
+      "time": "Reminder time",
+      "addAbsolute": "Remind at this time",
+      "offset": {
+        "0": "On time",
+        "10": "10 minutes before",
+        "30": "30 minutes before",
+        "60": "1 hour before",
+        "1440": "1 day before",
+        "other": "{minutes} minutes before"
+      },
+      "status": {
+        "sent": "sent",
+        "canceled": "canceled",
+        "skipped": "skipped",
+        "pending": "pending"
+      },
+      "remove": "Remove reminder {when}",
+      "failed": "The reminder couldn’t be saved. Try again."
     }
   },
   "firstSteps": {
@@ -457,7 +562,9 @@
       "l": "Add tag",
       "del": "Move to trash",
       "undo": "Undo last action (while the notice is shown)",
-      "help": "Open this guide"
+      "help": "Open this guide",
+      "gc": "Go to Calendar",
+      "gp": "Go to Projects"
     }
   },
   "projects": {
@@ -556,7 +663,8 @@
     "when": {
       "today": "Today, {time}",
       "yesterday": "Yesterday, {time}"
-    }
+    },
+    "calendar": "Calendar"
   },
   "views": {
     "filter": "Filter",
@@ -716,5 +824,45 @@
     "saved": "Saved",
     "duplicate": "A tag with this name already exists.",
     "failed": "Couldn’t save. Try again."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "description": "Reminder notifications. Deleted after 90 days.",
+    "bell": "Notifications",
+    "bellUnread": "Notifications, {count} unread",
+    "readAll": "Mark all as read",
+    "empty": "No notifications.",
+    "emptyHint": "When you add reminders to tasks, they appear here when due.",
+    "loading": "Loading…",
+    "seeAll": "See all",
+    "late": "delayed",
+    "unread": "unread",
+    "markRead": "Mark as read",
+    "markUnread": "Mark as unread",
+    "more": "More"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "previous": "Previous",
+    "next": "Next",
+    "today": "Today",
+    "views": "Calendar view",
+    "month": "Month",
+    "week": "Week",
+    "day": "Day",
+    "allDay": "All day",
+    "dayPlan": "Day plan",
+    "none": "No all-day tasks for this day.",
+    "undated": "No date",
+    "undatedHint": "These tasks aren’t on the calendar yet. Give them a date or drag them in.",
+    "count": "{count, plural, =0 {no tasks} one {# task} other {# tasks}}",
+    "more": "+{count} more",
+    "addOnDay": "Add a task on this day",
+    "moveFailed": "The task’s date couldn’t be changed. Try again.",
+    "project": "Project",
+    "allProjects": "All projects",
+    "tags": "Tags",
+    "allTags": "Tags",
+    "hours": "Hours"
   }
 }

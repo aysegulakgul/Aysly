@@ -1,6 +1,5 @@
 import { generateKeyBetween } from 'fractional-indexing';
 import { authorize, type WorkspaceScope } from '@/modules/workspaces';
-import type { Clock } from '@/shared/kernel/clock';
 import {
   businessRule,
   notFound,
@@ -21,15 +20,17 @@ import {
   type TaskStatus,
 } from '../domain/task';
 import { TAGS_PER_RECORD, TAGS_PER_WORKSPACE, prepareTagNames } from '@/modules/tags';
-import type { ProjectDirectory, TagPort, TaskChanges, TaskRepository } from './ports';
+import { checkWritable } from './guards';
+import {
+  generateNextOccurrence,
+  prepareRecurrence,
+  undoGeneratedOccurrence,
+  type RecurrenceInput,
+} from './recurring';
+import { addReminder, recomputeRelative, type ReminderInput } from './reminders';
+import type { TaskChanges, TaskDeps } from './ports';
 
-export type TaskDeps = {
-  tasks: TaskRepository;
-  projects: ProjectDirectory;
-  tags: TagPort;
-  clock: Clock;
-  newId: () => string;
-};
+export type { TaskDeps } from './ports';
 
 export type CreateTaskCommand = {
   title: string;
@@ -40,6 +41,10 @@ export type CreateTaskCommand = {
   due?: DueInput | null | undefined;
   parentTaskId?: string | null | undefined;
   tagNames?: readonly string[] | undefined;
+  /** BR-REC-001/003 */
+  recurrence?: RecurrenceInput | null | undefined;
+  /** BR-REM-001/002: oluşturmayla birlikte en fazla 5 hatırlatıcı. */
+  reminders?: readonly ReminderInput[] | undefined;
 };
 
 export const SUBTASKS_PER_TASK = 100; // BR-SUB-005
@@ -62,24 +67,6 @@ async function checkTags(
     return err(businessRule('BR-TAG-003'));
   }
   return ok(names);
-}
-
-/** BR-DEL-002: arşivlenmiş görev salt okunurdur; önce arşivden çıkarılmalıdır. */
-const readOnly = (task: Task) => task.archivedAt !== null;
-
-/**
- * Görev değiştirilebilir mi: BR-DEL-002 görevin kendisi arşivliyse, BR-PROJ-004 projesi arşivliyse salt okunur.
- * `allowArchivedTask`: arşivden çıkarma gibi arşivli görev üzerinde çalışan işlemler için.
- */
-export async function checkWritable(
-  deps: TaskDeps,
-  scope: WorkspaceScope,
-  task: Task,
-  options: { allowArchivedTask?: boolean } = {},
-): Promise<DomainError | null> {
-  if (!options.allowArchivedTask && readOnly(task)) return businessRule('BR-DEL-002');
-  const project = await deps.projects.find(scope, task.projectId);
-  return project?.archived ? businessRule('BR-PROJ-004') : null;
 }
 
 /**
@@ -131,9 +118,22 @@ export async function createTask(
     projectId = project.id;
   }
 
+  let recurrence = null;
+  if (command.recurrence) {
+    const prepared = prepareRecurrence(command.recurrence, {
+      due,
+      parentTaskId,
+      current: null,
+      newId: deps.newId,
+    });
+    if (!prepared.ok) return prepared;
+    recurrence = prepared.value;
+  }
+
   const now = deps.clock.now();
   const last = await deps.tasks.lastPosition(scope, projectId, parentTaskId);
   const task = await deps.tasks.insert(scope, {
+    recurrence,
     id: deps.newId(),
     projectId,
     parentTaskId,
@@ -147,6 +147,10 @@ export async function createTask(
     now,
   });
   if (tagNames.value?.length) await deps.tags.replace(scope, task.id, tagNames.value, now);
+  for (const reminder of command.reminders ?? []) {
+    const added = await addReminder(deps, scope, task.id, reminder);
+    if (!added.ok) return added;
+  }
   return ok(task);
 }
 
@@ -159,6 +163,10 @@ export type UpdateTaskCommand = {
   startDate?: string | null | undefined;
   due?: DueInput | null | undefined;
   tagNames?: readonly string[] | undefined;
+  /** BR-REC-006: `null` seriyi durdurur (görev normal görev olarak kalır). */
+  recurrence?: RecurrenceInput | null | undefined;
+  /** BR-REC-006: tekrarlayan görevin tarihi değişirken "yalnızca bu örnek" / "bu ve sonraki örnekler". */
+  recurrenceScope?: 'this' | 'following' | undefined;
 };
 
 /**
@@ -207,6 +215,26 @@ export async function updateTask(
   if (command.startDate !== undefined || command.due !== undefined) {
     issues.push(...checkStartBeforeDue(startDate, due));
   }
+  // BR-REC-001/006: tekrar kuralı ve tekrarlayan görevin tarihi.
+  if (command.recurrence !== undefined) {
+    if (command.recurrence === null) changes.recurrence = null;
+    else {
+      const prepared = prepareRecurrence(command.recurrence, {
+        due,
+        parentTaskId: current.parentTaskId,
+        current: current.recurrence,
+        newId: deps.newId,
+      });
+      if (!prepared.ok) return prepared;
+      changes.recurrence = prepared.value;
+    }
+  } else if (current.recurrence && command.due !== undefined) {
+    if (due === null) return err(businessRule('BR-REC-001'));
+    if (!command.recurrenceScope) issues.push({ field: 'recurrenceScope', reason: 'required' });
+    else if (command.recurrenceScope === 'following' && changes.due) {
+      changes.recurrence = { ...current.recurrence, anchor: changes.due.date };
+    }
+  }
   if (issues.length > 0) return err(validationError(issues));
   const tagNames = await checkTags(deps, scope, command.tagNames);
   if (!tagNames.ok) return tagNames;
@@ -215,6 +243,8 @@ export async function updateTask(
   if (saved.ok && tagNames.value !== undefined) {
     await deps.tags.replace(scope, current.id, tagNames.value, deps.clock.now());
   }
+  // BR-REM-004: son tarih değişince göreli hatırlatıcılar aynı işlemde yeniden hesaplanır.
+  if (saved.ok && command.due !== undefined) await recomputeRelative(deps, scope, saved.value);
   return saved;
 }
 
@@ -231,13 +261,19 @@ async function save(
   return latest ? err({ kind: 'version_conflict', current: latest }) : err(notFound());
 }
 
-/** BR-TASK-004: tamamlama. Zaten tamamlanmışsa değişiklik yapılmaz (aynı kayıt döner). */
+/** Tamamlama sonucu: tekrarlayan görevde üretilen sonraki örnek (BR-REC-002). */
+export type CompletedTask = Task & { nextOccurrence?: Task | null };
+
+/**
+ * BR-TASK-004: tamamlama. Zaten tamamlanmışsa değişiklik yapılmaz (aynı kayıt döner). BR-REM-003: bekleyen
+ * hatırlatıcılar iptal olur. BR-REC-002: tekrarlayan görevde sonraki örnek aynı işlemde oluşturulur.
+ */
 export async function completeTask(
   deps: TaskDeps,
   scope: WorkspaceScope,
   id: string,
   command: { version: number; completeSubtasks?: boolean | undefined },
-): Promise<Result<Task, DomainError>> {
+): Promise<Result<CompletedTask, DomainError>> {
   const allowed = authorize(scope, 'task.complete');
   if (!allowed.ok) return allowed;
   const current = await deps.tasks.findById(scope, id);
@@ -250,19 +286,25 @@ export async function completeTask(
   const saved = await save(deps, scope, current, command.version, changes);
   // BR-SUB-003: varsayılan yalnızca ana görev; istenirse açık alt görevler aynı işlemde tamamlanır.
   // Tüm alt görevlerin tamamlanması ebeveyni otomatik tamamlamaz (ters yön yok).
-  if (saved.ok && command.completeSubtasks) {
+  if (!saved.ok) return saved;
+  if (command.completeSubtasks) {
     await deps.tasks.completeOpenSubtasks(scope, current.id, now, scope.userId);
   }
-  return saved;
+  await deps.reminders.cancel(scope, [current.id], now);
+  const nextOccurrence = await generateNextOccurrence(deps, scope, saved.value);
+  return ok({ ...saved.value, nextOccurrence });
 }
 
-/** BR-TASK-004: yeniden açma; tamamlama bilgisi temizlenir. Açık görevde değişiklik yapılmaz. */
+/**
+ * BR-TASK-004: yeniden açma; tamamlama bilgisi temizlenir. Açık görevde değişiklik yapılmaz. BR-REM-003: zamanı
+ * gelmemiş hatırlatıcılar yeniden bekler. BR-REC-007: üretilen sonraki örnek değiştirilmemişse silinir.
+ */
 export async function reopenTask(
   deps: TaskDeps,
   scope: WorkspaceScope,
   id: string,
   command: { version: number },
-): Promise<Result<Task, DomainError>> {
+): Promise<Result<Task & { keptNextOccurrence?: boolean }, DomainError>> {
   const allowed = authorize(scope, 'task.complete');
   if (!allowed.ok) return allowed;
   const current = await deps.tasks.findById(scope, id);
@@ -271,7 +313,11 @@ export async function reopenTask(
   if (blocked) return err(blocked);
   const changes = reopening(current);
   if (!changes) return ok(current);
-  return save(deps, scope, current, command.version, changes);
+  const saved = await save(deps, scope, current, command.version, changes);
+  if (!saved.ok) return saved;
+  await deps.reminders.reactivate(scope, [current.id], deps.clock.now());
+  const undo = await undoGeneratedOccurrence(deps, scope, saved.value);
+  return ok({ ...saved.value, keptNextOccurrence: undo.keptNext });
 }
 
 export async function getTask(

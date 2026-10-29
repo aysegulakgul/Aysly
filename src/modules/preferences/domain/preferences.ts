@@ -25,8 +25,14 @@ export type Preferences = {
   weekStart: WeekStart;
   /** BR-DASH-001: widget sırası ve görünürlüğü. */
   dashboardLayout: DashboardLayout;
+  /** BR-REM-001: tüm gün görevlerde göreli hatırlatıcının referans saati (HH:MM, kullanıcı saat diliminde). */
+  allDayReminderTime: string;
+  /** BR-NOTIF-004: tür bazında uygulama içi bildirim tercihi (D-037). */
+  notificationSettings: NotificationSettings;
   version: number;
 };
+
+export type NotificationSettings = { v: 1; reminder: { inApp: boolean } };
 
 /** Kısmi güncelleme; verilmeyen (undefined) alan değişmez. */
 export type PreferenceChanges = {
@@ -38,6 +44,12 @@ export function validatePreferenceChanges(changes: PreferenceChanges): FieldIssu
   const issues: FieldIssue[] = [];
   if (changes.timezone !== undefined && !isValidTimezone(changes.timezone)) {
     issues.push({ field: 'timezone', reason: 'invalid' });
+  }
+  if (
+    changes.allDayReminderTime !== undefined &&
+    !/^([01]\d|2[0-3]):[0-5]\d$/.test(changes.allDayReminderTime)
+  ) {
+    issues.push({ field: 'allDayReminderTime', reason: 'invalid' });
   }
   return issues;
 }

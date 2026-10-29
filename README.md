@@ -18,7 +18,7 @@ Ayrıntılı durum: [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 
 ## Özellikler
 
-Şu an çalışanlar (Faz 1–5):
+Şu an çalışanlar (Faz 1–6):
 - **Hesap:** E-posta doğrulamalı kayıt, giriş, şifre sıfırlama, oturum ve cihaz yönetimi, profil.
 - **İlk kullanım:** Kullanım amacı ve tercihlere göre kurulum rehberi; "İlk adımlar" listesi.
 - **Tercihler:** Dil, saat dilimi, hafta başlangıcı, saat biçimi, tema.
@@ -28,9 +28,12 @@ Ayrıntılı durum: [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 - **Liste ve pano:** Proje sayfasında Liste (gruplama) ve Pano (masaüstünde sürükle-bırak, her cihazda kart menüsü); ortak filtreler, sıralama, kayıtlı görünümler; çoklu seçim ve toplu işlemler.
 - **Arşiv ve çöp kutusu:** Arşiv ve Çöp kutusu sayfaları, geri yükleme, kalıcı silme, 30 gün sonra otomatik kalıcı silme.
 - **Etiketler:** Ayarlar · Etiketler'de yeniden adlandırma, renk ve silme.
+- **Takvim:** Ay, hafta ve gün görünümleri; tarihsiz görevler paneli; masaüstünde sürükleyerek tarih değiştirme.
+- **Tekrarlayan görevler:** Günlük, haftalık, aylık ve yıllık kurallar; planlanan tarihe göre ya da tamamlandıktan sonra.
+- **Hatırlatıcılar ve bildirimler:** Son tarihe göre ya da belirli bir anda hatırlatıcı; uygulama açıkken bildirim merkezi.
 - **Klavye kısayolları:** `Q`, `G D/I/M/U`, `J/K`, `T/M/L`, `Ctrl/⌘+Z`, `?` rehberi.
 
-Plan gereği sonraki fazlarda: hatırlatıcılar, tekrarlayan görevler, takvim (Faz 6); notlar, hedefler, arama (Faz 7).
+Plan gereği sonraki fazlarda: notlar, hedefler, arama (Faz 7).
 
 **Mimari özet:** Modüler monolit (`src/modules/<modül>/{domain,application,infrastructure,http}`), yetkilendirme her istekte sunucuda, Zod ile doğrulama, REST API (`/api/v1`), `pnpm verify` ile 13 adımlı yerel kalite kontrolü (birim, entegrasyon ve Playwright testleri dahil).
 

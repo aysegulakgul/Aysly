@@ -3,6 +3,7 @@ import type { WorkspaceScope } from '@/modules/workspaces';
 import type { DbExecutor } from '@/shared/db/client';
 import { isUuid } from '@/shared/kernel/id';
 import type { TaskChanges, TaskRepository } from '../application/ports';
+import type { Recurrence, RecurrenceMode } from '../domain/recurrence';
 import type { Priority, Task, TaskStatus } from '../domain/task';
 import { tasks } from './schema';
 
@@ -31,6 +32,17 @@ function toTask(row: Row): Task {
     completedAt: row.completedAt,
     completedBy: row.completedBy,
     position: row.position,
+    recurrence:
+      row.recurrenceRule && row.recurrenceSeriesId && row.recurrenceAnchor
+        ? {
+            rule: row.recurrenceRule,
+            mode: row.recurrenceMode as RecurrenceMode,
+            seriesId: row.recurrenceSeriesId,
+            anchor: row.recurrenceAnchor,
+            index: row.recurrenceIndex ?? 1,
+            generatedFrom: row.recurrenceGeneratedFrom,
+          }
+        : null,
     createdBy: row.createdBy,
     archivedAt: row.archivedAt,
     deletedAt: row.deletedAt,
@@ -41,16 +53,30 @@ function toTask(row: Row): Task {
   };
 }
 
+/** Tekrar bilgisini kolonlara çevirir; kural kaldırılınca seri bilgisi de temizlenir (BR-REC-006). */
+const recurrenceColumns = (recurrence: Recurrence | null) => ({
+  recurrenceRule: recurrence?.rule ?? null,
+  recurrenceMode: recurrence?.mode ?? null,
+  recurrenceSeriesId: recurrence?.seriesId ?? null,
+  recurrenceAnchor: recurrence?.anchor ?? null,
+  recurrenceIndex: recurrence?.index ?? null,
+  recurrenceGeneratedFrom: recurrence?.generatedFrom ?? null,
+});
+
 /** Domain değişikliklerini kolonlara çevirir; `due` dört kolonu birlikte yazar (BR-DATE-001). */
 function toColumns(changes: TaskChanges) {
-  const { due, ...rest } = changes;
-  if (due === undefined) return rest;
+  const { due, recurrence, ...rest } = changes;
   return {
     ...rest,
-    dueDate: due?.date ?? null,
-    dueTime: due?.time ?? null,
-    timezone: due?.timezone ?? null,
-    dueAt: due?.at ?? null,
+    ...(recurrence === undefined ? {} : recurrenceColumns(recurrence)),
+    ...(due === undefined
+      ? {}
+      : {
+          dueDate: due?.date ?? null,
+          dueTime: due?.time ?? null,
+          timezone: due?.timezone ?? null,
+          dueAt: due?.at ?? null,
+        }),
   };
 }
 
@@ -73,6 +99,7 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
           priority: t.priority,
           startDate: t.startDate,
           ...toColumns({ due: t.due }),
+          ...recurrenceColumns(t.recurrence ?? null),
           position: t.position,
           createdBy: t.createdBy,
           createdAt: t.now,
@@ -428,6 +455,19 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
         .where(and(eq(tasks.workspaceId, scope.workspaceId), isNotNull(tasks.deletedAt)))
         .orderBy(desc(tasks.deletedAt));
       return rows.map(toTask);
+    },
+
+    async findGeneratedFrom(scope, id) {
+      const [row] = await db
+        .select()
+        .from(tasks)
+        .where(and(inScope(scope), eq(tasks.recurrenceGeneratedFrom, id)))
+        .limit(1);
+      return row ? toTask(row) : null;
+    },
+
+    async hardDelete(scope, id) {
+      await db.delete(tasks).where(and(eq(tasks.workspaceId, scope.workspaceId), eq(tasks.id, id)));
     },
 
     async purge(scope, batchId) {

@@ -34,6 +34,9 @@ export default async function MenuPage() {
         <NavItem href="/upcoming" glyph="▦">
           {t('upcoming')}
         </NavItem>
+        <NavItem href="/notifications" glyph="◔">
+          {t('notifications')}
+        </NavItem>
         <NavItem href="/projects" glyph="▭">
           {t('projects')}
         </NavItem>

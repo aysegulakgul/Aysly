@@ -152,6 +152,8 @@ Kod iş alanlarına (bounded context benzeri) göre **modüllere**, her modül *
 | `audit` | Güvenlik ve yıkıcı işlem olayları | `audit_events` |
 | `data-portability` | JSON dışa aktarma (Faz 8, D-046) | — (diğer modüllerin okuma servislerini kullanır) |
 
+**Uygulama notu (Faz 6, D-088):** `reminders` ve `notifications` modülleri kuruldu. Hatırlatıcı kuralları ve dağıtım `tasks` modülünde orkestre edilir; dağıtım bildirim uç noktalarının rotasında, okumadan önce çalışır (D-053). Bakım işi: `notifications.purge` (günlük).
+
 **Uygulama notu (Faz 5, D-086):** `views` modülü kuruldu (`TaskFilter` v1, `saved_views`). Proje ile görevlerini birlikte ilgilendiren işlemler (ilerleme, proje silme/geri yükleme, arşiv sayfası, çöp listesi) şimdilik `tasks` modülünde orkestre edilir; `lifecycle` modülü notlar ve hedefler geldiğinde (Faz 7) değerlendirilir.
 
 ### 4.2. Modüller arası iletişim kuralları
@@ -167,7 +169,7 @@ flowchart TD
   dashboard --> tasks & projects & goals & notifications
   search --> tasks & projects & notes & goals
   lifecycle --> tasks & projects & notes & goals & reminders
-  tasks --> projects & tags & reminders & views
+  tasks --> projects & tags & reminders & views & notifications & preferences
   notes --> tags
   goals --> tasks & projects
   reminders --> notifications
