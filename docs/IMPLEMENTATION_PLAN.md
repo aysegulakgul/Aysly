@@ -11,8 +11,8 @@
 | 2 | Proje altyapısı ve temel mimari | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
 | 3 | Kimlik doğrulama, hesap, tercihler, onboarding | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
 | 4 | Görev yönetimi, Inbox, My Tasks, dashboard | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
-| 5 | Projeler ve görev görünümleri | Kapı kontrolünde | — | 2026-10-29 | — |
-| 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | Başlamadı | — | — | — |
+| 5 | Projeler ve görev görünümleri | **Kapandı** | — | 2026-10-29 | 2026-10-29 |
+| 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | Devam ediyor | — | 2026-10-29 | — |
 | 7 | Notlar, hedefler, arama | Başlamadı | Not editörü paketi seçimi (Faz 7 başında sunulur) | — | — |
 | 8 | Test, güvenlik, kalite; dışa aktarma, hesap silme | Başlamadı | — | — | — |
 | 9 | Kullanım geri bildirimine göre iyileştirmeler | Başlamadı | — | — | — |
@@ -123,7 +123,7 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
   - Arşiv ve Çöp kutusu sayfaları; çöpte proje grupları ve BR-DEL-004 seçimi. Ayarlar · Etiketler (D-085).
   - Kenar çubuğunda Projeler, PROJELER ve KAYITLI GÖRÜNÜMLER bölümleri, Arşiv ve Çöp kutusu; mobil Menü'de aynı girişler.
   - Takvim görünümü (FR-VIEW-03) plan gereği Faz 6'da; proje sayfasındaki "Takvim" sekmesi ve "Bağlı kayıtlar" paneli o fazlara kadar gösterilmez (D-071 ilkesi).
-  - Doğrulama (2026-10-29): `pnpm verify` 13/13 yeşil — birim 155, entegrasyon 55, tarayıcı 252 (Faz 5 kabulü: AC-06, çoklu seçimli AC-02, toplu işlem atomikliği, görünüm geçişinde filtre korunumu, proje ilerlemesi, kayıtlı görünüm, yeni sayfaların erişilebilirlik taraması). Kapanış için ürün sahibinin onayı ve Figma'da olmayan ekranların görsel incelemesi bekleniyor.
+  - Doğrulama (2026-10-29): `pnpm verify` 13/13 yeşil — birim 155, entegrasyon 55, tarayıcı 252 (Faz 5 kabulü: AC-06, çoklu seçimli AC-02, toplu işlem atomikliği, görünüm geçişinde filtre korunumu, proje ilerlemesi, kayıtlı görünüm, yeni sayfaların erişilebilirlik taraması). Ürün sahibi kapanışı onayladı (2026-10-29); Figma'da olmayan ekranlar ve proje renk tonları kabul edildi.
   - Kısmi: FR-VIEW-08 (P1) — varsayılan görünüm şimdilik Liste; proje bazında son kullanılan görünümün hatırlanması ve ayar ekranı yapılmadı (D-086).
 
 ### Faz 6 — Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler
