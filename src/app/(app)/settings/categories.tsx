@@ -16,6 +16,8 @@ const CATEGORIES = [
   { href: '/settings/appearance', glyph: '☾', key: 'appearance' },
   { href: '/settings/date-time', glyph: '◷', key: 'dateTime' },
   { href: '/settings/security', glyph: '▣', key: 'security' },
+  // D-085: etiket yönetimi (Figma'da yok, D-065).
+  { href: '/settings/tags', glyph: '#', key: 'tags' },
 ] as const satisfies readonly { href: Route; glyph: string; key: string }[];
 
 export function SettingsCategories() {

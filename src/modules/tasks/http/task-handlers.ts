@@ -1,7 +1,28 @@
 import { z } from 'zod';
 import { findUserPreferences } from '@/modules/preferences';
-import { findInboxRef, findProjectRef, listActiveProjects } from '@/modules/projects';
-import { countTags, findTagsForTasks, missingTagNames, replaceTaskTags } from '@/modules/tags';
+import {
+  PROJECT_STATUSES,
+  createDrizzleProjectRepository,
+  findAnyProject,
+  findInboxRef,
+  findProjectRef,
+  listActiveProjects,
+  listTrashedProjects,
+  purgeProjects,
+  restoreProjects,
+  toProjectJson,
+  trashProject,
+  type Project,
+} from '@/modules/projects';
+import {
+  countTags,
+  existingTagIds,
+  findTagsForTasks,
+  missingTagNames,
+  replaceTaskTags,
+  taskIdsWithTags,
+} from '@/modules/tags';
+import { VIEW_TYPES, parseTaskFilter } from '@/modules/views';
 import { resolveWorkspaceScope, type WorkspaceScope } from '@/modules/workspaces';
 import { db, type DbExecutor } from '@/shared/db/client';
 import type { ApiContext } from '@/shared/http/api-route';
@@ -10,10 +31,19 @@ import { systemClock } from '@/shared/kernel/clock';
 import type { DomainError } from '@/shared/kernel/errors';
 import { uuidv7 } from '@/shared/kernel/id';
 import type { Result } from '@/shared/kernel/result';
+import { BULK_LIMIT, bulkTasks } from '../application/bulk';
+import {
+  archiveContents,
+  completeProject,
+  deleteProject,
+  projectDeletePreview,
+  projectDetail,
+  projectOverview,
+} from '../application/projects';
+import { queryTasks } from '../application/query';
 import {
   detachTask,
   getTaskDetail,
-  listSummaries,
   moveTask,
   myTasks,
   type TaskSummary,
@@ -21,7 +51,6 @@ import {
 import {
   completeTask,
   createTask,
-  listTasks,
   reopenTask,
   updateTask,
   type TaskDeps,
@@ -80,8 +109,48 @@ const CompleteBody = z.strictObject({
 });
 const MoveBody = z.strictObject({
   version: z.number().int().positive(),
-  projectId: z.string().max(100),
+  projectId: z.string().max(100).optional(),
+  beforeId: z.string().max(100).optional(),
+  afterId: z.string().max(100).optional(),
 });
+const TaskIds = z.array(z.string().max(100)).min(1).max(BULK_LIMIT);
+/** API_CONTRACTS §6.6, D-084. */
+const BulkBody = z.discriminatedUnion('action', [
+  z.strictObject({ action: z.literal('complete'), taskIds: TaskIds }),
+  z.strictObject({ action: z.literal('reopen'), taskIds: TaskIds }),
+  z.strictObject({ action: z.literal('archive'), taskIds: TaskIds }),
+  z.strictObject({ action: z.literal('delete'), taskIds: TaskIds }),
+  z.strictObject({
+    action: z.literal('move'),
+    taskIds: TaskIds,
+    params: z.strictObject({ projectId: z.string().max(100) }),
+  }),
+  z.strictObject({
+    action: z.literal('setStatus'),
+    taskIds: TaskIds,
+    params: z.strictObject({ status: z.enum(['todo', 'in_progress']) }),
+  }),
+  z.strictObject({
+    action: z.literal('setDue'),
+    taskIds: TaskIds,
+    params: z.strictObject({ due: Due.nullable() }),
+  }),
+  z.strictObject({
+    action: z.literal('setPriority'),
+    taskIds: TaskIds,
+    params: z.strictObject({ priority: Priority }),
+  }),
+  z.strictObject({
+    action: z.literal('addTags'),
+    taskIds: TaskIds,
+    params: z.strictObject({ tagNames: TagNames.min(1) }),
+  }),
+  z.strictObject({
+    action: z.literal('removeTags'),
+    taskIds: TaskIds,
+    params: z.strictObject({ tagNames: TagNames.min(1) }),
+  }),
+]);
 
 /** API görev nesnesi (API_CONTRACTS §6.3). Hatırlatıcı ve tekrar alanları Faz 6'da eklenir. */
 export function toTaskJson(task: Task) {
@@ -122,12 +191,20 @@ export function taskDeps(executor: DbExecutor): TaskDeps {
       find: (scope, id) => findProjectRef(executor, scope, id),
       inbox: (scope) => findInboxRef(executor, scope),
       listActive: (scope) => listActiveProjects(executor, scope),
+      repo: createDrizzleProjectRepository(executor),
+      findAny: (scope, id) => findAnyProject(executor, scope, id),
+      trash: (scope, id, batchId, now) => trashProject(executor, scope, id, batchId, now),
+      restore: (scope, ids, now) => restoreProjects(executor, scope, ids, now),
+      listTrashed: (scope, batchId) => listTrashedProjects(executor, scope, batchId),
+      purge: (scope, batchId) => purgeProjects(executor, scope, batchId),
     },
     tags: {
       replace: (scope, taskId, names, now) => replaceTaskTags(executor, scope, taskId, names, now),
       forTasks: (scope, ids) => findTagsForTasks(executor, scope, ids),
       missing: (scope, names) => missingTagNames(executor, scope, names),
       count: (scope) => countTags(executor, scope),
+      existing: (scope, ids) => existingTagIds(executor, scope, ids),
+      taskIdsWithTags: (scope, ids, mode) => taskIdsWithTags(executor, scope, ids, mode),
     },
     clock: systemClock,
     newId: uuidv7,
@@ -172,21 +249,40 @@ export const postTask = (ctx: ApiContext) =>
     });
   });
 
+/** Kullanıcının bugünü ve hafta başlangıcı (BR-DATE-003): görünüm filtrelerindeki tarih koşulları için. */
+async function userCalendar(userId: string) {
+  const prefs = await findUserPreferences(db(), userId);
+  return { today: todayIn(prefs?.timezone ?? 'UTC', new Date()), weekStart: prefs?.weekStart ?? 1 };
+}
+
+/**
+ * GET /tasks (API_CONTRACTS §6.2): `TaskFilter` v1 sorgu parametreleri, `sort`, `view=list|board`. Yanıtta
+ * `meta.ignored`: artık var olmayan proje/etiket koşulları (BR-VIEW-001).
+ */
 export const getTasks = (ctx: ApiContext) =>
   withScope(ctx, async (scope) => {
     const query = new URL(ctx.request.url).searchParams;
-    const parsed = z.array(z.enum(TASK_STATUSES)).safeParse(query.getAll('status'));
-    if (!parsed.success) {
-      return ctx.fail({ kind: 'validation', issues: [{ field: 'status', reason: 'invalid' }] });
+    const { filter, settings } = parseTaskFilter(query);
+    const viewType = z
+      .enum(VIEW_TYPES)
+      .catch('list')
+      .parse(query.get('view') ?? 'list');
+    if (!filter.success || !settings.success) {
+      const issues = [...(filter.error?.issues ?? []), ...(settings.error?.issues ?? [])];
+      return ctx.fail({
+        kind: 'validation',
+        issues: issues.map((i) => ({ field: String(i.path[0] ?? 'filter'), reason: 'invalid' })),
+      });
     }
-    const deps = taskDeps(db());
-    const result = await listTasks(deps, scope, {
-      projectId: query.get('projectId') ?? undefined,
-      statuses: parsed.data,
+    const result = await queryTasks(taskDeps(db()), scope, filter.data, settings.data, {
+      ...(await userCalendar(ctx.actor.userId)),
+      viewType,
     });
     if (!result.ok) return fail(ctx, result.error);
-    const summaries = await listSummaries(deps, scope, result.value);
-    return ctx.json(200, { data: summaries.map(toSummaryJson) });
+    return ctx.json(200, {
+      data: result.value.items.map(toSummaryJson),
+      meta: { ignored: result.value.ignored },
+    });
   });
 
 export const getOneTask = (ctx: ApiContext) =>
@@ -264,9 +360,16 @@ export const getMyTasks = (ctx: ApiContext) =>
   });
 
 const ConfirmBody = z.strictObject({ confirm: z.literal(true) });
+const ProjectChoice = z.enum(['restore', 'inbox']);
 const RestoreBody = z.union([
-  z.strictObject({ batchId: z.string().max(100) }),
-  z.strictObject({ id: z.string().max(100), restoreParent: z.boolean().optional() }),
+  z.strictObject({ batchId: z.string().max(100), projectChoice: ProjectChoice.optional() }),
+  z.strictObject({ type: z.literal('project'), id: z.string().max(100) }),
+  z.strictObject({
+    type: z.literal('task').optional(),
+    id: z.string().max(100),
+    restoreParent: z.boolean().optional(),
+    projectChoice: ProjectChoice.optional(),
+  }),
 ]);
 
 export const postArchive = (ctx: ApiContext) =>
@@ -329,4 +432,134 @@ export const deleteTrash = (ctx: ApiContext) =>
       confirm: body.data.confirm,
     });
     return result.ok ? ctx.json(200, { data: result.value }) : fail(ctx, result.error);
+  });
+
+/** POST /tasks/bulk (BR-TASK-008, D-084): atomik; bir görev reddedilirse işlem geri alınır, hiçbiri uygulanmaz. */
+class BulkRollback extends Error {
+  constructor(readonly error: DomainError) {
+    super('toplu işlem geri alındı');
+  }
+}
+export const postBulk = (ctx: ApiContext) =>
+  withScope(ctx, async (scope) => {
+    const body = await ctx.parse(BulkBody);
+    if (!body.ok) return body.response;
+    const { action, taskIds } = body.data;
+    const params = 'params' in body.data ? body.data.params : {};
+    try {
+      const value = await db().transaction(async (tx) => {
+        const result = await bulkTasks(taskDeps(tx), scope, {
+          action,
+          taskIds,
+          ...params,
+        } as Parameters<typeof bulkTasks>[2]);
+        if (!result.ok) throw new BulkRollback(result.error);
+        return result.value;
+      });
+      return ctx.json(200, { data: value });
+    } catch (error) {
+      if (error instanceof BulkRollback) return fail(ctx, error.error);
+      throw error;
+    }
+  });
+
+const ProjectQuery = z.object({
+  status: z.array(z.enum(PROJECT_STATUSES)).max(3),
+  includeArchived: z.boolean(),
+});
+
+/** Proje okuma ve silme uç noktalarının sürüm çakışması: güncel proje API biçiminde döner. */
+function failProject(ctx: ApiContext, error: DomainError) {
+  return error.kind === 'version_conflict' && error.current
+    ? ctx.fail({ kind: 'version_conflict', current: toProjectJson(error.current as Project) })
+    : ctx.fail(error);
+}
+
+/** GET /projects (API_CONTRACTS §5): Inbox ilk (`kind: 'inbox'`), sonra standart projeler ilerlemeyle. */
+export const getProjects = (ctx: ApiContext) =>
+  withScope(ctx, async (scope) => {
+    const query = new URL(ctx.request.url).searchParams;
+    const parsed = ProjectQuery.safeParse({
+      status: query
+        .getAll('status')
+        .flatMap((v) => v.split(','))
+        .filter(Boolean),
+      includeArchived: query.get('includeArchived') === 'true',
+    });
+    if (!parsed.success) {
+      return ctx.fail({ kind: 'validation', issues: [{ field: 'status', reason: 'invalid' }] });
+    }
+    const deps = taskDeps(db());
+    const result = await projectOverview(deps, scope, {
+      statuses: parsed.data.status,
+      includeArchived: parsed.data.includeArchived,
+    });
+    if (!result.ok) return failProject(ctx, result.error);
+    const inbox = await deps.projects.repo.findById(scope, (await deps.projects.inbox(scope)).id);
+    return ctx.json(200, {
+      data: [
+        ...(inbox ? [toProjectJson(inbox)] : []),
+        ...result.value.map((p) => toProjectJson(p.project, p.progress)),
+      ],
+    });
+  });
+
+/** GET /projects/{id} (BR-DEL-007: `?includeDeleted=true` ile çöpteki proje). */
+export const getOneProject = (ctx: ApiContext) =>
+  withScope(ctx, async (scope) => {
+    const includeDeleted = new URL(ctx.request.url).searchParams.get('includeDeleted') === 'true';
+    const result = await projectDetail(taskDeps(db()), scope, ctx.params.id ?? '', {
+      includeDeleted,
+    });
+    return result.ok
+      ? ctx.json(200, { data: toProjectJson(result.value.project, result.value.progress) })
+      : failProject(ctx, result.error);
+  });
+
+export const getProjectDeletePreview = (ctx: ApiContext) =>
+  withScope(ctx, async (scope) => {
+    const result = await projectDeletePreview(taskDeps(db()), scope, ctx.params.id ?? '');
+    return result.ok ? ctx.json(200, { data: result.value }) : failProject(ctx, result.error);
+  });
+
+/** DELETE /projects/{id} (BR-PROJ-005, D-031): yanıt `{ batchId, affected: { tasks } }`. */
+export const deleteOneProject = (ctx: ApiContext) =>
+  withScope(ctx, async (scope) => {
+    const result = await inTransaction((deps) => deleteProject(deps, scope, ctx.params.id ?? ''));
+    return result.ok ? ctx.json(200, { data: result.value }) : failProject(ctx, result.error);
+  });
+
+const CompleteProjectBody = z.strictObject({
+  version: z.number().int().positive(),
+  completeOpenTasks: z.boolean(),
+});
+
+/** POST /projects/{id}/complete `{ version, completeOpenTasks }` (BR-PROJ-002). */
+export const postProjectComplete = (ctx: ApiContext) =>
+  withScope(ctx, async (scope) => {
+    const body = await ctx.parse(CompleteProjectBody);
+    if (!body.ok) return body.response;
+    const result = await inTransaction((deps) =>
+      completeProject(deps, scope, ctx.params.id ?? '', body.data),
+    );
+    if (!result.ok) return failProject(ctx, result.error);
+    return ctx.json(200, {
+      data: {
+        ...toProjectJson(result.value.project),
+        completedTasks: result.value.completedTasks,
+      },
+    });
+  });
+
+/** GET /archive (API_CONTRACTS §13, FR-SET-06): arşivli projeler ve tek başına arşivlenmiş görevler. */
+export const getArchive = (ctx: ApiContext) =>
+  withScope(ctx, async (scope) => {
+    const result = await archiveContents(taskDeps(db()), scope);
+    if (!result.ok) return fail(ctx, result.error);
+    return ctx.json(200, {
+      data: {
+        projects: result.value.projects.map((p) => toProjectJson(p.project, p.progress)),
+        tasks: result.value.tasks.map(({ task, project }) => ({ ...toTaskJson(task), project })),
+      },
+    });
   });

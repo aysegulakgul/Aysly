@@ -1,6 +1,6 @@
 # Hata Durumları ve Uç Senaryolar
 
-> Durum: v0.4 · Son güncelleme: 2026-10-28
+> Durum: v0.5 · Son güncelleme: 2026-10-29
 > Her senaryo: beklenen sistem davranışı, kullanıcı mesajı (Türkçe ana metin; çeviri anahtarı uygulamada), gerekli testler. Kural kimlikleri BUSINESS_RULES'a referanstır.
 
 ## 1. Kullanıcı mesajı ilkeleri
@@ -38,6 +38,8 @@
 | E24 | Çalışma alanından çıkarılan kullanıcının açık ekranı (Faz 10) | Sonraki istek 404; arayüz alanı kapatır, kişisel alana yönlendirir | "Bu çalışma alanına erişimin kaldırıldı." | Yetki testleri | BR-PERM-003 |
 | E25 | Migration hatası (yerel veritabanında) | Migration işlem içinde geri alınır; uygulama başlatılmaz ve hata açıkça gösterilir; geri alınamayan durumda migration öncesi alınan yedekten dönülür (`pnpm db:restore`) | Terminalde: "Veritabanı güncellemesi başarısız oldu; veriler değiştirilmedi. Ayrıntı: …" | `pnpm verify`: migration'ı boş veritabanına uygulama; yedek/geri yükleme betiği testi | ARCHITECTURE §12.4, SECURITY §8.2 |
 | E26 | Toplu işlemde kısmi yetkisiz kayıt | Hiçbiri uygulanmaz; reddedilenler listelenir | "Seçili görevlerden 1'i güncellenemedi; değişiklik yapılmadı." | API | BR-TASK-008 |
+| E27 | Projesi hâlâ çöpte olan görevin geri yüklenmesi | `422 BR-DEL-004`; arayüz "Projeyi de geri yükle / Inbox'a geri yükle" sorar (Faz 5) | "Bu görevin projesi de çöp kutusunda. Nereye geri yüklensin?" | Birim + entegrasyon | BR-DEL-004 |
+| E28 | Kayıtlı görünümde silinmiş proje/etiket | Koşul yok sayılır; uyarı bandı (Faz 5) | "Bazı filtreler artık geçerli değil; …" | Birim | BR-VIEW-001 |
 | E27 | Not otomatik kaydında çatışma | Çatışma kopyası oluşturulur | "Not başka bir yerde değiştirildi. Senin sürümün ayrı bir not olarak kaydedildi." | E2E iki sekme | BR-NOTE-002 |
 | E28 | Kaydedilmemiş not varken sekmeyi kapatma | Tarayıcı uyarısı; yerel taslak | Tarayıcının standart uyarısı | E2E | BR-NOTE-001 |
 | E29 | Ay sonu tekrar (31'i) | Ayın son günü | — | Birim | BR-REC-005 |

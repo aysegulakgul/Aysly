@@ -1,4 +1,4 @@
-import { and, asc, count, eq, inArray, notInArray } from 'drizzle-orm';
+import { and, asc, count, eq, inArray, ne, notInArray, sql } from 'drizzle-orm';
 import type { WorkspaceScope } from '@/modules/workspaces';
 import type { DbExecutor } from '@/shared/db/client';
 import { uuidv7 } from '@/shared/kernel/id';
@@ -116,4 +116,117 @@ export function listTags(db: DbExecutor, scope: WorkspaceScope): Promise<TagView
     .from(tags)
     .where(eq(tags.workspaceId, scope.workspaceId))
     .orderBy(asc(tags.name));
+}
+
+/** Var olan etiket kimlikleri (kayıtlı görünümdeki silinmiş etiket referansı, BR-VIEW-001). */
+export async function existingTagIds(
+  db: DbExecutor,
+  scope: WorkspaceScope,
+  ids: readonly string[],
+): Promise<Set<string>> {
+  if (ids.length === 0) return new Set();
+  const rows = await db
+    .select({ id: tags.id })
+    .from(tags)
+    .where(and(eq(tags.workspaceId, scope.workspaceId), inArray(tags.id, [...ids])));
+  return new Set(rows.map((r) => r.id));
+}
+
+/** TaskFilter `tagId` (API_CONTRACTS §6.2): `any` en az birini, `all` hepsini taşıyan görevler. */
+export async function taskIdsWithTags(
+  db: DbExecutor,
+  scope: WorkspaceScope,
+  tagIds: readonly string[],
+  mode: 'any' | 'all',
+): Promise<Set<string>> {
+  if (tagIds.length === 0) return new Set();
+  const rows = await db
+    .select({ taskId: taskTags.taskId })
+    .from(taskTags)
+    .where(and(eq(taskTags.workspaceId, scope.workspaceId), inArray(taskTags.tagId, [...tagIds])))
+    .groupBy(taskTags.taskId)
+    .having(mode === 'all' ? sql`count(*) = ${tagIds.length}` : undefined);
+  return new Set(rows.map((r) => r.taskId));
+}
+
+export type TagWithUsage = TagView & { tasks: number };
+
+/** Ayarlar · Etiketler (D-085): etiketler kullanım sayılarıyla (API_CONTRACTS §7). */
+export async function listTagsWithUsage(
+  db: DbExecutor,
+  scope: WorkspaceScope,
+): Promise<TagWithUsage[]> {
+  const rows = await db
+    .select({
+      id: tags.id,
+      name: tags.name,
+      color: tags.color,
+      tasks: sql<number>`count(${taskTags.taskId})`.mapWith(Number),
+    })
+    .from(tags)
+    .leftJoin(taskTags, eq(taskTags.tagId, tags.id))
+    .where(eq(tags.workspaceId, scope.workspaceId))
+    .groupBy(tags.id)
+    .orderBy(asc(tags.name));
+  return rows;
+}
+
+export async function findTag(
+  db: DbExecutor,
+  scope: WorkspaceScope,
+  id: string,
+): Promise<TagWithUsage | null> {
+  const all = await listTagsWithUsage(db, scope);
+  return all.find((t) => t.id === id) ?? null;
+}
+
+/** BR-TAG-001: normalleştirilmiş adı başka bir etikette varsa o etiketin kimliği. */
+export async function findTagByName(
+  db: DbExecutor,
+  scope: WorkspaceScope,
+  name: string,
+  exceptId: string,
+): Promise<string | null> {
+  const [row] = await db
+    .select({ id: tags.id })
+    .from(tags)
+    .where(
+      and(
+        eq(tags.workspaceId, scope.workspaceId),
+        eq(tags.nameNormalized, normalizeTagName(name)),
+        ne(tags.id, exceptId),
+      ),
+    )
+    .limit(1);
+  return row?.id ?? null;
+}
+
+export async function updateTagRow(
+  db: DbExecutor,
+  scope: WorkspaceScope,
+  id: string,
+  changes: { name?: string | undefined; color?: string | undefined },
+  now: Date,
+): Promise<boolean> {
+  const rows = await db
+    .update(tags)
+    .set({
+      ...(changes.name !== undefined
+        ? { name: changes.name, nameNormalized: normalizeTagName(changes.name) }
+        : {}),
+      ...(changes.color !== undefined ? { color: changes.color } : {}),
+      updatedAt: now,
+    })
+    .where(and(eq(tags.workspaceId, scope.workspaceId), eq(tags.id, id)))
+    .returning({ id: tags.id });
+  return rows.length > 0;
+}
+
+/** BR-TAG-002: etiket silme kalıcıdır; görev bağlantıları yabancı anahtarla birlikte kalkar. */
+export async function deleteTagRow(db: DbExecutor, scope: WorkspaceScope, id: string) {
+  const rows = await db
+    .delete(tags)
+    .where(and(eq(tags.workspaceId, scope.workspaceId), eq(tags.id, id)))
+    .returning({ id: tags.id });
+  return rows.length > 0;
 }

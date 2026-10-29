@@ -50,6 +50,7 @@ export function TaskRow({
   overdue = false,
   onComplete,
   actions,
+  leading,
   stacked = false,
 }: {
   task: TaskView;
@@ -57,6 +58,8 @@ export function TaskRow({
   overdue?: boolean;
   onComplete: () => void;
   actions?: ReactNode;
+  /** Satırın başındaki ek öğe (ör. çoklu seçim kutusu, BR-TASK-008). */
+  leading?: ReactNode;
   /** Dar panellerde (Bugün bölümleri, Figma TaskRow 4:72024) bilgi başlığın altında. */
   stacked?: boolean;
 }) {
@@ -70,6 +73,7 @@ export function TaskRow({
       className="flex w-full flex-col border-b border-border"
     >
       <div className="flex min-h-row w-full items-center gap-3 rounded-sm px-2 py-1">
+        {leading}
         <button
           type="button"
           data-complete

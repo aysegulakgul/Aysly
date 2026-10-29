@@ -6,7 +6,11 @@ export type DomainError =
   | { kind: 'not_found' }
   | { kind: 'forbidden' }
   | { kind: 'version_conflict'; current?: unknown }
-  | { kind: 'business_rule'; rule: string; details?: FieldIssue[] };
+  | { kind: 'business_rule'; rule: string; details?: FieldIssue[] }
+  /** BR-TASK-008: toplu işlem atomiktir; reddedilen kayıtlar ve nedenleri. */
+  | { kind: 'bulk_rejected'; failures: BulkFailure[] };
+
+export type BulkFailure = { id: string; code: string; rule?: string };
 
 export const validationError = (issues: FieldIssue[]): DomainError => ({
   kind: 'validation',

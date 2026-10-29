@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import type { Project } from '@/modules/projects';
+import { EMPTY_FILTER, type TaskFilter } from '@/modules/views';
 import type { WorkspaceScope } from '@/modules/workspaces';
 import { fixedClock } from '@/shared/kernel/clock';
 import type { Task } from '../domain/task';
@@ -10,7 +12,16 @@ import {
   restoreFromTrash,
   unarchiveTask,
 } from './lifecycle';
+import { BULK_LIMIT, bulkTasks } from './bulk';
 import { dashboard, detachTask, moveTask, myTasks } from './organize';
+import {
+  archiveContents,
+  completeProject,
+  deleteProject,
+  projectDeletePreview,
+  projectOverview,
+} from './projects';
+import { queryTasks } from './query';
 import type { ProjectRef, TaskRepository } from './ports';
 import {
   completeTask,
@@ -24,8 +35,38 @@ import {
 const scope = { userId: 'u1', workspaceId: 'w1', role: 'owner' } as WorkspaceScope;
 const INBOX: ProjectRef = { id: 'inbox', name: 'Inbox', kind: 'inbox', archived: false };
 
+const toProject = (ref: ProjectRef, i: number): Project => ({
+  id: ref.id,
+  workspaceId: 'w1',
+  kind: ref.kind,
+  name: ref.name,
+  description: null,
+  color: 'slate',
+  status: 'active',
+  position: `a${i}`,
+  archivedAt: ref.archived ? new Date('2026-10-01T00:00:00Z') : null,
+  deletedAt: null,
+  deletedBatchId: null,
+  version: 1,
+  createdAt: new Date('2026-10-01T00:00:00Z'),
+  updatedAt: new Date('2026-10-01T00:00:00Z'),
+});
+
 /** Bellekte, kapsamı uygulayan sahte depo. */
 function setup(projects: ProjectRef[] = [], tagCount = 0) {
+  const projectRows = new Map<string, Project>(
+    [INBOX, ...projects].map((ref, i) => [ref.id, toProject(ref, i)]),
+  );
+  const refOf = (p: Project): ProjectRef => ({
+    id: p.id,
+    name: p.name,
+    kind: p.kind,
+    archived: p.archivedAt !== null,
+  });
+  const liveProject = (id: string) => {
+    const p = projectRows.get(id);
+    return p && !p.deletedAt ? p : null;
+  };
   const rows = new Map<string, Task>();
   const tagLinks = new Map<string, string[]>();
   let seq = 0;
@@ -176,6 +217,58 @@ function setup(projects: ProjectRef[] = [], tagCount = 0) {
       }
       return n;
     },
+    query: async (_s, q) =>
+      [...rows.values()]
+        .filter(
+          (t) =>
+            !t.deletedAt &&
+            q.projectIds.includes(t.projectId) &&
+            q.statuses.includes(t.status) &&
+            (!q.priorities?.length || q.priorities.includes(t.priority)) &&
+            (q.includeArchived || !t.archivedAt) &&
+            (!q.topLevelOnly || !t.parentTaskId),
+        )
+        .sort((a, b) => (a.position < b.position ? -1 : 1)),
+    progress: async (_s, projectIds) => {
+      const result = new Map<string, { done: number; total: number }>();
+      for (const t of rows.values()) {
+        if (t.deletedAt || t.archivedAt || t.parentTaskId || !projectIds.includes(t.projectId))
+          continue;
+        const p = result.get(t.projectId) ?? { done: 0, total: 0 };
+        result.set(t.projectId, {
+          done: p.done + (t.status === 'done' ? 1 : 0),
+          total: p.total + 1,
+        });
+      }
+      return result;
+    },
+    inProject: async (_s, projectId) =>
+      [...rows.values()]
+        .filter((t) => !t.deletedAt && t.projectId === projectId)
+        .map(({ id, parentTaskId }) => ({ id, parentTaskId })),
+    completeOpenInProject: async (_s, projectId, now, actorId) => {
+      let n = 0;
+      for (const t of rows.values()) {
+        if (t.deletedAt || t.archivedAt || t.projectId !== projectId || t.status === 'done')
+          continue;
+        rows.set(t.id, {
+          ...t,
+          status: 'done',
+          completedAt: now,
+          completedBy: actorId,
+          version: t.version + 1,
+        });
+        n++;
+      }
+      return n;
+    },
+    reassignTrashed: async (_s, projectIds, inboxId) => {
+      for (const t of rows.values()) {
+        if (t.deletedAt && projectIds.includes(t.projectId))
+          rows.set(t.id, { ...t, projectId: inboxId });
+      }
+    },
+    listArchived: async () => [...rows.values()].filter((t) => !t.deletedAt && t.archivedAt),
     moveSubtasks: async (_s, parentId, projectId) => {
       for (const t of rows.values()) {
         if (t.parentTaskId === parentId)
@@ -186,9 +279,63 @@ function setup(projects: ProjectRef[] = [], tagCount = 0) {
   const deps: TaskDeps = {
     tasks: repo,
     projects: {
-      find: async (_s, id) => projects.find((p) => p.id === id) ?? null,
+      find: async (_s, id) => {
+        const p = liveProject(id);
+        return p ? refOf(p) : null;
+      },
       inbox: async () => INBOX,
-      listActive: async () => [INBOX, ...projects.filter((p) => !p.archived)],
+      listActive: async () =>
+        [...projectRows.values()].filter((p) => !p.deletedAt && !p.archivedAt).map(refOf),
+      repo: {
+        insert: async () => {
+          throw new Error('kullanılmaz');
+        },
+        findById: async (_s, id) => liveProject(id),
+        update: async (_s, id, version, changes) => {
+          const p = liveProject(id);
+          if (!p || p.version !== version) return null;
+          const next = { ...p, ...changes, version: p.version + 1 } as Project;
+          projectRows.set(id, next);
+          return next;
+        },
+        list: async (_s, filter) =>
+          [...projectRows.values()].filter(
+            (p) =>
+              !p.deletedAt &&
+              p.kind === 'standard' &&
+              (filter.includeArchived || !p.archivedAt) &&
+              (!filter.statuses?.length || filter.statuses.includes(p.status)),
+          ),
+        lastPosition: async () => null,
+      },
+      findAny: async (_s, id) => projectRows.get(id) ?? null,
+      trash: async (_s, id, batchId, now) => {
+        const p = liveProject(id);
+        if (!p || p.kind === 'inbox') return false;
+        projectRows.set(id, { ...p, deletedAt: now, deletedBatchId: batchId });
+        return true;
+      },
+      restore: async (_s, ids) => {
+        for (const id of ids) {
+          const p = projectRows.get(id)!;
+          projectRows.set(id, { ...p, deletedAt: null, deletedBatchId: null });
+        }
+        return ids.length;
+      },
+      listTrashed: async (_s, batchId) =>
+        [...projectRows.values()].filter(
+          (p) => p.deletedAt && (batchId === undefined || p.deletedBatchId === batchId),
+        ),
+      purge: async (_s, batchId) => {
+        let n = 0;
+        for (const p of [...projectRows.values()]) {
+          if (p.deletedAt && (batchId === null || p.deletedBatchId === batchId)) {
+            projectRows.delete(p.id);
+            n++;
+          }
+        }
+        return n;
+      },
     },
     tags: {
       replace: async (_s, taskId, names) => {
@@ -205,11 +352,23 @@ function setup(projects: ProjectRef[] = [], tagCount = 0) {
         ),
       missing: async (_s, names) => [...names],
       count: async () => tagCount,
+      existing: async (_s, ids) =>
+        new Set(ids.filter((id) => [...tagLinks.values()].some((names) => names.includes(id)))),
+      taskIdsWithTags: async (_s, ids, mode) =>
+        new Set(
+          [...tagLinks.entries()]
+            .filter(([, names]) =>
+              mode === 'all'
+                ? ids.every((id) => names.includes(id))
+                : ids.some((id) => names.includes(id)),
+            )
+            .map(([taskId]) => taskId),
+        ),
     },
     clock: fixedClock(new Date('2026-10-28T09:00:00Z')),
     newId: () => `t${++seq}`,
   };
-  return { deps, rows, tagLinks };
+  return { deps, rows, tagLinks, projectRows };
 }
 
 const value = <T>(r: { ok: boolean; value?: T }) => {
@@ -555,12 +714,11 @@ describe('yaşam durumları', () => {
 
   it('BR-DEL-004: geri yükleme sürümü artırır; projesi artık yoksa görev Inbox’a döner', async () => {
     const ev: ProjectRef = { id: 'ev', name: 'Ev', kind: 'standard', archived: false };
-    const projects = [ev];
-    const { deps, rows } = setup(projects);
+    const { deps, rows, projectRows } = setup([ev]);
     const task = value(await createTask(deps, scope, { title: 'A', projectId: 'ev' }));
     value(await deleteTask(deps, scope, task.id));
     const before = rows.get(task.id)!.version;
-    projects.splice(0, 1); // proje kalıcı silindi
+    projectRows.delete('ev'); // proje kalıcı silindi
     const result = value(await restoreFromTrash(deps, scope, { id: task.id }));
     expect(result.movedToInbox).toBe(1);
     expect(rows.get(task.id)).toMatchObject({ projectId: 'inbox', deletedAt: null });
@@ -598,5 +756,320 @@ describe('dashboard', () => {
     expect(titles(d.overdue)).toEqual(['Daha eski', 'Eski', 'Bugün 10:00']);
     expect(titles(d.upcoming)).toEqual(['Yarın', '7 gün sonra']);
     expect(titles(d.priority)).toEqual(['Bugün 15:00']);
+  });
+});
+
+const EV: ProjectRef = { id: 'ev', name: 'Ev', kind: 'standard', archived: false };
+const IS: ProjectRef = { id: 'is', name: 'İş', kind: 'standard', archived: false };
+const failure = (r: { ok: boolean; error?: unknown }) => {
+  if (r.ok) throw new Error('hata bekleniyordu');
+  return r.error as { kind: string; rule?: string; failures?: { id: string; rule?: string }[] };
+};
+
+describe('Faz 5 — projeler ve görevler', () => {
+  it('BR-PROJ-003: ilerleme = tamamlanan / arşivlenmemiş üst düzey görev; alt görevler sayılmaz', async () => {
+    const { deps } = setup([EV]);
+    const a = value(await createTask(deps, scope, { title: 'A', projectId: 'ev' }));
+    value(await createTask(deps, scope, { title: 'B', projectId: 'ev' }));
+    value(await createTask(deps, scope, { title: 'Alt', parentTaskId: a.id }));
+    const c = value(await createTask(deps, scope, { title: 'C', projectId: 'ev' }));
+    value(await completeTask(deps, scope, a.id, { version: a.version }));
+    value(await archiveTask(deps, scope, c.id, { version: c.version }));
+    const [ev] = value(await projectOverview(deps, scope, {}));
+    expect(ev?.progress).toEqual({ done: 1, total: 2 });
+  });
+
+  it('BR-PROJ-004: arşivli projedeki görev düzenlenemez, eklenemez, taşınamaz, tek başına silinemez', async () => {
+    const { deps, rows } = setup([{ ...EV, archived: true }, IS]);
+    const created = value(await createTask(deps, scope, { title: 'X', projectId: 'is' }));
+    rows.set(created.id, { ...created, projectId: 'ev' });
+    const id = created.id;
+    expect(failure(await updateTask(deps, scope, id, { version: 1, title: 'Yeni' }))).toMatchObject(
+      {
+        rule: 'BR-PROJ-004',
+      },
+    );
+    expect(failure(await completeTask(deps, scope, id, { version: 1 }))).toMatchObject({
+      rule: 'BR-PROJ-004',
+    });
+    expect(failure(await moveTask(deps, scope, id, { version: 1, projectId: 'is' }))).toMatchObject(
+      {
+        rule: 'BR-PROJ-004',
+      },
+    );
+    expect(failure(await deleteTask(deps, scope, id))).toMatchObject({ rule: 'BR-PROJ-004' });
+    expect(
+      failure(await createTask(deps, scope, { title: 'Yeni', projectId: 'ev' })),
+    ).toMatchObject({ rule: 'BR-PROJ-004' });
+  });
+
+  it('BR-PROJ-005 / AC-06: proje ve görevleri tek grupla çöpe gider, grup geri yüklenince hepsi döner', async () => {
+    const { deps, rows, projectRows } = setup([EV]);
+    const ids: string[] = [];
+    for (const title of ['1', '2', '3', '4', '5']) {
+      ids.push(value(await createTask(deps, scope, { title, projectId: 'ev' })).id);
+    }
+    value(await createTask(deps, scope, { title: 'Alt', parentTaskId: ids[0]! }));
+    expect(value(await projectDeletePreview(deps, scope, 'ev'))).toEqual({
+      tasks: 6,
+      topLevel: 5,
+      subtasks: 1,
+    });
+    const deleted = value(await deleteProject(deps, scope, 'ev'));
+    expect(deleted.affected.tasks).toBe(6);
+    expect(projectRows.get('ev')?.deletedBatchId).toBe(deleted.batchId);
+    expect(value(await projectOverview(deps, scope, {}))).toHaveLength(0);
+    const groups = value(await listTrash(deps, scope));
+    expect(groups).toHaveLength(1);
+    expect(groups[0]).toMatchObject({ root: { type: 'project', id: 'ev' }, count: 6 });
+
+    value(await restoreFromTrash(deps, scope, { batchId: deleted.batchId }));
+    expect(projectRows.get('ev')?.deletedAt).toBeNull();
+    expect(
+      ids.every((id) => rows.get(id)?.deletedAt === null && rows.get(id)?.projectId === 'ev'),
+    ).toBe(true);
+  });
+
+  it('BR-PROJ-005: önceden ayrı silinen görev kendi grubunda kalır; BR-DEL-004: projesi çöpteyse seçim ister', async () => {
+    const { deps, rows } = setup([EV]);
+    const early = value(await createTask(deps, scope, { title: 'Önce', projectId: 'ev' }));
+    const own = value(await deleteTask(deps, scope, early.id));
+    const project = value(await deleteProject(deps, scope, 'ev'));
+    expect(project.affected.tasks).toBe(0);
+    expect(rows.get(early.id)?.deletedBatchId).toBe(own.batchId);
+    expect(value(await listTrash(deps, scope))).toHaveLength(2);
+
+    expect(failure(await restoreFromTrash(deps, scope, { batchId: own.batchId }))).toMatchObject({
+      rule: 'BR-DEL-004',
+    });
+    const toInbox = value(
+      await restoreFromTrash(deps, scope, { batchId: own.batchId, projectChoice: 'inbox' }),
+    );
+    expect(toInbox.movedToInbox).toBe(1);
+    expect(rows.get(early.id)?.projectId).toBe('inbox');
+  });
+
+  it('BR-DEL-005: proje grubu kalıcı silinirken başka gruptaki görevi Inbox’a bağlanır', async () => {
+    const { deps, rows, projectRows } = setup([EV]);
+    const early = value(await createTask(deps, scope, { title: 'Önce', projectId: 'ev' }));
+    value(await deleteTask(deps, scope, early.id));
+    const project = value(await deleteProject(deps, scope, 'ev'));
+    value(await purgeTrash(deps, scope, { batchId: project.batchId, confirm: true }));
+    expect(projectRows.has('ev')).toBe(false);
+    expect(rows.get(early.id)).toMatchObject({ projectId: 'inbox' });
+    expect(rows.get(early.id)?.deletedAt).not.toBeNull();
+  });
+
+  it('BR-PROJ-006: Inbox silinemez', async () => {
+    const { deps } = setup();
+    expect(failure(await deleteProject(deps, scope, 'inbox'))).toMatchObject({
+      rule: 'BR-PROJ-006',
+    });
+  });
+
+  it('BR-PROJ-002: "hepsini tamamla" açık görevleri de tamamlar; "olduğu gibi bırak" görevlere dokunmaz', async () => {
+    const { deps, rows } = setup([EV, IS]);
+    const a = value(await createTask(deps, scope, { title: 'A', projectId: 'ev' }));
+    const b = value(await createTask(deps, scope, { title: 'B', projectId: 'is' }));
+    const kept = value(
+      await completeProject(deps, scope, 'is', { version: 1, completeOpenTasks: false }),
+    );
+    expect(kept.project.status).toBe('completed');
+    expect(rows.get(b.id)?.status).toBe('todo');
+    const all = value(
+      await completeProject(deps, scope, 'ev', { version: 1, completeOpenTasks: true }),
+    );
+    expect(all.completedTasks).toBe(1);
+    expect(rows.get(a.id)?.status).toBe('done');
+  });
+
+  it('Arşiv sayfası (BR-DEL-001): arşivli projeler ve tek başına arşivlenen görevler', async () => {
+    const { deps } = setup([{ ...EV, archived: true }, IS]);
+    const t = value(await createTask(deps, scope, { title: 'T', projectId: 'is' }));
+    value(await archiveTask(deps, scope, t.id, { version: t.version }));
+    const archive = value(await archiveContents(deps, scope));
+    expect(archive.projects.map((p) => p.project.id)).toEqual(['ev']);
+    expect(archive.tasks.map((x) => x.task.id)).toEqual([t.id]);
+  });
+
+  it('BR-TASK-006: sıra içi taşıma yalnızca taşınan görevin konumunu değiştirir', async () => {
+    const { deps, rows } = setup([EV]);
+    const a = value(await createTask(deps, scope, { title: 'A', projectId: 'ev' }));
+    const b = value(await createTask(deps, scope, { title: 'B', projectId: 'ev' }));
+    const c = value(await createTask(deps, scope, { title: 'C', projectId: 'ev' }));
+    value(await moveTask(deps, scope, c.id, { version: c.version, afterId: a.id, beforeId: b.id }));
+    const order = [...rows.values()]
+      .filter((t) => t.projectId === 'ev')
+      .sort((x, y) => (x.position < y.position ? -1 : 1))
+      .map((t) => t.title);
+    expect(order).toEqual(['A', 'C', 'B']);
+    expect(rows.get(a.id)?.position).toBe(a.position);
+  });
+});
+
+describe('Faz 5 — görünümler (BR-VIEW-001/002)', () => {
+  const context = { today: '2026-10-28', weekStart: 1, viewType: 'list' as const };
+  const settings = { sort: 'manual' as const, groupBy: 'none' as const };
+  const filter = (f: Partial<TaskFilter>): TaskFilter => ({ ...EMPTY_FILTER, ...f });
+
+  it('BR-VIEW-002: liste açık görevleri, pano tüm durumları gösterir; filtreler aynıdır', async () => {
+    const { deps } = setup([EV]);
+    const a = value(await createTask(deps, scope, { title: 'A', projectId: 'ev', priority: 3 }));
+    value(await createTask(deps, scope, { title: 'B', projectId: 'ev', priority: 1 }));
+    value(await completeTask(deps, scope, a.id, { version: a.version }));
+    const list = value(
+      await queryTasks(deps, scope, filter({ projectId: ['ev'] }), settings, context),
+    );
+    const board = value(
+      await queryTasks(deps, scope, filter({ projectId: ['ev'] }), settings, {
+        ...context,
+        viewType: 'board',
+      }),
+    );
+    expect(list.items.map((i) => i.task.title)).toEqual(['B']);
+    expect(board.items.map((i) => i.task.title)).toEqual(['A', 'B']);
+    const high = value(
+      await queryTasks(deps, scope, filter({ priority: [3], status: ['done'] }), settings, context),
+    );
+    expect(high.items.map((i) => i.task.title)).toEqual(['A']);
+  });
+
+  it('FR-VIEW-04/05: tarih, metin ve etiket filtreleri; son tarihe ve başlığa göre sıralama', async () => {
+    const { deps } = setup([EV]);
+    value(
+      await createTask(deps, scope, {
+        title: 'Zeytin',
+        due: { date: '2026-10-28' },
+        tagNames: ['ev'],
+      }),
+    );
+    value(await createTask(deps, scope, { title: 'Armut', due: { date: '2026-10-27' } }));
+    value(await createTask(deps, scope, { title: 'Çay' }));
+    const overdue = value(
+      await queryTasks(deps, scope, filter({ due: 'overdue' }), settings, context),
+    );
+    expect(overdue.items.map((i) => i.task.title)).toEqual(['Armut']);
+    const undated = value(
+      await queryTasks(deps, scope, filter({ due: 'none' }), settings, context),
+    );
+    expect(undated.items.map((i) => i.task.title)).toEqual(['Çay']);
+    const text = value(await queryTasks(deps, scope, filter({ q: 'ZEYTİN' }), settings, context));
+    expect(text.items.map((i) => i.task.title)).toEqual(['Zeytin']);
+    const byDue = value(
+      await queryTasks(deps, scope, EMPTY_FILTER, { ...settings, sort: 'due' }, context),
+    );
+    expect(byDue.items.map((i) => i.task.title)).toEqual(['Armut', 'Zeytin', 'Çay']);
+    const byTitle = value(
+      await queryTasks(deps, scope, EMPTY_FILTER, { ...settings, sort: 'title' }, context),
+    );
+    expect(byTitle.items.map((i) => i.task.title)).toEqual(['Armut', 'Çay', 'Zeytin']);
+    const tagged = value(
+      await queryTasks(deps, scope, filter({ tagId: ['ev'] }), settings, context),
+    );
+    expect(tagged.items.map((i) => i.task.title)).toEqual(['Zeytin']);
+  });
+
+  it('BR-VIEW-001: silinmiş proje veya etikete referans yok sayılır ve bildirilir', async () => {
+    const { deps } = setup([EV]);
+    value(await createTask(deps, scope, { title: 'A', projectId: 'ev' }));
+    const result = value(
+      await queryTasks(
+        deps,
+        scope,
+        filter({
+          projectId: ['01900000-0000-7000-8000-00000000dead'],
+          tagId: ['01900000-0000-7000-8000-00000000beef'],
+        }),
+        settings,
+        context,
+      ),
+    );
+    expect(result.ignored).toEqual(['projectId', 'tagId']);
+    expect(result.items.map((i) => i.task.title)).toEqual(['A']);
+  });
+
+  it('BR-PROJ-004: arşivli projenin görevleri varsayılan görünümde yok, "arşivi dahil et" ile var', async () => {
+    const { deps, rows } = setup([{ ...EV, archived: true }]);
+    const created = value(await createTask(deps, scope, { title: 'X' }));
+    rows.set(created.id, { ...created, projectId: 'ev' });
+    const hidden = value(await queryTasks(deps, scope, EMPTY_FILTER, settings, context));
+    expect(hidden.items.map((i) => i.task.id)).not.toContain(created.id);
+    const shown = value(
+      await queryTasks(deps, scope, filter({ includeArchived: true }), settings, context),
+    );
+    expect(shown.items.map((i) => i.task.id)).toContain(created.id);
+  });
+});
+
+describe('Faz 5 — toplu işlemler (BR-TASK-008, D-084)', () => {
+  it('BR-TASK-008: bir görev reddedilirse tüm hatalar listelenir (çağıran işlemi geri alır)', async () => {
+    const { deps } = setup([EV]);
+    const a = value(await createTask(deps, scope, { title: 'A' }));
+    const parent = value(await createTask(deps, scope, { title: 'P' }));
+    const sub = value(await createTask(deps, scope, { title: 'Alt', parentTaskId: parent.id }));
+    const error = failure(
+      await bulkTasks(deps, scope, {
+        action: 'move',
+        projectId: 'ev',
+        taskIds: [a.id, sub.id, 'yok'],
+      }),
+    );
+    expect(error.kind).toBe('bulk_rejected');
+    expect(error.failures).toEqual([
+      { id: sub.id, code: 'BUSINESS_RULE_VIOLATION', rule: 'BR-SUB-002' },
+      { id: 'yok', code: 'NOT_FOUND' },
+    ]);
+  });
+
+  it('AC-02: seçilen iki görev projeye taşınır; tarih ve etiketler korunur', async () => {
+    const { deps, rows, tagLinks } = setup([EV]);
+    const a = value(
+      await createTask(deps, scope, { title: 'A', due: { date: '2026-11-01' }, tagNames: ['x'] }),
+    );
+    const b = value(await createTask(deps, scope, { title: 'B' }));
+    value(await createTask(deps, scope, { title: 'C' }));
+    const done = value(
+      await bulkTasks(deps, scope, { action: 'move', projectId: 'ev', taskIds: [a.id, b.id] }),
+    );
+    expect(done.affected).toBe(2);
+    expect(rows.get(a.id)).toMatchObject({ projectId: 'ev', due: { date: '2026-11-01' } });
+    expect(tagLinks.get(a.id)).toEqual(['x']);
+    expect(value(await inboxBadge(deps, scope))).toBe(1);
+  });
+
+  it('BR-DEL-006: toplu silme tek grup kimliğiyle; ebeveyniyle giden alt görev hata sayılmaz', async () => {
+    const { deps, rows } = setup();
+    const p = value(await createTask(deps, scope, { title: 'P' }));
+    const sub = value(await createTask(deps, scope, { title: 'Alt', parentTaskId: p.id }));
+    const other = value(await createTask(deps, scope, { title: 'O' }));
+    const result = value(
+      await bulkTasks(deps, scope, { action: 'delete', taskIds: [p.id, sub.id, other.id] }),
+    );
+    expect(result.batchId).toBeDefined();
+    expect(new Set([p.id, sub.id, other.id].map((id) => rows.get(id)?.deletedBatchId))).toEqual(
+      new Set([result.batchId]),
+    );
+  });
+
+  it('D-084: durum, öncelik, tarih ve etiket ekleme/kaldırma', async () => {
+    const { deps, rows, tagLinks } = setup();
+    const a = value(await createTask(deps, scope, { title: 'A', tagNames: ['iş', 'ev'] }));
+    const ids = [a.id];
+    value(
+      await bulkTasks(deps, scope, { action: 'setStatus', status: 'in_progress', taskIds: ids }),
+    );
+    value(await bulkTasks(deps, scope, { action: 'setPriority', priority: 2, taskIds: ids }));
+    value(
+      await bulkTasks(deps, scope, { action: 'setDue', due: { date: '2026-12-01' }, taskIds: ids }),
+    );
+    value(await bulkTasks(deps, scope, { action: 'removeTags', tagNames: ['İŞ'], taskIds: ids }));
+    value(await bulkTasks(deps, scope, { action: 'addTags', tagNames: ['acil'], taskIds: ids }));
+    expect(rows.get(a.id)).toMatchObject({
+      status: 'in_progress',
+      priority: 2,
+      due: { date: '2026-12-01' },
+    });
+    expect(tagLinks.get(a.id)).toEqual(['ev', 'acil']);
+    expect(BULK_LIMIT).toBe(200);
   });
 });

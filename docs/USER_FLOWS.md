@@ -1,6 +1,6 @@
 # Ekranlar, Navigasyon ve Kullanıcı Akışları
 
-> Durum: v0.4 · Son güncelleme: 2026-10-27
+> Durum: v0.5 · Son güncelleme: 2026-10-29
 > Ekran yapıları, navigasyon ve görsel düzen için Figma tek kaynaktır (D-063). Bu belgedeki ekran tarifleri ve ASCII çizimler Figma öncesi taslaktır; Figma ile çelişirse Figma geçerlidir. Akışlardaki iş kuralı davranışları (BR-*) ise BUSINESS_RULES'a bağlıdır.
 > İlgili: [UI_UX_DESIGN_SYSTEM.md](UI_UX_DESIGN_SYSTEM.md) (görsel kurallar, wireframe'ler) · [BUSINESS_RULES.md](BUSINESS_RULES.md) · [ERROR_HANDLING_AND_EDGE_CASES.md](ERROR_HANDLING_AND_EDGE_CASES.md)
 
@@ -58,6 +58,8 @@ flowchart TD
 ──────────────────────────────
  Arşiv · Çöp kutusu · Ayarlar
 ```
+
+**Uygulama notu (Faz 5):** Kenar çubuğu Figma 4:67037 sırasıyla: Inbox, Görevlerim, Bugün, Yaklaşanlar, Projeler; PROJELER (renk noktası ve ilerleme yüzdesi, "+" Projeler sayfasına), KAYITLI GÖRÜNÜMLER ("+" `/views/new`), Arşiv, Çöp kutusu, Ayarlar. Takvim, Hedefler, Notlar, arama ve bildirim zili ait oldukları fazda (D-071).
 
 ### 1.2. Mobil navigasyon
 - Alt sekme çubuğu: **Bugün (Dashboard)** · **Inbox** · **(+) Ekle** · **Takvim** · **Menü**.
@@ -125,6 +127,7 @@ Ayrıntı: [ONBOARDING_AND_PERSONALIZATION.md](ONBOARDING_AND_PERSONALIZATION.md
 | Arşivli proje | Salt okunur bant + "Arşivden çıkar" (BR-PROJ-004) |
 | Silme | Onay penceresi etkilenecek görev sayısıyla (BR-PROJ-005, D-031) |
 | Kurallar | BR-PROJ-001..006 |
+| Uygulama (Faz 5) | Liste: durum filtresi (varsayılan Aktif) ve sıralama (son güncelleme, ad, manuel — yukarı/aşağı düğmeleri) URL'de. Detay: Liste/Pano sekmeleri, filtre, "Görünümü kaydet", çoklu seçim; "⋯": düzenle, durum, tamamla, arşivle, sil. Silme sonrası Projeler sayfasında "Geri al". Takvim sekmesi ve bağlı kayıtlar Faz 6–7. |
 
 ### 2.7. Görev detayı (yan panel / sayfa)
 | | |
@@ -183,6 +186,7 @@ Zil simgesi açılır paneli (son 20) + tam sayfa `/notifications`. Okunmamış 
 | Güvenlik | Şifre değiştir, aktif oturumlar, son güvenlik olayları |
 | Veri ve gizlilik | Çalışma alanını JSON olarak dışa aktar (D-046), hesabı sil (D-036) |
 | Çalışma alanı | (Faz 10) Üyeler, roller, davetler |
+| Etiketler | (Faz 5, D-085) Ad (anında kayıt), renk, kullanım sayısı, onaylı silme (BR-TAG-002) |
 
 ### 2.15. Çalışma alanı yönetimi (Faz 10 — SONRA)
 Alan değiştirici (kenar çubuğu üstü), üye listesi, davet, rol değişikliği, alandan ayrılma. MVP'de gizli.

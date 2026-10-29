@@ -6,7 +6,8 @@ import { createPgAdvisoryLock } from '@/shared/jobs/pg-advisory-lock';
 import { createInProcessScheduler, type Scheduler } from '@/shared/jobs/scheduler';
 import { idempotencyCleanupJob } from '@/shared/http/idempotency';
 import { logger } from '@/shared/observability/logger';
-import { purgeExpiredTasks } from '@/modules/tasks';
+import { listExpiredTrashedProjects, purgeExpiredProjects } from '@/modules/projects';
+import { purgeExpiredTasks, reassignTrashedTasks } from '@/modules/tasks';
 import { db } from '@/shared/db/client';
 import type { JobDefinition } from '@/shared/jobs/scheduler';
 
@@ -51,7 +52,11 @@ export function trashPurgeJob(): JobDefinition {
     intervalMs: 60 * 60 * 1000,
     run: async () => {
       const before = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-      const purged = await purgeExpiredTasks(db(), before);
+      const purged = await db().transaction(async (tx) => {
+        // BR-DEL-004: süresi dolan projede başka grupla çöpte kalan görevler Inbox'a bağlanır.
+        await reassignTrashedTasks(tx, await listExpiredTrashedProjects(tx, before));
+        return (await purgeExpiredTasks(tx, before)) + (await purgeExpiredProjects(tx, before));
+      });
       if (purged > 0) logger().info({ purged }, 'süresi dolan çöp kayıtları silindi');
     },
   };

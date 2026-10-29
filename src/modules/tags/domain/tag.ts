@@ -33,3 +33,20 @@ export function prepareTagNames(raw: readonly string[]): { names: string[]; issu
   }
   return { names, issues: [] };
 }
+
+/** UI_UX §2.4: proje ve etiket renkleri aynı sabit 12 renklik paletten; serbest HEX yok. */
+export const TAG_COLORS = [
+  'slate',
+  'red',
+  'orange',
+  'amber',
+  'green',
+  'teal',
+  'cyan',
+  'blue',
+  'indigo',
+  'violet',
+  'pink',
+  'brown',
+] as const;
+export type TagColor = (typeof TAG_COLORS)[number];

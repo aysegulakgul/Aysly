@@ -5,8 +5,8 @@ import { PageFrame } from '../page-frame';
 import { SignOutButton } from '../sign-out-button';
 
 /**
- * Mobil Menü (Figma 4:69022). Kimlik bloğu, araçlar ve alt metin. Görevlerim, Projeler, Hedefler, Notlar,
- * Bildirimler, kayıtlı görünümler, Arşiv ve Çöp kutusu ait oldukları fazda eklenir.
+ * Mobil Menü (Figma 4:69022). Kimlik bloğu, araçlar ve alt metin (USER_FLOWS §1.2). Hedefler, Notlar ve Bildirimler
+ * ait oldukları fazda eklenir.
  */
 export default async function MenuPage() {
   const [viewer, t] = await Promise.all([getViewer(), getTranslations('shell')]);
@@ -34,7 +34,19 @@ export default async function MenuPage() {
         <NavItem href="/upcoming" glyph="▦">
           {t('upcoming')}
         </NavItem>
+        <NavItem href="/projects" glyph="▭">
+          {t('projects')}
+        </NavItem>
+        <NavItem href="/views/new" glyph="☆">
+          {t('savedViews')}
+        </NavItem>
         <div className="h-px w-full bg-border" />
+        <NavItem href="/archive" glyph="▤">
+          {t('archive')}
+        </NavItem>
+        <NavItem href="/trash" glyph="⌫">
+          {t('trash')}
+        </NavItem>
         <NavItem href="/settings" glyph="⚙">
           {t('settings')}
         </NavItem>

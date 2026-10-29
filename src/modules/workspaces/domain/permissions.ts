@@ -17,6 +17,7 @@ export const PERMISSIONS = [
   'task.restore',
   'task.purge',
   'tag.manage',
+  'view.manage_own',
   'trash.empty',
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];

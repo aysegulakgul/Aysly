@@ -1,6 +1,6 @@
 # Karar Kaydı (Decision Log)
 
-> Durum: v0.6 · Son güncelleme: 2026-10-28
+> Durum: v0.7 · Son güncelleme: 2026-10-29
 
 Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar silinmez; değiştirilen karar `YERİNE GEÇİLDİ (D-yyy)` olarak işaretlenir ve yeni kayıt açılır.
 
@@ -399,6 +399,41 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - AC-02 ("2 görev seçilip Ev'e taşınır"): çoklu seçim ve toplu işlemler (BR-TASK-008) planda Faz 5'te olduğundan Faz 4 kabul testinde iki görev tek tek taşındı; ölçülen sonuç aynı (Inbox sayacı, proje içeriği, korunan tarih ve etiketler). Çoklu seçimli sürüm Faz 5 kabulüne eklendi.
 - AC-09: sunucu saati tarayıcı testinde değiştirilemediği için sınır (23:30 / 00:01) domain birim testiyle doğrulandı.
 - Test sunucusu `--keepAliveTimeout 70000` ile başlatılır: test istemcisinin kapanmış bağlantıyı yeniden kullanmasından doğan aralıklı `ECONNRESET` giderildi.
+
+### D-082 — Proje rengi var, simge şimdilik yok (OQ-038)
+- Durum: ONAYLI · Tarih: 2026-10-29 · Karar veren: Ürün sahibi ("Hepsi A, onaylıyorum")
+- Karar: Proje oluşturma ve düzenlemede 12 renkli sabit paletten (UI_UX §2.4) renk seçilir. Tonları Claude Figma paletiyle uyumlu belirler ve onaya sunar (D-066 gibi). Renk kenar çubuğundaki dairede ve proje başlığında görünür. Simge seçimi MVP'de yok; `icon` kolonu boş kalır, herkes Figma'daki klasör simgesini görür.
+- Alternatifler: Renk + simge; ikisi de yok (Figma ile birebir).
+- Sonuçlar: FR-PROJ-01, UI_UX §2.4.
+
+### D-083 — Mobilde panoda durum kart menüsünden değişir (OQ-039)
+- Durum: ONAYLI · Tarih: 2026-10-29 · Karar veren: Ürün sahibi
+- Karar: Masaüstünde pano sütunları arasında sürükle-bırak (klavye ve menü alternatifiyle). Mobilde sürükleme yok; kartın menüsünde "Durumu değiştir". D-047 ile tutarlı.
+- Alternatif: Mobilde basılı tutup sürükleme.
+- Sonuçlar: FR-VIEW-02.
+
+### D-084 — Toplu işlemler tekil işlemlerin tamamını kapsar (OQ-040)
+- Durum: ONAYLI · Tarih: 2026-10-29 · Karar veren: Ürün sahibi
+- Karar: Toplu yapılabilen işlemler: tamamla, projeye taşı, durum, öncelik, tarih ver, etiket ekle/kaldır, arşivle, çöpe taşı. Her biri BR-TASK-008'e göre atomik ve tekil kurallardan geçer.
+- Alternatif: Yalnızca tamamla, taşı, çöpe taşı.
+- Sonuçlar: BR-TASK-008, API_CONTRACTS `POST /tasks/bulk`.
+
+### D-085 — Etiket yönetimi Faz 5'te, Ayarlar · Etiketler (OQ-041)
+- Durum: ONAYLI · Tarih: 2026-10-29 · Karar veren: Ürün sahibi
+- Karar: Ayarlar altında "Etiketler" sekmesi: yeniden adlandırma, renk, kullanım sayısını gösteren onayla silme (BR-TAG-002). Ekran Figma'da yok; D-065 ile kurulur ve onaya sunulur.
+- Alternatif: Faz 7'ye bırakmak.
+- Sonuçlar: BR-TAG-002, USER_FLOWS §2.14, IMPLEMENTATION_PLAN Faz 5 kapsamı.
+
+### D-086 — Faz 5 uygulama ayrıntıları (teknik/uygulama)
+- Durum: ONAYLI (teknik, CLAUDE.md §5.5) · Tarih: 2026-10-29 · Karar veren: Claude · Görsel ve renk seçimleri ürün sahibinin onayına sunuldu (D-065, D-082)
+- **Modül sınırı:** Proje kaydının kuralları `projects` modülünde (oluşturma, düzenleme, arşiv, sıra). Proje ile görevlerini birlikte ilgilendiren işlemler (ilerleme, silme ve geri yükleme, "hepsini tamamla", arşiv sayfası, çöp listesi) `tasks` modülünde orkestre edilir; böylece bağımlılık yönü `tasks → projects` korunur (ARCHITECTURE §4.3). Ayrı `lifecycle` modülü şimdilik açılmadı: çöp işlemleri Faz 4'ten beri `tasks` içindedir; notlar ve hedefler eklendiğinde (Faz 7) ayrılması değerlendirilir.
+- **`views` modülü:** `TaskFilter` v1 Zod şeması (URL ve kayıtlı görünüm için tek tanım) ve `saved_views`. Görünüm türleri şimdilik `list`, `board` (takvim Faz 6). Sıralama anahtarları: manual, due, priority, created, title; gruplama: none, date, priority, status, project.
+- **Sorgu:** Proje, durum ve öncelik veritabanında; etiket, tarih ve metin koşulları uygulamada uygulanır (1.000 görevlik ölçüm sınırı içinde). Silinmiş proje/etiket koşulu yok sayılır, yanıtta `meta.ignored` (BR-VIEW-001).
+- **Proje rengi tonları (D-082, onaya sunuldu):** slate #7c8799, red #e5534b, orange #e8833a, amber #d9a520, green #3fae6a, teal #2aa39a, cyan #2fa8c9, blue #4a8ae8, indigo #7a7ff0, violet #9a6ee6, pink #e05f9e, brown #a77b52. Etiket renkleri aynı paletten.
+- **Pano:** HTML5 sürükle-bırak (ek paket yok); kart menüsü her boyutta klavye ve dokunmatik alternatifidir (D-083). Sütun içi sıra `POST /tasks/{id}/move` `beforeId/afterId` ile.
+- **Toplu işlem:** Her görev tekil kullanım senaryosundan geçer; bir hata varsa HTTP katmanı veritabanı işlemini geri alır (BR-TASK-008). Toplu `setStatus` yalnızca Yapılacak/Devam ediyor; tamamlama için `complete`.
+- **Çöp ve proje:** Proje grubu kalıcı silinirken, o projede başka grupla çöpte kalan görevler önce Inbox'a bağlanır (BR-DEL-004, yabancı anahtar onları silmesin diye); aynısı 30 günlük temizlik işinde yapılır.
+- **Kapsam notları:** `POST /tags` (etiket oluşturma uç noktası) eklenmedi; etiketler görevden oluşturulur. FR-VIEW-08 (P1) kısmi: varsayılan görünüm Liste, proje bazında son görünüm hatırlanmıyor. Figma'da olmayan ekranlar (proje formu, filtre paneli, kayıtlı görünüm pencereleri, Arşiv, Çöp kutusu, Ayarlar · Etiketler) mevcut bileşenlerle kuruldu ve onaya sunuldu (D-065).
 
 ---
 

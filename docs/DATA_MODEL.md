@@ -1,6 +1,6 @@
 # Veri Modeli
 
-> Durum: v0.4 · Son güncelleme: 2026-10-28 · Uygulama durumu: Migration 0000–0002 uygulandı (§7.1); diğer tablolar ilgili fazlarda.
+> Durum: v0.5 · Son güncelleme: 2026-10-29 · Uygulama durumu: Migration 0000–0005 uygulandı (§7.1); diğer tablolar ilgili fazlarda.
 > PostgreSQL + Drizzle ONAYLI (D-044); Docker Desktop üzerinde yerel (D-056). Alan ayrıntıları ve sınırlar D-060 ile onaylı; D-061 sadeleştirmeleri uygulanmıştır.
 > Veritabanı: PostgreSQL 16+ (ONAYLI, D-044). Bu belgedeki alanlar **hedef şemadır**; açık sorulara bağlı alanlar işaretlenmiştir.
 
@@ -279,6 +279,8 @@ Kısıtlar: `UNIQUE (task_id, remind_at)`; `CHECK (kind <> 'relative' OR offset_
 `notification_deliveries` — **SONRA** (D-037: MVP'de yalnızca uygulama içi): `id`, `notification_id` (CASCADE), `channel` (`email`), `status`, `attempts`, `last_error`, `sent_at`. `UNIQUE (notification_id, channel)`. MVP'de oluşturulmaz.
 
 ### 3.13. `saved_views` — modül: views
+**Uygulama notu (Faz 5, D-086):** `view_type` şimdilik `list/board`; `sort` ve `group_by` metin; `pinned` kullanılmadığı için eklenmedi. Filtre okunurken şemadan geçer; okunamayan filtre boş filtre sayılır.
+
 `id`, `workspace_id`, `owner_user_id`, `name` (1–60), `view_type` (`list/board/calendar`), `filter jsonb` (`TaskFilter` v1), `sort jsonb`, `group_by text`, `position`, `pinned boolean`, `version`, zaman damgaları. Kullanıcı başına ≤ 50 (BR-VIEW-001).
 
 ### 3.14. `audit_events` — modül: audit
@@ -333,6 +335,7 @@ Ayrıntı: ARCHITECTURE §12.4. Ek kurallar:
 | 0002 | `drizzle/0002_projects_created_by_set_null.sql` | `projects.created_by` isteğe bağlı, kullanıcı silinince boşalır (D-068) | 3 |
 | 0004 | `drizzle/0004_tags.sql` | `tags`, `task_tags` (bileşik FK'lar; `note_tags` Faz 7) | 4 |
 | 0003 | `drizzle/0003_tasks_idempotency.sql` | `tasks` (tekrar ve arama kolonları hariç; D-076), `idempotency_keys` | 4 |
+| 0005 | `drizzle/0005_projects_views.sql` | `saved_views` (`pinned` kolonu ve takvim türü yok; D-086), `projects_color` CHECK (12 renk, D-082) | 5 |
 
 Notlar: `idempotency_keys` ilk oluşturma uç noktalarıyla birlikte Faz 4'te eklenecek. Kimlik tablolarının alan adları Better Auth'un beklediği adlardır (`users.email_verified` boolean; DATA_MODEL §3.1'deki `email_verified_at` yerine). Hız sınırı sayaçları `auth_rate_limits` tablosunda tutulur.
 ## 8. Başlangıç ve test verileri

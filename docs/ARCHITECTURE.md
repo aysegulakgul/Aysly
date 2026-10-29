@@ -1,6 +1,6 @@
 # Sistem Mimarisi
 
-> Durum: v0.4 · Son güncelleme: 2026-10-28 · Uygulama durumu: Modüler monolit iskeleti, kimlik, çalışma alanı, projeler (Inbox), tercihler ve denetim modülleri kuruldu (Faz 2–3). Bu belge hedef mimariyi tanımlar; henüz kurulmayan modüller ilgili fazlarda gelir.
+> Durum: v0.5 · Son güncelleme: 2026-10-29 · Uygulama durumu: Kimlik, çalışma alanı, projeler, görevler, etiketler, görünümler, tercihler ve denetim modülleri kuruldu (Faz 2–5). Bu belge hedef mimariyi tanımlar; henüz kurulmayan modüller ilgili fazlarda gelir.
 > Temel yığın **ONAYLI** (D-044), çalışma ortamı yalnızca yerel (D-045). Zamanlanmış işler D-053, Docker ile yerel PostgreSQL D-056, yerel Git + `pnpm verify` D-057, yardımcı kütüphaneler yalnızca gerektiğinde D-058. Teknik öneriler D-060 ile onaylı; D-061 sadeleştirmeleri geçerli.
 
 ## 1. Mimari hedefler
@@ -152,6 +152,8 @@ Kod iş alanlarına (bounded context benzeri) göre **modüllere**, her modül *
 | `audit` | Güvenlik ve yıkıcı işlem olayları | `audit_events` |
 | `data-portability` | JSON dışa aktarma (Faz 8, D-046) | — (diğer modüllerin okuma servislerini kullanır) |
 
+**Uygulama notu (Faz 5, D-086):** `views` modülü kuruldu (`TaskFilter` v1, `saved_views`). Proje ile görevlerini birlikte ilgilendiren işlemler (ilerleme, proje silme/geri yükleme, arşiv sayfası, çöp listesi) şimdilik `tasks` modülünde orkestre edilir; `lifecycle` modülü notlar ve hedefler geldiğinde (Faz 7) değerlendirilir.
+
 ### 4.2. Modüller arası iletişim kuralları
 1. Bir modül başka bir modülün **tablolarına doğrudan erişmez**; o modülün `index.ts` ile dışa açtığı **application servisini veya sorgu arayüzünü** çağırır.
 2. Okuma ağırlıklı birleşik ekranlar (dashboard, arama, My Tasks) için ayrı **okuma modelleri** (query services) yazılabilir; bunlar birden çok tabloyu okuyabilir ama **asla yazmaz**.
@@ -165,7 +167,7 @@ flowchart TD
   dashboard --> tasks & projects & goals & notifications
   search --> tasks & projects & notes & goals
   lifecycle --> tasks & projects & notes & goals & reminders
-  tasks --> projects & tags & reminders
+  tasks --> projects & tags & reminders & views
   notes --> tags
   goals --> tasks & projects
   reminders --> notifications

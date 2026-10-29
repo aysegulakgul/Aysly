@@ -1,6 +1,6 @@
 # Aysly — Ürün Gereksinimleri Dokümanı (PRD)
 
-> Durum: v0.3 · Son güncelleme: 2026-10-27 · Uygulama durumu: Faz 3 devam ediyor (kimlik doğrulama, kabuk, tercihler); ayrıntı IMPLEMENTATION_PLAN §1
+> Durum: v0.4 · Son güncelleme: 2026-10-29 · Uygulama durumu: Faz 1–4 kapandı, Faz 5 sürüyor; ayrıntı IMPLEMENTATION_PLAN §1
 > v0.2: OQ-001..OQ-023 kararları işlendi (D-030..D-052). Çalışma ortamı şimdilik yalnızca yerel (D-045).
 > Etiketler: `ONAYLI` · `ÖNERİ` · `AÇIK (OQ-xxx)` · `SONRA` — anlamları [DECISIONS.md](DECISIONS.md) içinde.
 
@@ -225,7 +225,7 @@ Kural kimlikleri [BUSINESS_RULES.md](BUSINESS_RULES.md) dosyasındadır; burada 
 
 | ID | Gereksinim | Öncelik | Kurallar |
 |---|---|---|---|
-| FR-PROJ-01 | Proje oluşturma/düzenleme: ad (zorunlu), açıklama, renk, simge. | P0 | BR-PROJ-001 |
+| FR-PROJ-01 | Proje oluşturma/düzenleme: ad (zorunlu), açıklama, renk (12 renklik palet). Simge MVP'de yok (D-082). | P0 | BR-PROJ-001 |
 | FR-PROJ-02 | Proje durumu: Aktif / Beklemede / Tamamlandı. | P0 | BR-PROJ-002 |
 | FR-PROJ-03 | İlerleme göstergesi. | P0 | BR-PROJ-003 |
 | FR-PROJ-04 | Proje listesi: filtre (durum), sıralama (ad, son güncelleme, manuel). | P0 | — |
@@ -237,7 +237,7 @@ Kural kimlikleri [BUSINESS_RULES.md](BUSINESS_RULES.md) dosyasındadır; burada 
 | ID | Gereksinim | Öncelik |
 |---|---|---|
 | FR-VIEW-01 | Liste görünümü (gruplama: yok/tarih/öncelik/durum/proje). | P0 |
-| FR-VIEW-02 | Board görünümü (sütunlar = durumlar; sürükle-bırak durum değiştirir). | P0 |
+| FR-VIEW-02 | Board görünümü (sütunlar = durumlar; masaüstünde sürükle-bırak, mobilde kart menüsünden "Durumu değiştir", D-083). | P0 |
 | FR-VIEW-03 | Takvim görünümü (bkz. 6.7). | P0 |
 | FR-VIEW-04 | Ortak filtreler: durum, öncelik, etiket, proje, tarih aralığı, tarihsiz, arşivlenmiş dahil. | P0 |
 | FR-VIEW-05 | Sıralama: manuel, son tarih, öncelik, oluşturma, başlık. | P0 |

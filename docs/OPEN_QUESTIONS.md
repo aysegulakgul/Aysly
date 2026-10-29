@@ -1,6 +1,6 @@
 # Açık Sorular (Karar Bekleyen Konular)
 
-> Durum: v0.5 · Son güncelleme: 2026-10-28 · Sahibi: Ürün sahibi (karar), Claude (hazırlık)
+> Durum: v0.6 · Son güncelleme: 2026-10-29 · Sahibi: Ürün sahibi (karar), Claude (hazırlık)
 
 Bu dosya, **ürün sahibinin kararını bekleyen** konuların tek kaynağıdır. Bir konu burada `AÇIK` durumdayken, ona bağlı geliştirme **yapılamaz** ve ilgili belgeler bu kararı kesinleşmiş gibi yazamaz (bkz. [CLAUDE.md](../CLAUDE.md) §5).
 
@@ -20,6 +20,43 @@ Bu dosya, **ürün sahibinin kararını bekleyen** konuların tek kaynağıdır.
 | ID | Konu | Engellediği faz | Öneri (kısa) | Durum |
 |---|---|---|---|---|
 | OQ-032 | Yayına alma (hosting, alan adı, e-posta sağlayıcı, hata izleme, yedekleme) | Yayın kararı (MVP sonrası) | Şimdi karar gerekmiyor | AÇIK (ertelendi) |
+
+### OQ-038 — Proje rengi ve simgesi — KAPANDI (D-082: seçenek A)
+
+**Bağlam.** FR-PROJ-01 proje için renk ve simge ister; UI_UX §2.4 12 renklik bir palet adlandırır ama tonları yoktur. Figma'daki Projeler (`4:67037`) ve Proje · Pano (`4:67253`) ekranlarında projeler renksizdir (kenar çubuğunda boş daire, başlıkta klasör simgesi); proje oluşturma formu Figma'da yoktur (D-065).
+
+| Seçenek | Sonuç |
+|---|---|
+| A. Renk var, simge şimdilik yok | 12 rengin tonlarını Claude Figma paletiyle uyumlu belirler ve onaya sunar (D-066 gibi). Renk kenar çubuğundaki dairede ve proje başlığında görünür. Simge kolonu boş kalır; herkes Figma'daki klasör simgesini görür. **Önerilen.** |
+| B. Renk ve simge | Ek olarak Figma ikonlarından ~12 simgelik seçim. Daha fazla tasarım kararı ve Figma dışı görünüm. |
+| C. İkisi de yok | Figma ile birebir; FR-PROJ-01 güncellenir. Projeler kenar çubuğunda yalnızca adla ayrışır. |
+
+### OQ-039 — Mobilde panoda durum değiştirme — KAPANDI (D-083: seçenek A)
+
+**Bağlam.** FR-VIEW-02 "sürükle-bırak durum değiştirir" der. Figma mobil pano (`4:68533`) sütunları alt alta dizer; dokunmatik ekranda sütunlar arası sürükleme uzun kaydırma gerektirir. Takvim için benzer karar D-047'dir (mobilde tarih seçici).
+
+| Seçenek | Sonuç |
+|---|---|
+| A. Mobilde kart menüsünden "Durumu değiştir"; masaüstünde sürükle-bırak + klavye/menü alternatifi | D-047 ile tutarlı, basit, erişilebilir. **Önerilen.** |
+| B. Mobilde de basılı tutup sürükleme | Dokunmatik sürükleme ve otomatik kaydırma gerekir; ek paket ve daha fazla test. |
+
+### OQ-040 — Toplu işlemlerin kapsamı — KAPANDI (D-084: seçenek A)
+
+**Bağlam.** BR-TASK-008 toplu işlemin kurallarını (200 sınırı, atomiklik) tanımlar ama hangi işlemlerin toplu yapılabileceğini saymaz.
+
+| Seçenek | Sonuç |
+|---|---|
+| A. Tamamla, projeye taşı, durum, öncelik, tarih ver, etiket ekle/kaldır, arşivle, çöpe taşı | Tekil işlemlerin tamamı; her biri aynı tekil kurallardan geçer. **Önerilen.** |
+| B. Yalnızca tamamla, projeye taşı, çöpe taşı | AC-02 için yeterli; daha az iş, kullanıcı geri kalanları tek tek yapar. |
+
+### OQ-041 — Etiket yönetimi ekranı — KAPANDI (D-085: seçenek A)
+
+**Bağlam.** IMPLEMENTATION_PLAN Faz 4 sonucunda etiket yönetimi (BR-TAG-002) "Faz 5'e kalanlar" arasındadır, ama Faz 5 kapsam satırında yoktur. Ekran Figma'da ve USER_FLOWS §2.14'teki Ayarlar sekmelerinde yoktur.
+
+| Seçenek | Sonuç |
+|---|---|
+| A. Faz 5'te Ayarlar · Etiketler sekmesi (yeniden adlandır, renk, kullanım sayısıyla sil) | Kayıtlı görünümlerdeki geçersiz etiket uyarısı (BR-VIEW-001) aynı fazda test edilir. Ekran D-065 ile onaya sunulur. **Önerilen.** |
+| B. Faz 7'ye (notlar ve aramayla birlikte) bırak | Faz 5 küçülür; etiketler o zamana kadar yalnızca görevden eklenip çıkarılır. |
 
 
 ### OQ-037 — Onboarding'in zamanlaması — KAPANDI (D-074: seçenek B)
@@ -111,5 +148,9 @@ D-045 gereği şimdilik yalnızca yerel ortam kullanılıyor. Yayına alma karar
 | OQ-035 | Açık temada eksik iki Figma rengi | Claude temaya uygun belirledi: support-1 `#dfe3f6`, support-2 `#d6d6cf`. | D-066 |
 | OQ-036 | Kayıtta hesap varlığının gizlenmesi | Şimdilik genel mesaj + hız sınırı; kayıttan hemen sonra kullanım korunur; yayına alma öncesi yeniden değerlendirilir. | D-070 |
 | OQ-037 | Onboarding zamanlaması | Faz 3'te tamamıyla; örnek projeler Faz 5'te görünür hale gelir. | D-074 |
+| OQ-038 | Proje rengi ve simgesi | 12 renkli paletten renk; simge MVP'de yok. | D-082 |
+| OQ-039 | Mobil panoda durum | Masaüstünde sürükle-bırak, mobilde kart menüsü. | D-083 |
+| OQ-040 | Toplu işlem kapsamı | Tamamla, taşı, durum, öncelik, tarih, etiket, arşivle, çöpe taşı. | D-084 |
+| OQ-041 | Etiket yönetimi | Faz 5'te Ayarlar · Etiketler. | D-085 |
 
 Kapanan soruların değerlendirilen seçenekleri DECISIONS.md'deki ilgili kaydın "Alternatifler" alanında özetlenmiştir.

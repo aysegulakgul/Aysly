@@ -1,6 +1,6 @@
 # UI/UX ve Tasarım Sistemi
 
-> Durum: v0.5 · Son güncelleme: 2026-10-28
+> Durum: v0.6 · Son güncelleme: 2026-10-29
 > **Tasarımın tek kaynağı Figma'dır (D-063).** Bu belgedeki renk, tipografi, boşluk, bileşen, kısayol ve wireframe değerleri Figma incelenmeden önce yazılmış **ön taslaktır**; Faz 2'de Figma'dan çıkarılan değerlerle değiştirilecek. Figma ile bu belge çeliştiğinde Figma geçerlidir. Figma'da olmayan bir şey bu belgeden "tasarım kararı" olarak alınmaz; önemliyse ürün sahibine sorulur. İlkeler (§1) ve erişilebilirlik hedefleri (§10, WCAG 2.2 AA) geçerliliğini korur; Figma'daki bir öğe bunlarla çelişirse sorulur. Tüm değerler tasarım token'ı olarak tanımlanır; bileşenler sabit renk/ölçü kullanmaz.
 
 
@@ -75,6 +75,8 @@ Renk **tek başına** anlam taşımaz; her zaman simge/metin ile birlikte (eriş
 
 ### 2.4. Proje ve etiket renkleri
 Sabit 12 renklik palet (`slate, red, orange, amber, green, teal, cyan, blue, indigo, violet, pink, brown`), her biri açık/koyu tema için kontrast doğrulanmış tonlarla. Kullanıcı serbest HEX giremez (tutarlılık ve kontrast güvencesi).
+
+**Uygulama (Faz 5, D-082, D-086 — ürün sahibinin onayına sunuldu):** Figma'da proje rengi yoktur. Tek ton kümesi iki temada da kullanılır (yalnızca 10–12 px renk noktası; anlamı her zaman ad taşır): slate #7c8799, red #e5534b, orange #e8833a, amber #d9a520, green #3fae6a, teal #2aa39a, cyan #2fa8c9, blue #4a8ae8, indigo #7a7ff0, violet #9a6ee6, pink #e05f9e, brown #a77b52 (`src/app/(app)/projects/project-color.tsx`).
 
 ## 3. Tipografi
 - **Yazı tipi:** `Inter` (değişken; Türkçe karakter desteği tam; `font-feature-settings: "cv11", "ss01"` isteğe bağlı) — alternatif: sistem yazı tipi yığını. Kendi sunucumuzdan barındırılır (üçüncü taraf istek yok).

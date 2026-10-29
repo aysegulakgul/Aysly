@@ -9,7 +9,7 @@ import { InboxList } from './inbox-list';
 
 /**
  * Inbox (Figma 4:66650 masaüstü, 4:68036 mobil): hızlı ekleme ve "İşlenecekler". `?task=` görev detay panelini
- * açar (4:66875). Çoklu seçim ("Seç") toplu işlemlerle birlikte gelir.
+ * açar (4:66875). "Seç" ile çoklu seçim ve toplu işlemler (BR-TASK-008).
  */
 export default async function InboxPage({
   searchParams,

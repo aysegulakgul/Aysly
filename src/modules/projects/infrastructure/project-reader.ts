@@ -8,6 +8,7 @@ export type ProjectRef = {
   id: string;
   name: string;
   kind: 'inbox' | 'standard';
+  color: string;
   archived: boolean;
 };
 
@@ -15,17 +16,20 @@ const columns = {
   id: projects.id,
   name: projects.name,
   kind: projects.kind,
+  color: projects.color,
   archivedAt: projects.archivedAt,
 };
 const toRef = (row: {
   id: string;
   name: string;
   kind: string;
+  color: string;
   archivedAt: Date | null;
 }): ProjectRef => ({
   id: row.id,
   name: row.name,
   kind: row.kind === 'inbox' ? 'inbox' : 'standard',
+  color: row.color,
   archived: row.archivedAt !== null,
 });
 

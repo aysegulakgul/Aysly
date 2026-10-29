@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import type { Route } from 'next';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Icon } from '@/ui/components/icon';
 import { BottomNav, BottomNavItem, NavItem } from '@/ui/components/nav';
 import { badge } from './badge';
+import { ProjectDot } from './projects/project-color';
 import { SignOutButton } from './sign-out-button';
 
 function useSection() {
@@ -15,6 +17,11 @@ function useSection() {
     inbox: pathname === '/inbox',
     myTasks: pathname === '/my-tasks',
     upcoming: pathname === '/upcoming',
+    projects: pathname === '/projects',
+    project: (id: string) => pathname === `/projects/${id}`,
+    view: (id: string) => pathname === `/views/${id}`,
+    archive: pathname === '/archive',
+    trash: pathname === '/trash',
     settings: pathname.startsWith('/settings'),
     menu: pathname === '/menu',
   };
@@ -22,13 +29,29 @@ function useSection() {
 
 const Divider = () => <div className="h-px w-full shrink-0 bg-border" />;
 
-/** Figma UI/Sidebar (4:66491): 232 px, surface-muted zemin, 16 px iç boşluk, 12 px aralık. */
+export type SidebarProject = { id: string; name: string; color: string; percent: number | null };
+export type SidebarView = { id: string; name: string };
+
+const sectionLink = (active: boolean) =>
+  `flex h-row w-full items-center gap-2 rounded-sm px-3 text-sm ${
+    active ? 'bg-support-1 text-primary' : 'text-text-secondary'
+  }`;
+
+/**
+ * Figma UI/Sidebar (4:66491): 232 px, surface-muted zemin, 16 px iç boşluk, 12 px aralık. Faz 5: Projeler girişi,
+ * "PROJELER" (renk ve ilerleme yüzdesiyle) ve "KAYITLI GÖRÜNÜMLER" bölümleri, Arşiv ve Çöp kutusu (Figma 4:67037).
+ * Takvim, Hedefler ve Notlar ait oldukları fazda eklenir (D-071).
+ */
 export function Sidebar({
   userName,
   counts,
+  projects,
+  views,
 }: {
   userName: string;
   counts: { inbox: number; myTasks: number; today: number; upcoming: number };
+  projects: SidebarProject[];
+  views: SidebarView[];
 }) {
   const t = useTranslations('shell');
   const section = useSection();
@@ -83,7 +106,88 @@ export function Sidebar({
         >
           {t('upcoming')}
         </NavItem>
+        <NavItem
+          href="/projects"
+          glyph="▭"
+          active={section.projects}
+          count={badge(projects.length)}
+          countLabel={t('projectsCount', { count: projects.length })}
+        >
+          {t('projects')}
+        </NavItem>
         <Divider />
+        <div className="flex items-center gap-2 px-1">
+          <h2 className="flex-1 text-xs font-medium tracking-wide text-text-secondary uppercase">
+            {t('projectsSection')}
+          </h2>
+          <Link
+            href="/projects"
+            aria-label={t('newProject')}
+            className="flex size-8 items-center justify-center rounded-sm text-text-secondary"
+          >
+            +
+          </Link>
+        </div>
+        <ul className="flex flex-col">
+          {projects.map((p) => (
+            <li key={p.id}>
+              <Link
+                href={`/projects/${p.id}` as Route}
+                aria-current={section.project(p.id) ? 'page' : undefined}
+                className={sectionLink(section.project(p.id))}
+              >
+                <ProjectDot color={p.color} />
+                <span className="min-w-0 flex-1 truncate">
+                  {p.percent === null
+                    ? p.name
+                    : t('projectProgress', { name: p.name, percent: p.percent })}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <Divider />
+        <div className="flex items-center gap-2 px-1">
+          <h2 className="flex-1 text-xs font-medium tracking-wide text-text-secondary uppercase">
+            {t('savedViews')}
+          </h2>
+          <Link
+            href="/views/new"
+            aria-label={t('newView')}
+            className="flex size-8 items-center justify-center rounded-sm text-text-secondary"
+          >
+            +
+          </Link>
+        </div>
+        <ul className="flex flex-col">
+          {views.map((v) => (
+            <li key={v.id}>
+              <Link
+                href={`/views/${v.id}` as Route}
+                aria-current={section.view(v.id) ? 'page' : undefined}
+                className={sectionLink(section.view(v.id))}
+              >
+                <span aria-hidden="true">☆</span>
+                <span className="min-w-0 flex-1 truncate">{v.name}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <Divider />
+        <Link
+          href="/archive"
+          aria-current={section.archive ? 'page' : undefined}
+          className={sectionLink(section.archive)}
+        >
+          {t('archive')}
+        </Link>
+        <Link
+          href="/trash"
+          aria-current={section.trash ? 'page' : undefined}
+          className={sectionLink(section.trash)}
+        >
+          {t('trash')}
+        </Link>
         <NavItem href="/settings" glyph="⚙" active={section.settings}>
           {t('settings')}
         </NavItem>

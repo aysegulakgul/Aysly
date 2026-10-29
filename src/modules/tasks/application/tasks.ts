@@ -68,6 +68,21 @@ async function checkTags(
 const readOnly = (task: Task) => task.archivedAt !== null;
 
 /**
+ * Görev değiştirilebilir mi: BR-DEL-002 görevin kendisi arşivliyse, BR-PROJ-004 projesi arşivliyse salt okunur.
+ * `allowArchivedTask`: arşivden çıkarma gibi arşivli görev üzerinde çalışan işlemler için.
+ */
+export async function checkWritable(
+  deps: TaskDeps,
+  scope: WorkspaceScope,
+  task: Task,
+  options: { allowArchivedTask?: boolean } = {},
+): Promise<DomainError | null> {
+  if (!options.allowArchivedTask && readOnly(task)) return businessRule('BR-DEL-002');
+  const project = await deps.projects.find(scope, task.projectId);
+  return project?.archived ? businessRule('BR-PROJ-004') : null;
+}
+
+/**
  * Görev oluşturma (API_CONTRACTS §6.3). BR-TASK-001 başlık, BR-TASK-002 proje verilmezse Inbox,
  * BR-PROJ-004 arşivlenmiş projeye görev eklenmez, BR-DATE-001/002 tarih kuralları, BR-TASK-006 sona eklenir.
  */
@@ -99,7 +114,8 @@ export async function createTask(
     const parent = await deps.tasks.findById(scope, command.parentTaskId);
     if (!parent) return err(notFound());
     if (parent.parentTaskId !== null) return err(businessRule('BR-SUB-001'));
-    if (readOnly(parent)) return err(businessRule('BR-DEL-002'));
+    const blocked = await checkWritable(deps, scope, parent);
+    if (blocked) return err(blocked);
     const siblings = await deps.tasks.subtaskCounts(scope, [parent.id]);
     if ((siblings.get(parent.id)?.total ?? 0) >= SUBTASKS_PER_TASK) {
       return err(businessRule('BR-SUB-005'));
@@ -159,7 +175,8 @@ export async function updateTask(
   if (!allowed.ok) return allowed;
   const current = await deps.tasks.findById(scope, id);
   if (!current) return err(notFound());
-  if (readOnly(current)) return err(businessRule('BR-DEL-002'));
+  const blocked = await checkWritable(deps, scope, current);
+  if (blocked) return err(blocked);
 
   const issues: FieldIssue[] = [];
   const changes: TaskChanges = {};
@@ -225,7 +242,8 @@ export async function completeTask(
   if (!allowed.ok) return allowed;
   const current = await deps.tasks.findById(scope, id);
   if (!current) return err(notFound());
-  if (readOnly(current)) return err(businessRule('BR-DEL-002'));
+  const blocked = await checkWritable(deps, scope, current);
+  if (blocked) return err(blocked);
   const now = deps.clock.now();
   const changes = completion(current, now, scope.userId);
   if (!changes) return ok(current);
@@ -249,7 +267,8 @@ export async function reopenTask(
   if (!allowed.ok) return allowed;
   const current = await deps.tasks.findById(scope, id);
   if (!current) return err(notFound());
-  if (readOnly(current)) return err(businessRule('BR-DEL-002'));
+  const blocked = await checkWritable(deps, scope, current);
+  if (blocked) return err(blocked);
   const changes = reopening(current);
   if (!changes) return ok(current);
   return save(deps, scope, current, command.version, changes);

@@ -1,6 +1,6 @@
 # API Sözleşmeleri
 
-> Durum: v0.4 · Son güncelleme: 2026-10-28 · Uygulama durumu: Faz 3 — kayıt (§3), Better Auth kimlik uç noktaları (§3) ve `GET/PATCH /me/preferences` (§4) uygulandı; diğerleri ilgili fazlarda.
+> Durum: v0.5 · Son güncelleme: 2026-10-29 · Uygulama durumu: Faz 3–5 uç noktaları uygulandı (her bölümdeki "Uygulandı" notları); diğerleri ilgili fazlarda.
 > Yaklaşım: Sürümlü REST, JSON (D-013, ONAYLI — D-060). Bu belge, Zod şemaları yazıldıktan sonra şemalarla tutarlı tutulur; ileride OpenAPI belgesi şemalardan otomatik üretilir.
 
 ## 1. İçindekiler
@@ -142,6 +142,8 @@ Hesap varlığını ifşa etmeme: `sign-up` mevcut e-postada da kullanıcıya ge
 | GET | `/workspaces/{ws}/projects/{id}/delete-preview` | `project.delete` | Onay penceresi için etkilenecek kayıt sayıları |
 | POST | `/workspaces/{ws}/projects/reorder` | `project.update` | `{ id, beforeId?, afterId? }` |
 
+**Uygulandı (Faz 5):** Tablodaki tüm uç noktalar. `GET /projects` standart projelere `progress` ekler (Inbox ilk, `progress` yok); `status` birden çok kez verilebilir. `icon` her zaman `null` (D-082); `color` 12 renklik paletten. `POST /projects` `Idempotency-Key` ister. `delete-preview` yanıtı `{ tasks, topLevel, subtasks }`. `POST …/complete` yanıtı proje + `completedTasks`. `reorder`: `afterId` projesinin ardına, `beforeId` projesinin önüne.
+
 **Proje nesnesi:**
 ```json
 {
@@ -178,6 +180,8 @@ Hesap varlığını ifşa etmeme: `sign-up` mevcut e-postada da kullanıcıya ge
 **Uygulandı (Faz 4, 3. bölüm):** Oluşturmada `parentTaskId` ve `tagNames`; `PATCH` gövdesinde `tagNames` (görevin etiket kümesini verilen adlarla **değiştirir**; boş dizi tüm etiketleri kaldırır); `POST …/complete` gövdesinde `completeSubtasks`; `POST …/move` (`{ version, projectId }`, sıra hedefin sonu; sıra içi taşıma Faz 5'te), `POST …/detach`; `GET /workspaces/{ws}/my-tasks` (`[{ group: overdue|today|tomorrow|thisWeek|later|none, tasks }]`); `GET /workspaces/{ws}/projects` (salt okunur ilk sürüm: `{ id, name, kind }`, Inbox ilk); `GET /workspaces/{ws}/tags`. Liste ve detay yanıtlarında `project { id, name, kind }`, `tags`, `subtaskCount { total, done }`; detayda ayrıca `subtasks`. Etiket yönetimi uç noktaları (`POST/PATCH/DELETE /tags`, BR-TAG-002) henüz yok.
 
 **Uygulandı (Faz 4, 4. bölüm):** `POST …/archive`, `POST …/unarchive` (`{ version }`; alt görevler birlikte), `DELETE /workspaces/{ws}/tasks/{id}` (çöpe taşır; `{ data: { batchId, affected } }`), `GET /workspaces/{ws}/tasks/{id}?includeDeleted=true`, `GET /trash`, `POST /trash/restore`, `DELETE /trash/{batchId}` ve `DELETE /trash` (`{ confirm: true }`). Çöp kutusu şimdilik yalnızca görevleri içerir (proje çöpü Faz 5). Toplu işlem (`POST /tasks/bulk`) ve `GET /archive` Faz 5'te.
+
+**Uygulandı (Faz 5):** `GET /tasks` tam `TaskFilter` v1 (§6.2) + `sort` (`manual|due|priority|created|title`) + `view=list|board` (durum filtresi boşken listede açık, panoda tüm durumlar); yanıt `meta.ignored` (BR-VIEW-001). `POST …/move` gövdesinde `projectId` isteğe bağlı, `beforeId`/`afterId` ile sıra içi taşıma. `POST /tasks/bulk` (§6.6) — işlemlere `setStatus` (`todo|in_progress`) eklendi (D-084); `setDue` için `due: null` tarihi kaldırır. `GET /archive`, proje çöpü (§13).
 
 ### 6.2. Liste sorgusu (`TaskFilter` v1)
 
@@ -268,6 +272,7 @@ Yanıt: `{ data: { task, nextOccurrence: Task | null, completedSubtaskIds: [] } 
 ```
 - En fazla 200 kimlik; atomik (BR-TASK-008). Toplu işlemler sürüm kontrolü yapmaz ("son yazan kazanır", D-060); gerekçe: kullanıcı açıkça toplu değişiklik istiyor.
 - Başarı: `{ data: { affected: 37, batchId?: "..." } }`; ret: `422 BULK_OPERATION_REJECTED` + `failures: [{ id, code, rule }]`.
+- Uygulanan gövde (Faz 5): `{ action, taskIds, params? }`; `params` işleme göre `{ projectId }`, `{ status }`, `{ due }`, `{ priority }`, `{ tagNames }`.
 
 ## 7. Etiketler
 
@@ -277,6 +282,8 @@ Yanıt: `{ data: { task, nextOccurrence: Task | null, completedSubtaskIds: [] } 
 | POST | `/workspaces/{ws}/tags` | BR-TAG-001 (çakışmada `422` + mevcut etiket kimliği) |
 | PATCH | `/workspaces/{ws}/tags/{id}` | Ad/renk; BR-TAG-001 |
 | DELETE | `/workspaces/{ws}/tags/{id}` | BR-TAG-002 (kalıcı); yanıt `{ removedFrom: { tasks, notes } }` |
+
+**Uygulandı (Faz 5):** `GET` (kullanım sayısı `tasks`), `PATCH`, `DELETE` (yanıt `{ removedFrom: { tasks } }`; notlar Faz 7). Ad çakışmasında `422 BR-TAG-001` + `details: [{ field: 'existingTagId', reason: <kimlik> }]`. `POST /tags` eklenmedi (D-086).
 
 ## 8. Hatırlatıcılar
 
@@ -321,6 +328,8 @@ Gövde Markdown olarak döner; istemci sanitize edilmiş HTML'e çevirir (SECURI
 | GET | `/search?q=&types=task,project,note,goal&includeArchived=` | Global arama; erişilebilir tüm alanlar | BR-SRCH-001/002; hız sınırı yayına alma öncesi (D-061) |
 | GET | `/workspaces/{ws}/dashboard` | Tek istekte widget verisi | BR-DASH-001/002 |
 
+**Uygulandı (Faz 5):** `/views` ve `/views/{id}` (`GET`, `POST` + `Idempotency-Key`, `PATCH` + `version`, `DELETE` → 204). `viewType`: `list|board`. Kullanıcı başına 50 (`422 BR-VIEW-001`).
+
 Dashboard yanıtı:
 ```json
 {
@@ -358,6 +367,8 @@ MVP'de yalnızca uygulama içi bildirim vardır (D-037). D-053 gereği `unread-c
 | POST | `/workspaces/{ws}/trash/restore` | `{ batchId }` veya `{ type, id, restoreParent?: boolean }` | BR-DEL-004, BR-SUB-004 |
 | DELETE | `/workspaces/{ws}/trash/{batchId}` | Grubu kalıcı sil (`{ confirm: true }` zorunlu) | BR-DEL-005 |
 | DELETE | `/workspaces/{ws}/trash` | Çöpü boşalt (`{ confirm: true }`) | BR-DEL-005, `trash.empty` |
+
+**Uygulandı (Faz 5):** `GET /archive` → `{ projects: Proje[] (progress ile), tasks: Görev[] (project özetiyle) }` (tür filtresi arayüzde sekmeyle). `GET /trash` → `root: { type: 'task'|'project', id, title }`, `count` (gruptaki görev sayısı). `POST /trash/restore` → `{ batchId, projectChoice? }`, `{ type: 'project', id }` veya `{ type?: 'task', id, restoreParent?, projectChoice? }`; görevin projesi başka grupla çöpteyse `projectChoice` (`restore|inbox`) yoksa `422 BR-DEL-004`.
 
 ## 14. Dışa aktarma ve sağlık
 

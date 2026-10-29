@@ -1,6 +1,6 @@
 # Merkezi İş Kuralları
 
-> Durum: v0.3 · Son güncelleme: 2026-10-27 · Uygulama durumu: Faz 3 kuralları uygulanıyor; hangi kuralın kodda ve testte olduğu `node scripts/br-coverage.mjs` çıktısındadır.
+> Durum: v0.4 · Son güncelleme: 2026-10-29 · Uygulama durumu: Faz 3–5 kuralları uygulanıyor; hangi kuralın kodda ve testte olduğu `node scripts/br-coverage.mjs` çıktısındadır.
 > v0.3: OQ-024..OQ-031 kararları işlendi (D-053..D-060). OQ-030 ile teknik öneriler onaylandı; "gereksiz karmaşıklık" ölçütüyle çıkarılanlar D-061 kaydındadır. OQ-033 kapandı (D-062): BR-ACC-005 için onay e-postası MVP'de yok.
 
 Bu dosya Aysly'deki iş kurallarının **tek gerçek kaynağıdır**. Diğer belgeler kuralları kimlikleriyle referans verir; kuralı yeniden tanımlamaz. Kod içinde bir kuralı uygulayan yer, yorumla kural kimliğini belirtir (ör. `// BR-TASK-004`). Testler kural kimliğini test adında taşır.
@@ -202,6 +202,7 @@ Ayrıntılı matris: [ROLES_AND_PERMISSIONS.md](ROLES_AND_PERMISSIONS.md).
 
 ### BR-TASK-008 — Toplu işlemler
 - **Durum:** ONAYLI (D-060)
+- **İşlemler (ONAYLI, D-084):** tamamla, yeniden aç, projeye taşı, durum (Yapılacak/Devam ediyor), öncelik, tarih ver/kaldır, etiket ekle/kaldır, arşivle, çöpe taşı.
 - **Davranış:** Tek istekte en fazla 200 görev. İşlem **atomiktir**: bir görev yetki veya kural nedeniyle reddedilirse hiçbiri uygulanmaz ve yanıt reddedilen kimlikleri ve nedenleri listeler. Her görev için aynı tekil kurallar uygulanır (toplu işlem kuralları atlatamaz). Toplu silme tek bir `deleted_batch_id` ile yapılır ve tek "Geri al" ile geri alınır.
 - **Hata:** `422 BULK_OPERATION_REJECTED` + `failures[]`.
 - **Kabul:** Given 10 görevden 1'i başka alanda, When toplu tamamlama, Then 0 görev değişir; yanıt 1 hata içerir.
@@ -600,3 +601,4 @@ Bir kayıt hem arşivli hem çöpte olabilir; geri yüklenince arşivli durumuna
 | 2026-10-27 | BR-NOTIF-001 | Günlük özet MVP dışı | D-054 |
 | 2026-10-27 | BR-PERM-005 | SONRA'ya alındı (EntitlementService yazılmayacak) | D-061 |
 | 2026-10-27 | BR-SUB-001 | DB trigger kaldırıldı; uygulama + test yeterli | D-061 |
+| 2026-10-29 | BR-TASK-008 | Toplu yapılabilen işlemler listelendi | D-084 |

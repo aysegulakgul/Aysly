@@ -1,16 +1,16 @@
 import { generateKeyBetween } from 'fractional-indexing';
 import { authorize, type WorkspaceScope } from '@/modules/workspaces';
-import { businessRule, notFound, type DomainError } from '@/shared/kernel/errors';
+import { businessRule, notFound, validationError, type DomainError } from '@/shared/kernel/errors';
 import { err, ok, type Result } from '@/shared/kernel/result';
 import { DUE_GROUPS, dueGroup, isUpcoming, type DueGroup } from '../domain/schedule';
 import type { Task } from '../domain/task';
 import type { ProjectRef } from './ports';
-import type { TaskDeps } from './tasks';
+import { checkWritable, type TaskDeps } from './tasks';
 
 type Tag = { id: string; name: string; color: string };
 export type TaskSummary = {
   task: Task;
-  project: { id: string; name: string; kind: 'inbox' | 'standard' };
+  project: { id: string; name: string; kind: 'inbox' | 'standard'; color: string };
   tags: Tag[];
   subtasks: { total: number; done: number };
 };
@@ -37,25 +37,55 @@ export async function moveTask(
   deps: TaskDeps,
   scope: WorkspaceScope,
   id: string,
-  command: { version: number; projectId: string },
+  command: {
+    version: number;
+    projectId?: string | undefined;
+    beforeId?: string | undefined;
+    afterId?: string | undefined;
+  },
 ): Promise<Result<Task, DomainError>> {
   const allowed = authorize(scope, 'task.update');
   if (!allowed.ok) return allowed;
   const current = await deps.tasks.findById(scope, id);
   if (!current) return err(notFound());
-  if (current.archivedAt) return err(businessRule('BR-DEL-002'));
+  const blocked = await checkWritable(deps, scope, current);
+  if (blocked) return err(blocked);
   if (current.parentTaskId) return err(businessRule('BR-SUB-002'));
-  const target = await deps.projects.find(scope, command.projectId);
+  const target = await deps.projects.find(scope, command.projectId ?? current.projectId);
   if (!target) return err(notFound());
   if (target.archived) return err(businessRule('BR-PROJ-004'));
-  if (target.id === current.projectId) return ok(current);
+  const changesProject = target.id !== current.projectId;
+  if (!changesProject && !command.beforeId && !command.afterId) return ok(current);
 
-  const last = await deps.tasks.lastPosition(scope, target.id, null);
+  // BR-TASK-006: yalnızca taşınan görevin konumu değişir; komşular hedef projenin üst düzey görevleridir.
+  const neighbour = async (neighbourId: string | undefined) => {
+    if (!neighbourId) return null;
+    const task = await deps.tasks.findById(scope, neighbourId);
+    return task && task.projectId === target.id && !task.parentTaskId && task.id !== current.id
+      ? task
+      : undefined;
+  };
+  const after = await neighbour(command.afterId);
+  const before = await neighbour(command.beforeId);
+  if (after === undefined || before === undefined) return err(notFound());
+  let position: string;
+  if (after || before) {
+    const lower = after?.position ?? null;
+    const upper = before?.position ?? null;
+    if (lower !== null && upper !== null && lower >= upper) {
+      return err(validationError([{ field: 'beforeId', reason: 'invalid' }]));
+    }
+    position = generateKeyBetween(lower, upper);
+  } else {
+    position = generateKeyBetween(await deps.tasks.lastPosition(scope, target.id, null), null);
+  }
   const moved = await versionChecked(deps, scope, current, command.version, {
     projectId: target.id,
-    position: generateKeyBetween(last, null),
+    position,
   });
-  if (moved.ok) await deps.tasks.moveSubtasks(scope, current.id, target.id, deps.clock.now());
+  if (moved.ok && changesProject) {
+    await deps.tasks.moveSubtasks(scope, current.id, target.id, deps.clock.now());
+  }
   return moved;
 }
 
@@ -70,7 +100,8 @@ export async function detachTask(
   if (!allowed.ok) return allowed;
   const current = await deps.tasks.findById(scope, id);
   if (!current) return err(notFound());
-  if (current.archivedAt) return err(businessRule('BR-DEL-002'));
+  const blocked = await checkWritable(deps, scope, current);
+  if (blocked) return err(blocked);
   if (!current.parentTaskId) return ok(current);
   const last = await deps.tasks.lastPosition(scope, current.projectId, null);
   return versionChecked(deps, scope, current, command.version, {
@@ -79,7 +110,7 @@ export async function detachTask(
   });
 }
 
-async function summarize(
+export async function summarize(
   deps: TaskDeps,
   scope: WorkspaceScope,
   tasks: Task[],
@@ -98,6 +129,7 @@ async function summarize(
         id: task.projectId,
         name: project?.name ?? '',
         kind: project?.kind ?? 'standard',
+        color: project?.color ?? 'slate',
       },
       tags: tags.get(task.id) ?? [],
       subtasks: counts.get(task.id) ?? { total: 0, done: 0 },

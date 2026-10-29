@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { findInboxCount, findMyTasksCount } from '@/modules/tasks';
+import { findInboxCount, findMyTasksCount, findProjectOverview } from '@/modules/tasks';
+import { findViews } from '@/modules/views';
 import { getDashboard, getPersonalScope, getViewer } from '../viewer';
 import { KeyboardShortcuts } from './shortcuts';
 import { MobileNavigation, Sidebar } from './navigation';
@@ -13,10 +14,12 @@ import { MobileNavigation, Sidebar } from './navigation';
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const [viewer, scope] = await Promise.all([getViewer(), getPersonalScope()]);
   if (!viewer || !scope) redirect('/sign-in');
-  const [inboxCount, myTasksCount, dashboard] = await Promise.all([
+  const [inboxCount, myTasksCount, dashboard, projects, views] = await Promise.all([
     findInboxCount(scope),
     findMyTasksCount(scope),
     getDashboard(),
+    findProjectOverview(scope),
+    findViews(scope),
   ]);
   const counts = {
     inbox: inboxCount,
@@ -26,7 +29,20 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   };
   return (
     <div className="flex min-h-dvh">
-      <Sidebar userName={viewer.user.name} counts={counts} />
+      <Sidebar
+        userName={viewer.user.name}
+        counts={counts}
+        projects={projects.map((p) => ({
+          id: p.id,
+          name: p.name,
+          color: p.color,
+          // BR-PROJ-003: görev yoksa ilerleme gösterilmez.
+          percent: p.progress?.total
+            ? Math.round((p.progress.done / p.progress.total) * 100)
+            : null,
+        }))}
+        views={views.map((v) => ({ id: v.id, name: v.name }))}
+      />
       <div className="flex min-w-0 flex-1 flex-col pb-[84px] lg:pb-0">{children}</div>
       <MobileNavigation />
       <KeyboardShortcuts workspaceId={scope.workspaceId} />

@@ -1,6 +1,6 @@
 # Aşamalı Geliştirme Planı
 
-> Durum: v0.5 · Son güncelleme: 2026-10-28
+> Durum: v0.6 · Son güncelleme: 2026-10-29
 > v0.2: OQ-001..OQ-023 kararları işlendi. Çalışma ortamı yalnızca yerel (D-045); "beta" ve "yayına alma" ayrı bir karara bağlandı (OQ-032).
 
 ## 1. Faz durumu (tek gerçek kaynak)
@@ -11,7 +11,7 @@
 | 2 | Proje altyapısı ve temel mimari | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
 | 3 | Kimlik doğrulama, hesap, tercihler, onboarding | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
 | 4 | Görev yönetimi, Inbox, My Tasks, dashboard | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
-| 5 | Projeler ve görev görünümleri | Başlamadı | — | — | — |
+| 5 | Projeler ve görev görünümleri | Kapı kontrolünde | — | 2026-10-29 | — |
 | 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | Başlamadı | — | — | — |
 | 7 | Notlar, hedefler, arama | Başlamadı | Not editörü paketi seçimi (Faz 7 başında sunulur) | — | — |
 | 8 | Test, güvenlik, kalite; dışa aktarma, hesap silme | Başlamadı | — | — | — |
@@ -112,8 +112,19 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
 
 ### Faz 5 — Projeler ve görev görünümleri
 - **Bağımlılık:** Faz 4.
-- **Kapsam:** FR-PROJ-01..06 (silmede proje + görevler birlikte çöpe, D-031), FR-VIEW-01..02, 04..08; board sürükle-bırak; toplu işlemler (BR-TASK-008); kayıtlı görünümler (filtre + sıralama, D-051); arşiv ve çöp sayfaları.
+- **Kapsam:** FR-PROJ-01..06 (silmede proje + görevler birlikte çöpe, D-031; renk var, simge yok, D-082), FR-VIEW-01..02, 04..08; board sürükle-bırak (mobilde kart menüsü, D-083); toplu işlemler (BR-TASK-008, kapsam D-084); kayıtlı görünümler (filtre + sıralama, D-051); arşiv ve çöp sayfaları; etiket yönetimi (BR-TAG-002, D-085). Takvim görünümü (FR-VIEW-03) Faz 6'da.
 - **Kabul:** AC-06; AC-02 çoklu seçimle (D-081); görünüm geçişinde filtre korunumu E2E; toplu işlem atomikliği; proje ilerlemesi doğru.
+- **İlerleme (2026-10-29):**
+  - Açık sorular OQ-038..041 yanıtlandı (D-082..D-085). Uygulama ayrıntıları D-086'da.
+  - Migration 0005: `saved_views`, `projects_color` kısıtı.
+  - Projeler: oluşturma, düzenleme, durum, tamamlama (açık görev sorusu), arşivleme / arşivden çıkarma (görevler salt okunur, BR-PROJ-004), çöpe taşıma ve birlikte geri yükleme (BR-PROJ-005), ilerleme (BR-PROJ-003), manuel sıra; Projeler ve proje sayfası (Figma 4:67037, 4:67132, 4:67253).
+  - Görünümler: `TaskFilter` v1 (filtre, sıralama, gruplama URL'de), Liste ve Pano, kayıtlı görünümler (`/views/new`, `/views/:id`), görünüm geçişinde filtre korunur.
+  - Toplu işlemler (BR-TASK-008, D-084): Inbox ve listelerde "Seç", atomik `POST /tasks/bulk`.
+  - Arşiv ve Çöp kutusu sayfaları; çöpte proje grupları ve BR-DEL-004 seçimi. Ayarlar · Etiketler (D-085).
+  - Kenar çubuğunda Projeler, PROJELER ve KAYITLI GÖRÜNÜMLER bölümleri, Arşiv ve Çöp kutusu; mobil Menü'de aynı girişler.
+  - Takvim görünümü (FR-VIEW-03) plan gereği Faz 6'da; proje sayfasındaki "Takvim" sekmesi ve "Bağlı kayıtlar" paneli o fazlara kadar gösterilmez (D-071 ilkesi).
+  - Doğrulama (2026-10-29): `pnpm verify` 13/13 yeşil — birim 155, entegrasyon 55, tarayıcı 252 (Faz 5 kabulü: AC-06, çoklu seçimli AC-02, toplu işlem atomikliği, görünüm geçişinde filtre korunumu, proje ilerlemesi, kayıtlı görünüm, yeni sayfaların erişilebilirlik taraması). Kapanış için ürün sahibinin onayı ve Figma'da olmayan ekranların görsel incelemesi bekleniyor.
+  - Kısmi: FR-VIEW-08 (P1) — varsayılan görünüm şimdilik Liste; proje bazında son kullanılan görünümün hatırlanması ve ayar ekranı yapılmadı (D-086).
 
 ### Faz 6 — Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler
 - **Bağımlılık:** Faz 5.

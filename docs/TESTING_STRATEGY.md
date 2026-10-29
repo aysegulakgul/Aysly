@@ -1,6 +1,6 @@
 # Test Stratejisi ve Kabul Kriterleri
 
-> Durum: v0.4 · Son güncelleme: 2026-10-28 · Uygulama durumu: Test altyapısı kuruldu (Faz 2); birim, entegrasyon, tarayıcı testleri ve yetki matrisi kontrolü `pnpm verify` içinde çalışıyor.
+> Durum: v0.5 · Son güncelleme: 2026-10-29 · Uygulama durumu: Test altyapısı kuruldu (Faz 2); birim, entegrasyon, tarayıcı testleri ve yetki matrisi kontrolü `pnpm verify` içinde çalışıyor. Faz 5 kabul testleri: `tests/e2e/acceptance-faz5.spec.ts`, `tests/integration/projects.test.ts`.
 > Araçlar: Vitest ve Playwright (D-044). Testing Library, Testcontainers (Docker, D-056), axe-core, fast-check onaylı ama yalnızca ihtiyaç duyulduğunda eklenir (D-058). Kapsam hedefleri D-060 ile onaylı.
 
 ## 1. İlkeler

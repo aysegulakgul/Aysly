@@ -3,7 +3,7 @@ import { businessRule, notFound, validationError, type DomainError } from '@/sha
 import { err, ok, type Result } from '@/shared/kernel/result';
 import type { Task } from '../domain/task';
 import { daysLeft, isExpired, purgeAt } from '../domain/trash';
-import type { TaskDeps } from './tasks';
+import { checkWritable, type TaskDeps } from './tasks';
 
 const conflict = (current: Task): DomainError => ({ kind: 'version_conflict', current });
 
@@ -19,6 +19,8 @@ export async function archiveTask(
   const task = await deps.tasks.findById(scope, id);
   if (!task) return err(notFound());
   if (task.archivedAt) return ok(task);
+  const blocked = await checkWritable(deps, scope, task);
+  if (blocked) return err(blocked);
   if (task.version !== command.version) return err(conflict(task));
   const subtasks = (await deps.tasks.listSubtasks(scope, task.id)).filter((s) => !s.archivedAt);
   const now = deps.clock.now();
@@ -38,6 +40,8 @@ export async function unarchiveTask(
   const task = await deps.tasks.findById(scope, id);
   if (!task) return err(notFound());
   if (!task.archivedAt) return ok(task);
+  const blocked = await checkWritable(deps, scope, task, { allowArchivedTask: true });
+  if (blocked) return err(blocked);
   if (task.version !== command.version) return err(conflict(task));
   const ids = [
     task.id,
@@ -54,18 +58,21 @@ export async function unarchiveTask(
 /**
  * Çöpe taşıma (BR-DEL-001/006, BR-SUB-004): görev ve alt görevleri tek silme grubuyla çöpe gider; 30 gün içinde
  * geri yüklenebilir. Sürüm kontrolü yapılmaz: silme tüm kaydı hedefler ve "Geri al" ile geri alınabilir.
+ * BR-PROJ-004: arşivli projedeki görev tek başına çöpe atılamaz. Toplu silmede grup kimliği dışarıdan gelir.
  */
 export async function deleteTask(
   deps: TaskDeps,
   scope: WorkspaceScope,
   id: string,
+  batchId: string = deps.newId(),
 ): Promise<Result<{ batchId: string; affected: number }, DomainError>> {
   const allowed = authorize(scope, 'task.delete');
   if (!allowed.ok) return allowed;
   const task = await deps.tasks.findById(scope, id);
   if (!task) return err(notFound());
+  const blocked = await checkWritable(deps, scope, task, { allowArchivedTask: true });
+  if (blocked) return err(blocked);
   const subtasks = await deps.tasks.listSubtasks(scope, task.id);
-  const batchId = deps.newId();
   const affected = await deps.tasks.trash(
     scope,
     [task.id, ...subtasks.map((s) => s.id)],
@@ -75,13 +82,69 @@ export async function deleteTask(
   return ok({ batchId, affected });
 }
 
+/** BR-DEL-004: görevin projesi çöpteyse kullanıcı seçer — projeyi de geri yükle veya Inbox'a geri yükle. */
+export type ProjectChoice = 'restore' | 'inbox';
+
 export type RestoreCommand =
-  { batchId: string } | { id: string; restoreParent?: boolean | undefined };
+  | { batchId: string; projectChoice?: ProjectChoice | undefined }
+  | {
+      type?: 'task' | undefined;
+      id: string;
+      restoreParent?: boolean | undefined;
+      projectChoice?: ProjectChoice | undefined;
+    }
+  | { type: 'project'; id: string };
+
+/** Geri yüklenecek kayıtlar: grup, tek görev (BR-SUB-004 bağımlılıklarıyla) veya proje (projenin grubuyla). */
+async function restoreTargets(
+  deps: TaskDeps,
+  scope: WorkspaceScope,
+  command: RestoreCommand,
+): Promise<Result<{ tasks: Task[]; projectIds: string[] }, DomainError>> {
+  if ('batchId' in command || command.type === 'project') {
+    let batchId: string;
+    if ('batchId' in command) {
+      batchId = command.batchId;
+    } else {
+      const project = await deps.projects.findAny(scope, command.id);
+      if (!project?.deletedAt || !project.deletedBatchId) return err(notFound());
+      batchId = project.deletedBatchId;
+    }
+    const projects = await deps.projects.listTrashed(scope, batchId);
+    if (projects.length > 0) {
+      const allowed = authorize(scope, 'project.restore');
+      if (!allowed.ok) return allowed;
+    }
+    const now = deps.clock.now();
+    if (projects.some((p) => isExpired(p.deletedAt!, now))) {
+      return err(businessRule('BR-DEL-003'));
+    }
+    return ok({
+      tasks: await deps.tasks.batchMembers(scope, batchId),
+      projectIds: projects.map((p) => p.id),
+    });
+  }
+  const task = await deps.tasks.findAny(scope, command.id);
+  if (!task?.deletedAt) return err(notFound());
+  const tasks = [task];
+  // BR-SUB-004: ebeveyn geri yüklenince aynı gruptaki alt görevleri de döner.
+  if (!task.parentTaskId && task.deletedBatchId) {
+    const batch = await deps.tasks.batchMembers(scope, task.deletedBatchId);
+    tasks.push(...batch.filter((t) => t.parentTaskId === task.id));
+  }
+  if (task.parentTaskId) {
+    const parent = await deps.tasks.findAny(scope, task.parentTaskId);
+    if (parent?.deletedAt) {
+      if (!command.restoreParent) return err(businessRule('BR-SUB-004'));
+      tasks.push(parent);
+    }
+  }
+  return ok({ tasks, projectIds: [] });
+}
 
 /**
- * Geri yükleme (BR-DEL-004/006, BR-SUB-004): grup veya tek kayıt. Süresi dolan grup geri yüklenemez
- * (BR-DEL-003). Ebeveyni çöpteki alt görev yalnızca ebeveyniyle birlikte geri yüklenir. Projesi artık yoksa
- * görev Inbox'a döner.
+ * Geri yükleme (BR-DEL-004/006, BR-SUB-004, BR-PROJ-005). Süresi dolan grup geri yüklenemez (BR-DEL-003).
+ * Projesi kalıcı silinmiş görev Inbox'a döner; projesi (başka bir grupla) çöpteyse `projectChoice` gerekir.
  */
 export async function restoreFromTrash(
   deps: TaskDeps,
@@ -91,40 +154,45 @@ export async function restoreFromTrash(
   const allowed = authorize(scope, 'task.restore');
   if (!allowed.ok) return allowed;
   const now = deps.clock.now();
-  let tasks: Task[];
-  if ('batchId' in command) {
-    tasks = await deps.tasks.batchMembers(scope, command.batchId);
-  } else {
-    const task = await deps.tasks.findAny(scope, command.id);
-    if (!task?.deletedAt) return err(notFound());
-    tasks = [task];
-    // BR-SUB-004: ebeveyn geri yüklenince aynı gruptaki alt görevleri de döner.
-    if (!task.parentTaskId && task.deletedBatchId) {
-      const batch = await deps.tasks.batchMembers(scope, task.deletedBatchId);
-      tasks.push(...batch.filter((t) => t.parentTaskId === task.id));
-    }
-    if (task.parentTaskId) {
-      const parent = await deps.tasks.findAny(scope, task.parentTaskId);
-      if (parent?.deletedAt) {
-        if (!command.restoreParent) return err(businessRule('BR-SUB-004'));
-        tasks.push(parent);
-      }
-    }
-  }
-  if (tasks.length === 0) return err(notFound());
+  const targets = await restoreTargets(deps, scope, command);
+  if (!targets.ok) return targets;
+  const { tasks } = targets.value;
+  let { projectIds } = targets.value;
+  if (tasks.length === 0 && projectIds.length === 0) return err(notFound());
   if (tasks.some((t) => t.deletedAt && isExpired(t.deletedAt, now))) {
     return err(businessRule('BR-DEL-003'));
   }
 
-  const restored = await deps.tasks.restore(
+  // BR-DEL-004: hâlâ çöpte olan bir projeye bağlı görevler için kullanıcı seçimi gerekir.
+  const roots = tasks.filter((t) => !t.parentTaskId || !tasks.some((o) => o.id === t.parentTaskId));
+  const trashedProjects: string[] = [];
+  for (const projectId of new Set(roots.map((t) => t.projectId))) {
+    if (projectIds.includes(projectId)) continue;
+    const project = await deps.projects.findAny(scope, projectId);
+    if (project?.deletedAt) trashedProjects.push(projectId);
+  }
+  if (trashedProjects.length > 0) {
+    const choice = 'projectChoice' in command ? command.projectChoice : undefined;
+    if (!choice) {
+      return err(businessRule('BR-DEL-004', [{ field: 'projectChoice', reason: 'required' }]));
+    }
+    if (choice === 'restore') {
+      const restoreProject = authorize(scope, 'project.restore');
+      if (!restoreProject.ok) return restoreProject;
+      projectIds = [...projectIds, ...trashedProjects];
+    }
+  }
+
+  const restoredProjects = await deps.projects.restore(scope, projectIds, now);
+  const restoredTasks = await deps.tasks.restore(
     scope,
     tasks.map((t) => t.id),
     now,
   );
-  // BR-DEL-004: proje artık yoksa Inbox'a (proje çöpü Faz 5'te; o zaman "projeyi de geri yükle" seçimi gelir).
+  // Projesi artık olmayan (kalıcı silinmiş) veya kullanıcının Inbox'ı seçtiği görevler Inbox'a döner.
   let movedToInbox = 0;
   const inbox = await deps.projects.inbox(scope);
-  for (const task of tasks) {
+  for (const task of roots) {
     if (task.parentTaskId || task.projectId === inbox.id) continue;
     if (await deps.projects.find(scope, task.projectId)) continue;
     const current = await deps.tasks.findById(scope, task.id);
@@ -134,7 +202,7 @@ export async function restoreFromTrash(
       movedToInbox++;
     }
   }
-  return ok({ restored, movedToInbox });
+  return ok({ restored: restoredTasks + restoredProjects, movedToInbox });
 }
 
 export type TrashGroup = {
@@ -143,7 +211,8 @@ export type TrashGroup = {
   purgeAt: Date;
   daysLeft: number;
   expired: boolean;
-  root: { id: string; title: string };
+  root: { type: 'task' | 'project'; id: string; title: string };
+  /** Gruptaki görev sayısı (proje grubunda projenin görevleri). */
   count: number;
 };
 
@@ -160,26 +229,41 @@ export async function listTrash(
     const batch = task.deletedBatchId ?? task.id;
     groups.set(batch, [...(groups.get(batch) ?? []), task]);
   }
-  return ok(
-    [...groups.entries()]
-      .map(([batchId, members]) => {
-        const root = members.find((m) => !members.some((o) => o.id === m.parentTaskId))!;
-        const deletedAt = root.deletedAt!;
-        return {
-          batchId,
-          deletedAt,
-          purgeAt: purgeAt(deletedAt),
-          daysLeft: daysLeft(deletedAt, now),
-          expired: isExpired(deletedAt, now),
-          root: { id: root.id, title: root.title },
-          count: members.length,
-        };
-      })
-      .sort((a, b) => b.deletedAt.getTime() - a.deletedAt.getTime()),
+  const projects = new Map(
+    (await deps.projects.listTrashed(scope)).map((p) => [p.deletedBatchId ?? p.id, p]),
   );
+  const timing = (deletedAt: Date) => ({
+    deletedAt,
+    purgeAt: purgeAt(deletedAt),
+    daysLeft: daysLeft(deletedAt, now),
+    expired: isExpired(deletedAt, now),
+  });
+  const result: TrashGroup[] = [];
+  for (const [batchId, project] of projects) {
+    result.push({
+      batchId,
+      ...timing(project.deletedAt!),
+      root: { type: 'project', id: project.id, title: project.name },
+      count: (groups.get(batchId) ?? []).length,
+    });
+  }
+  for (const [batchId, members] of groups) {
+    if (projects.has(batchId)) continue;
+    const root = members.find((m) => !members.some((o) => o.id === m.parentTaskId))!;
+    result.push({
+      batchId,
+      ...timing(root.deletedAt!),
+      root: { type: 'task', id: root.id, title: root.title },
+      count: members.length,
+    });
+  }
+  return ok(result.sort((a, b) => b.deletedAt.getTime() - a.deletedAt.getTime()));
 }
 
-/** BR-DEL-005: kalıcı silme açık onay ister; grup verilmezse "Çöpü boşalt" (`trash.empty`). */
+/**
+ * BR-DEL-005: kalıcı silme açık onay ister; grup verilmezse "Çöpü boşalt" (`trash.empty`). Silinen projede başka
+ * grupla çöpte kalan görevler önce Inbox'a bağlanır (BR-DEL-004), sonra görevler ve projeler silinir.
+ */
 export async function purgeTrash(
   deps: TaskDeps,
   scope: WorkspaceScope,
@@ -188,5 +272,18 @@ export async function purgeTrash(
   const allowed = authorize(scope, command.batchId ? 'task.purge' : 'trash.empty');
   if (!allowed.ok) return allowed;
   if (!command.confirm) return err(validationError([{ field: 'confirm', reason: 'required' }]));
-  return ok({ purged: await deps.tasks.purge(scope, command.batchId) });
+  const projects = await deps.projects.listTrashed(scope, command.batchId ?? undefined);
+  if (projects.length > 0) {
+    const purgeProject = authorize(scope, 'project.purge');
+    if (!purgeProject.ok) return purgeProject;
+    const inbox = await deps.projects.inbox(scope);
+    await deps.tasks.reassignTrashed(
+      scope,
+      projects.map((p) => p.id),
+      inbox.id,
+    );
+  }
+  const purgedTasks = await deps.tasks.purge(scope, command.batchId);
+  const purgedProjects = await deps.projects.purge(scope, command.batchId);
+  return ok({ purged: purgedTasks + purgedProjects });
 }

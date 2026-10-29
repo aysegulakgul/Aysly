@@ -134,6 +134,100 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
       return rows.map(toTask);
     },
 
+    async query(scope, q) {
+      if (q.projectIds.length === 0 || q.statuses.length === 0) return [];
+      const rows = await db
+        .select()
+        .from(tasks)
+        .where(
+          and(
+            inScope(scope),
+            inArray(tasks.projectId, [...q.projectIds]),
+            inArray(tasks.status, [...q.statuses]),
+            q.priorities?.length ? inArray(tasks.priority, [...q.priorities]) : undefined,
+            q.includeArchived ? undefined : isNull(tasks.archivedAt),
+            q.topLevelOnly ? isNull(tasks.parentTaskId) : undefined,
+          ),
+        )
+        .orderBy(asc(tasks.position), asc(tasks.id));
+      return rows.map(toTask);
+    },
+
+    async progress(scope, projectIds) {
+      const result = new Map<string, { done: number; total: number }>();
+      if (projectIds.length === 0) return result;
+      const rows = await db
+        .select({
+          projectId: tasks.projectId,
+          total: count(),
+          done: sql<number>`count(*) filter (where ${tasks.status} = 'done')`.mapWith(Number),
+        })
+        .from(tasks)
+        .where(
+          and(
+            inScope(scope),
+            isNull(tasks.archivedAt),
+            isNull(tasks.parentTaskId),
+            inArray(tasks.projectId, [...projectIds]),
+          ),
+        )
+        .groupBy(tasks.projectId);
+      for (const row of rows) result.set(row.projectId, { done: row.done, total: row.total });
+      return result;
+    },
+
+    inProject(scope, projectId) {
+      return db
+        .select({ id: tasks.id, parentTaskId: tasks.parentTaskId })
+        .from(tasks)
+        .where(and(inScope(scope), eq(tasks.projectId, projectId)));
+    },
+
+    async completeOpenInProject(scope, projectId, now, actorId) {
+      const rows = await db
+        .update(tasks)
+        .set({
+          status: 'done',
+          completedAt: now,
+          completedBy: actorId,
+          version: sql`${tasks.version} + 1`,
+          updatedAt: now,
+        })
+        .where(
+          and(
+            inScope(scope),
+            eq(tasks.projectId, projectId),
+            ne(tasks.status, 'done'),
+            isNull(tasks.archivedAt),
+          ),
+        )
+        .returning({ id: tasks.id });
+      return rows.length;
+    },
+
+    async reassignTrashed(scope, projectIds, inboxId) {
+      if (projectIds.length === 0) return;
+      await db
+        .update(tasks)
+        .set({ projectId: inboxId })
+        .where(
+          and(
+            eq(tasks.workspaceId, scope.workspaceId),
+            isNotNull(tasks.deletedAt),
+            inArray(tasks.projectId, [...projectIds]),
+          ),
+        );
+    },
+
+    async listArchived(scope) {
+      const rows = await db
+        .select()
+        .from(tasks)
+        .where(and(inScope(scope), isNotNull(tasks.archivedAt)))
+        .orderBy(desc(tasks.archivedAt));
+      return rows.map(toTask);
+    },
+
     async countOpen(scope, projectId) {
       const [row] = await db
         .select({ n: count() })
@@ -358,6 +452,22 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
  * BR-DEL-003 / D-053: süresi dolan silme gruplarının kalıcı silinmesi (tüm çalışma alanları; sistem işi).
  * İdempotenttir: tekrar çalıştırıldığında silinecek kayıt kalmaz.
  */
+/**
+ * BR-DEL-004: kalıcı silinecek projelerde başka bir grupla çöpte kalan görevler o alanın Inbox'ına bağlanır;
+ * böylece proje silinirken yabancı anahtar onları da silmez ve geri yüklenirlerse Inbox'a dönerler (sistem işi).
+ */
+export async function reassignTrashedTasks(
+  db: DbExecutor,
+  moves: readonly { projectId: string; inboxId: string }[],
+): Promise<void> {
+  for (const move of moves) {
+    await db
+      .update(tasks)
+      .set({ projectId: move.inboxId })
+      .where(and(eq(tasks.projectId, move.projectId), isNotNull(tasks.deletedAt)));
+  }
+}
+
 export async function purgeExpiredTasks(db: DbExecutor, before: Date): Promise<number> {
   const rows = await db
     .delete(tasks)

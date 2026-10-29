@@ -238,6 +238,148 @@
       "body": {
         "dismissed": true
       }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/projects",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/projects",
+      "body": {
+        "name": "x"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/projects/reorder",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/projects/reorder",
+      "body": {
+        "id": "01900000-0000-7000-8000-000000000002"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/[ws]/projects/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/projects/01900000-0000-7000-8000-000000000002"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/workspaces/[ws]/projects/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/projects/01900000-0000-7000-8000-000000000002",
+      "body": {
+        "version": 1
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/workspaces/[ws]/projects/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/projects/01900000-0000-7000-8000-000000000002"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/projects/[id]/complete",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/projects/01900000-0000-7000-8000-000000000002/complete",
+      "body": {
+        "version": 1,
+        "completeOpenTasks": false
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/projects/[id]/archive",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/projects/01900000-0000-7000-8000-000000000002/archive",
+      "body": {
+        "version": 1
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/projects/[id]/unarchive",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/projects/01900000-0000-7000-8000-000000000002/unarchive",
+      "body": {
+        "version": 1
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/[ws]/projects/[id]/delete-preview",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/projects/01900000-0000-7000-8000-000000000002/delete-preview"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/tasks/bulk",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tasks/bulk",
+      "body": {
+        "action": "complete",
+        "taskIds": ["01900000-0000-7000-8000-000000000002"]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/[ws]/archive",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/archive"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/[ws]/views",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/views"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/views",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/views",
+      "body": {
+        "name": "x",
+        "viewType": "list",
+        "filter": {}
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/[ws]/views/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/views/01900000-0000-7000-8000-000000000002"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/workspaces/[ws]/views/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/views/01900000-0000-7000-8000-000000000002",
+      "body": {
+        "version": 1
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/workspaces/[ws]/views/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/views/01900000-0000-7000-8000-000000000002"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/workspaces/[ws]/tags/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tags/01900000-0000-7000-8000-000000000002",
+      "body": {
+        "name": "x"
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/workspaces/[ws]/tags/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tags/01900000-0000-7000-8000-000000000002"
     }
   ]
 }

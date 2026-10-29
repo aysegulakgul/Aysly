@@ -7,6 +7,8 @@ export type ApiError = {
   rule?: string;
   details?: { field: string; reason: string }[];
   current?: unknown;
+  /** BR-TASK-008: toplu işlemde reddedilen görevler. */
+  failures?: { id: string; code: string; rule?: string }[];
   requestId?: string;
 };
 
@@ -45,4 +47,6 @@ async function apiRequest<T>(
 export const apiPost = <T>(path: ApiPath, body: unknown, headers?: Record<string, string>) =>
   apiRequest<T>('POST', path, body, headers);
 export const apiPatch = <T>(path: ApiPath, body: unknown) => apiRequest<T>('PATCH', path, body);
-export const apiDelete = (path: ApiPath) => apiRequest<void>('DELETE', path);
+export const apiDelete = <T = void>(path: ApiPath, body?: unknown) =>
+  apiRequest<T>('DELETE', path, body);
+export const apiGet = <T>(path: ApiPath) => apiRequest<T>('GET', path);

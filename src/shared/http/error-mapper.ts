@@ -11,6 +11,7 @@ export type ErrorBody = {
     rule?: string;
     details?: { field: string; reason: string }[];
     current?: unknown;
+    failures?: { id: string; code: string; rule?: string }[];
     requestId: string;
   };
 };
@@ -66,6 +67,18 @@ export function mapDomainError(
             message: t(`rules.${error.rule}`),
             rule: error.rule,
             ...(error.details ? { details: error.details } : {}),
+            requestId,
+          },
+        },
+      };
+    case 'bulk_rejected':
+      return {
+        status: 422,
+        body: {
+          error: {
+            code: 'BULK_OPERATION_REJECTED',
+            message: t('errors.bulkRejected'),
+            failures: error.failures,
             requestId,
           },
         },

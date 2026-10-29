@@ -26,9 +26,12 @@ const newKey = () => crypto.randomUUID();
 export function QuickCapture({
   context,
   autoFocus = false,
+  projectId,
 }: {
   context: TaskUiContext;
   autoFocus?: boolean;
+  /** Proje sayfasında görev o projeye eklenir; verilmezse Inbox (BR-INBOX-001). */
+  projectId?: string | undefined;
 }) {
   const t = useTranslations('tasks');
   const reasons = useTranslations('auth.reasons');
@@ -68,7 +71,7 @@ export function QuickCapture({
     setAdded(false);
     const result = await apiPost(
       `/api/v1/workspaces/${context.workspaceId}/tasks`,
-      { title, priority, ...(due ? { due } : {}) },
+      { title, priority, ...(due ? { due } : {}), ...(projectId ? { projectId } : {}) },
       { 'idempotency-key': key.current },
     );
     setPending(false);

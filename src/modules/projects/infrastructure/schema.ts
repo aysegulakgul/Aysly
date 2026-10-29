@@ -14,8 +14,7 @@ import { users } from '@/modules/identity/infrastructure/schema';
 import { workspaces } from '@/modules/workspaces/infrastructure/schema';
 
 /**
- * Projeler ve Inbox (DATA_MODEL §3.6, D-030). Faz 3'te yalnızca kayıtta oluşturulan Inbox kullanılır;
- * proje yönetimi Faz 5'te gelir.
+ * Projeler ve Inbox (DATA_MODEL §3.6, D-030). Proje yönetimi Faz 5'te (FR-PROJ); simge MVP'de seçilmez (D-082).
  */
 export const projects = pgTable(
   'projects',
@@ -43,6 +42,11 @@ export const projects = pgTable(
   (t) => [
     check('projects_kind', sql`${t.kind} in ('inbox','standard')`),
     check('projects_status', sql`${t.status} in ('active','on_hold','completed')`),
+    // UI_UX §2.4, D-082: sabit 12 renklik palet.
+    check(
+      'projects_color',
+      sql`${t.color} in ('slate','red','orange','amber','green','teal','cyan','blue','indigo','violet','pink','brown')`,
+    ),
     check('projects_name_length', sql`char_length(btrim(${t.name})) between 1 and 120`),
     check(
       'projects_description_length',

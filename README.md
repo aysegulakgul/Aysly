@@ -8,26 +8,29 @@ Aysly; görevleri, projeleri, günlük planı, notları ve hedefleri tek, sakin 
 
 | | |
 |---|---|
-| Mevcut faz | **Faz 5 — Projeler ve görev görünümleri** (başlamadı; Faz 1–4 kapandı) |
+| Mevcut faz | **Faz 5 — Projeler ve görev görünümleri** (geliştirme tamam, ürün sahibinin kapanış onayı bekleniyor; Faz 1–4 kapandı) |
 | Uygulama kodu | Hesap, onboarding, tercihler ve görev yönetimi çalışıyor (aşağıdaki "Özellikler") |
 | Çalışma ortamı | Yalnızca yerel bilgisayar; hosting ve ücretli servis yok |
 | Teknoloji | Next.js, TypeScript, PostgreSQL, Drizzle, Better Auth |
-| Sonraki adım | Faz 5: projeler, pano, toplu işlemler, kayıtlı görünümler |
+| Sonraki adım | Faz 5 kapanış onayı; ardından Faz 6: takvim, hatırlatıcılar, tekrarlayan görevler |
 
 Ayrıntılı durum: [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 
 ## Özellikler
 
-Şu an çalışanlar (Faz 1–4):
+Şu an çalışanlar (Faz 1–5):
 - **Hesap:** E-posta doğrulamalı kayıt, giriş, şifre sıfırlama, oturum ve cihaz yönetimi, profil.
 - **İlk kullanım:** Kullanım amacı ve tercihlere göre kurulum rehberi; "İlk adımlar" listesi.
 - **Tercihler:** Dil, saat dilimi, hafta başlangıcı, saat biçimi, tema.
 - **Görevler:** Inbox ve hızlı ekleme; tarih/saat (saat dilimi ve yaz saati geçişleri dahil), öncelik, açıklama, etiketler, alt görevler; projeye taşıma; tamamlama ve 5 saniyelik "Geri al".
 - **Görünümler:** Bugün (Bugün, Geciken, Yaklaşan, Öncelikli bölümleri; düzenlenebilir), Görevlerim (tarihe göre gruplu), Yaklaşanlar (7 gün), görev detay paneli.
-- **Arşiv ve çöp kutusu:** Arşivleme, geri yükleme, 30 gün sonra otomatik kalıcı silme.
+- **Projeler:** Oluşturma, düzenleme (ad, açıklama, renk), durum (Aktif / Beklemede / Tamamlandı), ilerleme, manuel sıra, arşivleme; silindiğinde görevleriyle birlikte çöpe gider ve birlikte geri yüklenir.
+- **Liste ve pano:** Proje sayfasında Liste (gruplama) ve Pano (masaüstünde sürükle-bırak, her cihazda kart menüsü); ortak filtreler, sıralama, kayıtlı görünümler; çoklu seçim ve toplu işlemler.
+- **Arşiv ve çöp kutusu:** Arşiv ve Çöp kutusu sayfaları, geri yükleme, kalıcı silme, 30 gün sonra otomatik kalıcı silme.
+- **Etiketler:** Ayarlar · Etiketler'de yeniden adlandırma, renk ve silme.
 - **Klavye kısayolları:** `Q`, `G D/I/M/U`, `J/K`, `T/M/L`, `Ctrl/⌘+Z`, `?` rehberi.
 
-Plan gereği sonraki fazlarda: projeler ve pano görünümü, toplu işlemler, kayıtlı görünümler (Faz 5); hatırlatıcılar, tekrarlayan görevler, takvim (Faz 6); notlar, hedefler, arama (Faz 7).
+Plan gereği sonraki fazlarda: hatırlatıcılar, tekrarlayan görevler, takvim (Faz 6); notlar, hedefler, arama (Faz 7).
 
 **Mimari özet:** Modüler monolit (`src/modules/<modül>/{domain,application,infrastructure,http}`), yetkilendirme her istekte sunucuda, Zod ile doğrulama, REST API (`/api/v1`), `pnpm verify` ile 13 adımlı yerel kalite kontrolü (birim, entegrasyon ve Playwright testleri dahil).
 

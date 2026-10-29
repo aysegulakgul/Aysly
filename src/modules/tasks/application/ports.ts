@@ -1,3 +1,4 @@
+import type { Progress, Project, ProjectRepository } from '@/modules/projects';
 import type { WorkspaceScope } from '@/modules/workspaces';
 import type { Due } from '../domain/due';
 import type { Priority, Task, TaskStatus } from '../domain/task';
@@ -36,6 +37,15 @@ export type TaskListFilter = {
   statuses: readonly TaskStatus[];
 };
 
+/** Görünüm sorgusunun veritabanında uygulanan kısmı (TaskFilter v1, API_CONTRACTS §6.2). */
+export type TaskQuery = {
+  projectIds: readonly string[];
+  statuses: readonly TaskStatus[];
+  priorities?: readonly Priority[] | undefined;
+  includeArchived: boolean;
+  topLevelOnly: boolean;
+};
+
 /** Görev deposu. Her metot `WorkspaceScope` ister; başka çalışma alanının kaydı hiç görülmez (ARCHITECTURE §6). */
 export type TaskRepository = {
   insert(scope: WorkspaceScope, task: NewTask): Promise<Task>;
@@ -55,6 +65,30 @@ export type TaskRepository = {
     parentTaskId: string | null,
   ): Promise<string | null>;
   list(scope: WorkspaceScope, filter: TaskListFilter): Promise<Task[]>;
+  /** Görünümler (BR-VIEW-002): verilen projelerdeki görevler, `position` sırasıyla. */
+  query(scope: WorkspaceScope, query: TaskQuery): Promise<Task[]>;
+  /** BR-PROJ-003: tamamlanmış / (arşivlenmemiş, çöpte olmayan) üst düzey görev sayıları, proje başına. */
+  progress(scope: WorkspaceScope, projectIds: readonly string[]): Promise<Map<string, Progress>>;
+  /** BR-PROJ-005: projenin çöpte olmayan tüm görevleri (alt görevler ve arşivliler dahil). */
+  inProject(
+    scope: WorkspaceScope,
+    projectId: string,
+  ): Promise<{ id: string; parentTaskId: string | null }[]>;
+  /** BR-PROJ-002 "hepsini tamamla": projedeki açık, arşivlenmemiş görevler (alt görevler dahil). */
+  completeOpenInProject(
+    scope: WorkspaceScope,
+    projectId: string,
+    now: Date,
+    actorId: string,
+  ): Promise<number>;
+  /** BR-DEL-004: kalıcı silinecek projelerde kalan (başka grupla çöpteki) görevler Inbox'a bağlanır. */
+  reassignTrashed(
+    scope: WorkspaceScope,
+    projectIds: readonly string[],
+    inboxId: string,
+  ): Promise<void>;
+  /** Arşiv sayfası (BR-DEL-001): tek başına arşivlenmiş, çöpte olmayan görevler. */
+  listArchived(scope: WorkspaceScope): Promise<Task[]>;
   /** Projedeki açık, arşivlenmemiş, çöpte olmayan üst düzey görev sayısı. */
   countOpen(scope: WorkspaceScope, projectId: string): Promise<number>;
   /** Görevlerim (BR-INBOX-004): verilen projelerdeki açık, arşivlenmemiş üst düzey görevler. */
@@ -124,6 +158,14 @@ export type TagPort = {
   /** Çalışma alanında henüz olmayan adlar ve mevcut etiket sayısı (BR-TAG-003 sınırı için). */
   missing(scope: WorkspaceScope, names: readonly string[]): Promise<string[]>;
   count(scope: WorkspaceScope): Promise<number>;
+  /** Çalışma alanında var olan etiket kimlikleri (silinmiş etikete referans tespiti, BR-VIEW-001). */
+  existing(scope: WorkspaceScope, tagIds: readonly string[]): Promise<Set<string>>;
+  /** TaskFilter `tagId` + `tagMode`: etiketlere uyan görev kimlikleri. */
+  taskIdsWithTags(
+    scope: WorkspaceScope,
+    tagIds: readonly string[],
+    mode: 'any' | 'all',
+  ): Promise<Set<string>>;
 };
 
 /** Görevin bağlanacağı proje bilgisi (projects modülünden). */
@@ -131,6 +173,7 @@ export type ProjectRef = {
   id: string;
   name: string;
   kind: 'inbox' | 'standard';
+  color?: string | undefined;
   archived: boolean;
 };
 
@@ -140,4 +183,11 @@ export type ProjectDirectory = {
   inbox(scope: WorkspaceScope): Promise<ProjectRef>;
   /** Arşivlenmemiş ve çöpte olmayan projeler; Inbox ilk sırada. */
   listActive(scope: WorkspaceScope): Promise<ProjectRef[]>;
+  /** Proje yönetimi (Faz 5): tam proje kayıtları; çöpteki projeler yalnızca `findAny` ve `listTrashed` ile. */
+  repo: ProjectRepository;
+  findAny(scope: WorkspaceScope, id: string): Promise<Project | null>;
+  trash(scope: WorkspaceScope, id: string, batchId: string, now: Date): Promise<boolean>;
+  restore(scope: WorkspaceScope, ids: readonly string[], now: Date): Promise<number>;
+  listTrashed(scope: WorkspaceScope, batchId?: string): Promise<Project[]>;
+  purge(scope: WorkspaceScope, batchId: string | null): Promise<number>;
 };

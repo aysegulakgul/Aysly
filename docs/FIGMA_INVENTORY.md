@@ -1,6 +1,6 @@
 # Figma Envanteri
 
-> Durum: v0.1 · Son güncelleme: 2026-10-27 · Karar: D-063 (arayüzde tek kaynak Figma)
+> Durum: v0.2 · Son güncelleme: 2026-10-29 · Karar: D-063 (arayüzde tek kaynak Figma)
 > Dosya: [Aysly (Figma)](https://www.figma.com/design/XciejfKVEdq0ik3dg4jY2O/Aysly) · fileKey `XciejfKVEdq0ik3dg4jY2O` · Sayfa `0:1` ("Page 1")
 > Bu belge, Figma'daki çerçevelerin düğüm kimliklerini ve MVP kapsamıyla eşleşmesini tutar. Ayrıntılı değerler (renk, tipografi, boşluk) Faz 2'de Figma'dan okunup UI_UX_DESIGN_SYSTEM.md'ye işlenecek. Figma'da değişiklik yapıldıkça bu belge yeniden üretilir.
 
@@ -44,7 +44,8 @@
 | Onboarding adımları ve başlangıç projeleri | ONBOARDING §2–3, D-063 | 3 |
 | Ayarlar: Profil, Tarih ve saat, Bildirimler, Güvenlik (şifre, oturumlar), Veri ve gizlilik (dışa aktarma, hesap silme) | FR-SET, D-036, D-046 | 3, 8 |
 | Bildirim merkezi | FR-NOTIF-01 | 6 |
-| Arşiv ve Çöp kutusu sayfaları | FR-SET-06/07, BR-DEL-* | 4–5 |
+| Arşiv ve Çöp kutusu sayfaları | FR-SET-06/07, BR-DEL-* | 5 (kuruldu, onaya sunuldu) |
 | Hedef detayı (bağlı görev/projeler) | FR-GOAL-02 | 7 |
-| Kayıtlı görünüm oluşturma/düzenleme | FR-VIEW-07, D-051 | 5 |
+| Kayıtlı görünüm oluşturma/düzenleme | FR-VIEW-07, D-051 | 5 (kuruldu, onaya sunuldu) |
+| Proje oluşturma/düzenleme formu, filtre paneli, Ayarlar · Etiketler | FR-PROJ-01, FR-VIEW-04, D-085 | 5 (kuruldu, onaya sunuldu) |
 | Desktop "Menü" karşılığı (kenar çubuğu çerçeve içinde olabilir; Faz 3'te ekranlardan doğrulanacak) | — | 3 |
