@@ -9,6 +9,7 @@ import { QuickCapture } from '../../tasks/quick-capture';
 import { buildTaskContext } from '../../tasks/task-context.server';
 import { TaskDetailPanel } from '../../tasks/task-detail';
 import { SaveViewButton } from '../../views/filter-bar';
+import { LinkedRecords } from '../../notes/linked-records';
 import { TaskViewSection } from '../../views/task-view';
 import { readViewParams, type PageSearchParams } from '../../views/view-params';
 import { ProjectHeader, TrashedProject } from './project-header';
@@ -16,7 +17,7 @@ import { ProjectHeader, TrashedProject } from './project-header';
 /**
  * Proje sayfası (Figma Liste 4:67132, Pano 4:67253; mobil 4:68426, 4:68533): başlık, durum, ilerleme
  * (BR-PROJ-003), Liste/Pano sekmeleri, filtre çubuğu ve görevler. Arşivli proje salt okunur (BR-PROJ-004); çöpteki
- * projeye gidilirse "çöp kutusunda" ekranı (BR-DEL-007). Takvim sekmesi ve "Bağlı kayıtlar" paneli Faz 6–7'de.
+ * projeye gidilirse "çöp kutusunda" ekranı (BR-DEL-007). Bağlı notlar ve hedefler sayfa sonunda (Figma "Bağlı kayıtlar").
  */
 export default async function ProjectPage({
   params,
@@ -101,6 +102,7 @@ export default async function ProjectPage({
           />
         }
       />
+      <LinkedRecords workspaceId={scope.workspaceId} target={{ kind: 'project', id: project.id }} />
       {task ? <TaskDetailPanel detail={detail} context={context} /> : null}
     </PageFrame>
   );

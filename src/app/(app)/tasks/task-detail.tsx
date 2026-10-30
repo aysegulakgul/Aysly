@@ -15,6 +15,7 @@ import { DatePickerPanel, type DueValue } from './date-picker';
 import { longDay, offsetLabel, shortTime } from './dates';
 import { useTaskCompletion } from './task-actions';
 import type { TaskUiContext } from './task-context';
+import { LinkedRecords } from '../notes/linked-records';
 import { RecurrenceField, RecurrenceScopeDialog, RemindersSection } from './schedule-fields';
 
 type Patch = Record<string, unknown>;
@@ -97,7 +98,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 const selectClass =
   'min-h-11 w-full appearance-none rounded-sm bg-transparent px-2 text-sm text-text hover:bg-surface-muted';
 
-/** Figma "Görev detayı" paneli (4:66875). Tekrar ve hatırlatıcılar Faz 6'da (D-087/D-088); bağlı kayıtlar Faz 7'de. */
+/** Figma "Görev detayı" paneli (4:66875). Tekrar ve hatırlatıcılar Faz 6'da (D-087/D-088); bağlı notlar ve hedefler Faz 7'de. */
 export function TaskDetailPanel({
   detail,
   context,
@@ -255,6 +256,12 @@ function DetailBody({ detail, context }: { detail: TaskDetailView; context: Task
 
         <div className="flex flex-col border-b border-border pb-3">
           <RemindersSection detail={detail} context={context} />
+          {detail.deletedAt ? null : (
+            <LinkedRecords
+              workspaceId={context.workspaceId}
+              target={{ kind: 'task', id: detail.id }}
+            />
+          )}
 
           {detail.parentTaskId ? null : (
             <Field label={t('detail.project')}>

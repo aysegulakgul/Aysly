@@ -465,6 +465,16 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Paketler (D-058, tam sürüm sabit): `@tiptap/react`, `@tiptap/pm`, `@tiptap/starter-kit`, `@tiptap/extension-task-list`, `@tiptap/extension-task-item`, `@tiptap/markdown` 3.32.0; `react-markdown` 10.1.0, `remark-gfm` 4.0.1, `rehype-sanitize` 6.0.0. En yeni Tiptap sürümü (3.32.2) karar günü yayımlandığı için en az iki haftalık 3.32.0 seçildi.
 - Alternatifler: CodeMirror 6 + önizleme; düz metin alanı + önizleme.
 
+### D-091 — Notlar, hedefler ve aramanın uygulama ayrıntıları (Faz 7)
+- Durum: ONAYLI · Tarih: 2026-10-30 · Karar veren: Claude (uygulama ayrıntısı; ürün davranışı PRD/BR'ye uygun)
+- **Migration'lar:** 0007 `notes`, `note_task_links`, `note_project_links`, `note_tags`, `goals`, `goal_task_links`, `goal_project_links`; 0008 arama: değişmez `aysly_search_text()` (ı/İ → i/I, `unaccent`, küçük harf), görev/proje/not/hedef tablolarında üretilmiş `search_vector` kolonları ve GIN indeksleri. Arama önek sorgusudur (`terim:* & …`); kullanıcı girdisinden yalnızca harf ve rakam alınır (D-022).
+- **`lifecycle` modülü kuruldu:** Arşiv sayfası, çöp listesi, geri yükleme ve kalıcı silme görev/proje/not/hedefi birlikte ele alır; görev ve proje işlemleri `tasks` modülüne devredilir. 30 günlük temizlik işi not ve hedefleri de siler.
+- **`search` modülü** bir okuma modelidir (ham SQL, tür başına en çok 20 sonuç, `ts_rank` sırası, görev ve notlarda etiket adı eşleşmesi). MVP'de kişisel çalışma alanında arar.
+- **Not kaydı (BR-NOTE-001/002):** 1 sn gecikmeli otomatik kayıt; kayıtlar sırayla gönderilir ve her biri son sürümü kullanır; yeni not ilk kaydında kimlik kazanınca aynı düzenleyici açık kalır. Eski sürümle gelen kayıt 409 yerine 200 + `meta.outcome = "conflict_copy"` döner: içerik "(çatışma kopyası – tarih)" ekli yeni bir nota yazılır, hiçbir şey kaybolmaz (API_CONTRACTS §9'dan sapma; istemci tek akışla işler). Kaydedilemeyen değişiklik `localStorage`'da saklanır, bağlantı gelince gönderilir; açılışta daha yeni taslak varsa "Taslağı geri getir" önerilir.
+- **Hedef durumu:** "Ulaşıldı / Vazgeçildi / Yeniden etkinleştir" ayrı uç noktalar yerine `PATCH { status }` ile yapılır (API_CONTRACTS §10'dan sapma). Otomatik ilerleme bağlı görevler ile bağlı projelerin üst düzey görevlerinin birleşiminden hesaplanır; her görev bir kez sayılır (BR-GOAL-004).
+- **Arayüz:** `/notes` ve `/goals` liste + detay (detay URL parametresiyle: `?note=`, `?goal=`); `Ctrl/⌘+K` komut paleti; görev detayında ve proje sayfasında "Bağlı kayıtlar"; panoda Projeler ve Hedefler widget'ları; arşiv sayfasında Notlar ve Hedefler sekmeleri.
+- **Süreç notu:** 0007 ve not alanı kodu paralel bir oturumda başladı; çakışan şema dışa aktarımları birleştirildi, uygulanmış 0007 korundu.
+
 ---
 
 ## 5. Faz kapanış kayıtları

@@ -32,6 +32,13 @@ export type GoalChanges = Partial<{
 
 export type GoalLinks = { taskIds: string[]; projectIds: string[] };
 
+export type GoalListFilter = {
+  status?: GoalStatus | undefined;
+  includeArchived?: boolean | undefined;
+  linkedTaskId?: string | undefined;
+  linkedProjectId?: string | undefined;
+};
+
 export type GoalRepository = {
   insert(
     scope: WorkspaceScope,
@@ -52,10 +59,7 @@ export type GoalRepository = {
     changes: GoalChanges,
     now: Date,
   ): Promise<Goal | null>;
-  list(
-    scope: WorkspaceScope,
-    filter: { status?: GoalStatus | undefined; includeArchived?: boolean | undefined },
-  ): Promise<Goal[]>;
+  list(scope: WorkspaceScope, filter: GoalListFilter): Promise<Goal[]>;
   trash(scope: WorkspaceScope, id: string, batchId: string, now: Date): Promise<boolean>;
   restore(scope: WorkspaceScope, id: string, now: Date): Promise<boolean>;
   listTrashed(scope: WorkspaceScope): Promise<Goal[]>;
@@ -270,7 +274,7 @@ export async function getGoal(
 export async function listGoals(
   deps: GoalDeps,
   scope: WorkspaceScope,
-  filter: { status?: GoalStatus | undefined; includeArchived?: boolean | undefined },
+  filter: GoalListFilter,
 ): Promise<Result<GoalWithProgress[], DomainError>> {
   const allowed = authorize(scope, 'goal.read');
   if (!allowed.ok) return allowed;

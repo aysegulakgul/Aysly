@@ -4,7 +4,9 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { apiDelete, apiPost } from '@/client/api';
-import type { TrashGroupView } from '@/modules/tasks';
+import type { TrashGroupsView } from '@/modules/lifecycle';
+
+type TrashGroupView = TrashGroupsView[number];
 import { Button } from '@/ui/components/button';
 import { Dialog } from '@/ui/components/dialog';
 import { Banner, EmptyState } from '@/ui/components/feedback';
@@ -62,9 +64,13 @@ export function TrashList({
   const title = (g: TrashGroupView) =>
     g.root.type === 'project'
       ? t('projectGroup', { title: g.root.title, count: g.count })
-      : g.count > 1
-        ? t('taskGroupMore', { title: g.root.title, count: g.count - 1 })
-        : t('taskGroup', { title: g.root.title });
+      : g.root.type === 'note'
+        ? t('noteGroup', { title: g.root.title })
+        : g.root.type === 'goal'
+          ? t('goalGroup', { title: g.root.title })
+          : g.count > 1
+            ? t('taskGroupMore', { title: g.root.title, count: g.count - 1 })
+            : t('taskGroup', { title: g.root.title });
   const projects = groups.filter((g) => g.root.type === 'project').length;
   const tasks = groups.reduce((n, g) => n + g.count, 0);
 

@@ -12,7 +12,9 @@ export type ApiError = {
   requestId?: string;
 };
 
-export type ApiResult<T> = { ok: true; data: T } | { ok: false; status: number; error: ApiError };
+export type ApiResult<T> =
+  | { ok: true; data: T; meta?: Record<string, unknown> | undefined }
+  | { ok: false; status: number; error: ApiError };
 
 type ApiPath = `/api/v1/${string}`;
 
@@ -35,8 +37,13 @@ async function apiRequest<T>(
     return { ok: false, status: 0, error: { code: 'NETWORK', message: '' } };
   }
   if (response.status === 204) return { ok: true, data: undefined as T };
-  const json = (await response.json().catch(() => null)) as { data?: T; error?: ApiError } | null;
-  if (response.ok && json && 'data' in json) return { ok: true, data: json.data as T };
+  const json = (await response.json().catch(() => null)) as {
+    data?: T;
+    meta?: Record<string, unknown>;
+    error?: ApiError;
+  } | null;
+  if (response.ok && json && 'data' in json)
+    return { ok: true, data: json.data as T, meta: json.meta };
   return {
     ok: false,
     status: response.status,
@@ -50,3 +57,4 @@ export const apiPatch = <T>(path: ApiPath, body: unknown) => apiRequest<T>('PATC
 export const apiDelete = <T = void>(path: ApiPath, body?: unknown) =>
   apiRequest<T>('DELETE', path, body);
 export const apiGet = <T>(path: ApiPath) => apiRequest<T>('GET', path);
+export const apiPut = <T>(path: ApiPath, body: unknown) => apiRequest<T>('PUT', path, body);

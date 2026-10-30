@@ -1,8 +1,9 @@
 import { redirect } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
+import { findGoals } from '@/modules/goals';
 import { getSessionStartedAt } from '@/modules/identity';
 import { findOnboardingOffer, findOnboardingState } from '@/modules/preferences';
-import { findTaskProgress } from '@/modules/tasks';
+import { findProjectOverview, findTaskProgress } from '@/modules/tasks';
 import { getDashboard, getPersonalScope, getViewer } from '../viewer';
 import { FirstSteps, type FirstStep } from './dashboard/first-steps';
 import { LayoutEditor } from './dashboard/layout-editor';
@@ -30,11 +31,13 @@ export default async function TodayPage() {
   const startedAt = await getSessionStartedAt();
   if (startedAt && (await findOnboardingOffer(viewer.user.id, startedAt))) redirect('/onboarding');
 
-  const [context, data, onboarding, progress] = await Promise.all([
+  const [context, data, onboarding, progress, projects, goals] = await Promise.all([
     buildTaskContext(viewer, scope),
     getDashboard(),
     findOnboardingState(viewer.user.id),
     findTaskProgress(scope),
+    findProjectOverview(scope),
+    findGoals(scope, { status: 'active' }),
   ]);
   const { timezone, dashboardLayout, version } = viewer.preferences;
   const now = new Date();
@@ -65,7 +68,15 @@ export default async function TodayPage() {
       </div>
       <QuickCapture context={context} />
       {showSteps ? <FirstSteps steps={steps} /> : null}
-      {data ? <DashboardWidgets data={data} order={order} context={context} /> : null}
+      {data ? (
+        <DashboardWidgets
+          data={data}
+          order={order}
+          context={context}
+          projects={projects}
+          goals={goals}
+        />
+      ) : null}
     </PageFrame>
   );
 }

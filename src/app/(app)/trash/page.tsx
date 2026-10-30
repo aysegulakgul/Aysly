@@ -1,5 +1,5 @@
 import { getTranslations } from 'next-intl/server';
-import { findTrash } from '@/modules/tasks';
+import { findTrashGroups } from '@/modules/lifecycle';
 import { getPersonalScope, getViewer } from '../../viewer';
 import { PageFrame } from '../page-frame';
 import { TrashList } from './trash-list';
@@ -15,7 +15,7 @@ export default async function TrashPage() {
     getTranslations('trash'),
   ]);
   if (!viewer || !scope) return null;
-  const groups = await findTrash(scope);
+  const groups = await findTrashGroups(scope);
   return (
     <PageFrame title={t('title')}>
       <TrashList groups={groups} workspaceId={scope.workspaceId} />

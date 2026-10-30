@@ -184,7 +184,9 @@ describe('projeler ve görünümler (veritabanı)', () => {
       ok: false,
       error: { rule: 'BR-TAG-001' },
     });
-    expect(ok(await deleteTag(tagDeps, scope, is.id))).toEqual({ removedFrom: { tasks: 1 } });
+    expect(ok(await deleteTag(tagDeps, scope, is.id))).toEqual({
+      removedFrom: { tasks: 1, notes: 0 },
+    });
     const [{ n } = { n: -1 }] = await client<{ n: number }[]>`
       select count(*)::int as n from task_tags where task_id = ${task.id}`;
     expect(n).toBe(1);

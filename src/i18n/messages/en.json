@@ -130,7 +130,9 @@
     "trash": "Trash",
     "projectProgress": "{name} · {percent}%",
     "calendar": "Calendar",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "goals": "Goals",
+    "notes": "Notes"
   },
   "dashboard": {
     "greeting": {
@@ -151,7 +153,9 @@
       "today": "Today",
       "overdue": "Overdue",
       "upcoming": "Upcoming",
-      "priority": "Priority"
+      "priority": "Priority",
+      "projects": "Projects",
+      "goals": "Goals"
     },
     "counts": {
       "today": "{count} tasks",
@@ -163,14 +167,19 @@
       "today": "Nothing planned for today. Take a look at what’s upcoming.",
       "overdue": "No overdue tasks.",
       "upcoming": "No tasks in the next 7 days.",
-      "priority": "No open high-priority tasks."
+      "priority": "No open high-priority tasks.",
+      "projects": "No active projects.",
+      "goals": "No active goals."
     },
     "allUpcoming": "See all {count} tasks",
     "toToday": "Move to today",
     "toTomorrow": "Move to tomorrow",
     "noTasksTitle": "Start planning your day with a task",
     "noTasksDescription": "Write your first task with quick add; today’s, overdue and upcoming tasks gather here.",
-    "allHidden": "All sections are hidden. Use “Edit” to add one."
+    "allHidden": "All sections are hidden. Use “Edit” to add one.",
+    "allProjects": "All",
+    "allGoals": "All",
+    "projectProgress": "{done}/{total} · {percent}%"
   },
   "settings": {
     "title": "Settings",
@@ -564,7 +573,8 @@
       "undo": "Undo last action (while the notice is shown)",
       "help": "Open this guide",
       "gc": "Go to Calendar",
-      "gp": "Go to Projects"
+      "gp": "Go to Projects",
+      "search": "Global search"
     }
   },
   "projects": {
@@ -780,7 +790,11 @@
     "emptyTasks": "No archived tasks.",
     "archivedAt": "Archived: {when}",
     "inProject": "{project}",
-    "failed": "Couldn’t unarchive. Try again."
+    "failed": "Couldn’t unarchive. Try again.",
+    "notes": "Notes",
+    "goals": "Goals",
+    "emptyNotes": "No archived notes.",
+    "emptyGoals": "No archived goals."
   },
   "trash": {
     "title": "Trash",
@@ -806,7 +820,9 @@
     "choiceDescription": "This task’s project is also in the trash. Where should it be restored?",
     "restoreProject": "Restore the project too",
     "restoreToInbox": "Restore to Inbox",
-    "failed": "The action couldn’t be completed. Try again."
+    "failed": "The action couldn’t be completed. Try again.",
+    "noteGroup": "Note: {title}",
+    "goalGroup": "Goal: {title}"
   },
   "tags": {
     "title": "Tags",
@@ -864,5 +880,144 @@
     "tags": "Tags",
     "allTags": "Tags",
     "hours": "Hours"
+  },
+  "notes": {
+    "title": "Notes",
+    "subtitle": "Keep your thoughts, decisions and small details.",
+    "create": "Create note",
+    "list": "Note list",
+    "search": "Search notes",
+    "pinned": "Pinned",
+    "others": "Other notes",
+    "emptyTitle": "No notes yet",
+    "emptyDescription": "Meeting notes, ideas, decisions… Keep them all here.",
+    "pick": "Pick a note to read or edit.",
+    "untitled": "Untitled note",
+    "editor": "Note editor",
+    "noteTitle": "Note title",
+    "titlePlaceholder": "Title",
+    "body": "Note content",
+    "saving": "Saving…",
+    "savedAt": "Saved · {time}",
+    "savedLocally": "Couldn’t save, kept locally",
+    "saveFailed": "Couldn’t save. Try again.",
+    "conflictCopy": "conflict copy",
+    "conflictBanner": "This note was changed elsewhere. Your version was saved as a conflict copy; nothing was lost.",
+    "draftFound": "An unsaved draft was found.",
+    "restoreDraft": "Restore draft",
+    "draftRestored": "The unsaved draft was restored and is being saved.",
+    "archivedBand": "This note is archived. Unarchive it to edit.",
+    "deletedBand": "This note is in the trash. Use the Trash page to restore it.",
+    "more": "Note actions",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "pinnedChip": "Pinned",
+    "archive": "Archive",
+    "unarchive": "Unarchive",
+    "delete": "Move to trash",
+    "links": "Linked records",
+    "noLinks": "No linked notes or goals.",
+    "goals": "Goals",
+    "addLink": "Add link",
+    "linkTask": "Search tasks",
+    "linkProject": "Project",
+    "unlink": "Remove link to {name}",
+    "linkFailed": "The link couldn’t be saved. Try again.",
+    "toolbar": {
+      "label": "Formatting",
+      "h2": "Heading",
+      "bold": "Bold",
+      "italic": "Italic",
+      "bullet": "Bulleted list",
+      "ordered": "Numbered list",
+      "task": "To-do list",
+      "code": "Code block",
+      "link": "Link",
+      "linkPrompt": "Link address (https://…)"
+    },
+    "tags": "Tags",
+    "tagsPlaceholder": "Type a tag, press Enter",
+    "removeTag": "Remove tag {tag}"
+  },
+  "goals": {
+    "title": "Goals",
+    "subtitle": "Break big intentions into small, meaningful steps.",
+    "create": "Add goal",
+    "tabs": "Goal status",
+    "tab": {
+      "active": "Active",
+      "achieved": "Achieved",
+      "abandoned": "Abandoned"
+    },
+    "status": {
+      "active": "Active",
+      "achieved": "Achieved",
+      "abandoned": "Abandoned"
+    },
+    "modes": {
+      "auto": "Automatic",
+      "manual": "Manual"
+    },
+    "modeHint": {
+      "auto": "Automatic is the default. Calculated from linked tasks being completed; each task counts once.",
+      "manual": "Enter the progress yourself (0–100)."
+    },
+    "noDate": "No date",
+    "noLinks": "No linked records yet.",
+    "noManual": "No progress entered yet.",
+    "progressAuto": "{done}/{total} · {percent}%",
+    "progressManual": "{percent}%",
+    "emptyTitle": "Set a goal",
+    "emptyDescription": "Set a goal and feed it with tasks.",
+    "more": "Goal actions",
+    "abandon": "Abandon",
+    "reactivate": "Reactivate",
+    "archive": "Archive",
+    "unarchive": "Unarchive",
+    "delete": "Move to trash",
+    "archivedBand": "This goal is archived. Unarchive it to edit.",
+    "failed": "The action couldn’t be completed. Try again.",
+    "suggestAchieved": "All linked tasks are done. Would you like to mark the goal as achieved?",
+    "progressMode": "Progress mode",
+    "manualLabel": "Progress (%)",
+    "save": "Save",
+    "linkedProjects": "Linked project",
+    "linkedTasks": "Linked task",
+    "add": "Add",
+    "addProject": "Link project",
+    "addTask": "Link task",
+    "searchTask": "Search tasks",
+    "unlink": "Remove link to {name}",
+    "countedOnce": "This task is also in a linked project; it isn’t counted twice.",
+    "markAchieved": "Mark as achieved",
+    "goalTitle": "Goal",
+    "targetDate": "Target date",
+    "description": "Description",
+    "titleRequired": "A goal title is required.",
+    "cancel": "Cancel"
+  },
+  "search": {
+    "title": "Global search",
+    "description": "Command palette / results by type",
+    "label": "Search everywhere",
+    "button": "Search",
+    "results": "Search results",
+    "archivedOff": "Include archive: Off",
+    "archivedOn": "Include archive: On",
+    "archived": "archived",
+    "types": {
+      "task": "Tasks",
+      "project": "Projects",
+      "note": "Notes",
+      "goal": "Goals"
+    },
+    "empty": "No results for “{q}”.",
+    "tipSpelling": "Check the spelling; Turkish letters don’t matter (ı/i, ş/s…).",
+    "tipArchive": "Turn on \"Include archive\" to search archived records too.",
+    "createTask": "Create a task titled “{title}”",
+    "recent": "Recent searches",
+    "addTask": "Add task",
+    "settings": "Settings",
+    "footer": "↑ ↓ navigate · Enter open · Esc close · Trash isn’t searched"
   }
 }

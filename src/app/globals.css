@@ -82,3 +82,60 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Not içeriği (Figma Notlar 4:67588): başlık 17 px yarı kalın, gövde 15 px, listeler girintili. D-090 editörü ve
+   SafeMarkdown aynı görünümü paylaşır. */
+.prose-aysly {
+  color: var(--color-text, inherit);
+  line-height: 1.6;
+}
+.prose-aysly > * + * {
+  margin-top: 0.75rem;
+}
+.prose-aysly h1,
+.prose-aysly h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+.prose-aysly h3 {
+  font-weight: 600;
+}
+.prose-aysly ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+.prose-aysly ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+.prose-aysly ul[data-type='taskList'],
+.prose-aysly ul.contains-task-list {
+  list-style: none;
+  padding-left: 0;
+}
+.prose-aysly ul[data-type='taskList'] li {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+.prose-aysly code {
+  border-radius: 4px;
+  padding: 0 0.25rem;
+  background: var(--surface-muted);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.9em;
+}
+.prose-aysly pre {
+  overflow-x: auto;
+  border-radius: 6px;
+  padding: 0.75rem;
+  background: var(--surface-muted);
+}
+.prose-aysly pre code {
+  padding: 0;
+  background: none;
+}
+.prose-aysly a {
+  color: var(--primary);
+  text-decoration: underline;
+}

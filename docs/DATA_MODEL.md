@@ -1,6 +1,6 @@
 # Veri Modeli
 
-> Durum: v0.6 · Son güncelleme: 2026-10-29 · Uygulama durumu: Migration 0000–0006 uygulandı (§7.1); diğer tablolar ilgili fazlarda.
+> Durum: v0.6 · Son güncelleme: 2026-10-29 · Uygulama durumu: Migration 0000–0008 uygulandı (§7.1); diğer tablolar ilgili fazlarda.
 > PostgreSQL + Drizzle ONAYLI (D-044); Docker Desktop üzerinde yerel (D-056). Alan ayrıntıları ve sınırlar D-060 ile onaylı; D-061 sadeleştirmeleri uygulanmıştır.
 > Veritabanı: PostgreSQL 16+ (ONAYLI, D-044). Bu belgedeki alanlar **hedef şemadır**; açık sorulara bağlı alanlar işaretlenmiştir.
 
@@ -338,6 +338,8 @@ Ayrıntı: ARCHITECTURE §12.4. Ek kurallar:
 | 0004 | `drizzle/0004_tags.sql` | `tags`, `task_tags` (bileşik FK'lar; `note_tags` Faz 7) | 4 |
 | 0003 | `drizzle/0003_tasks_idempotency.sql` | `tasks` (tekrar ve arama kolonları hariç; D-076), `idempotency_keys` | 4 |
 | 0006 | `drizzle/0006_recurrence_reminders_notifications.sql` | `tasks.recurrence_*` (kural, mod, seri, planlanan tarih, sıra, üreten görev; D-087), `reminders` (`failed` durumu yok), `notifications` (`notification_deliveries` SONRA), `saved_views.view_type` + `calendar` | 6 |
+| 0007 | `drizzle/0007_notes_goals.sql` | `notes`, `note_task_links`, `note_project_links`, `note_tags`, `goals`, `goal_task_links`, `goal_project_links` | 7 |
+| 0008 | `drizzle/0008_search_vectors.sql` | `aysly_search_text()` (ı/İ, `unaccent`, küçük harf; D-091), `tasks`/`projects`/`notes`/`goals` üretilmiş `search_vector` + GIN | 7 |
 | 0005 | `drizzle/0005_projects_views.sql` | `saved_views` (`pinned` kolonu ve takvim türü yok; D-086), `projects_color` CHECK (12 renk, D-082) | 5 |
 
 Notlar: `idempotency_keys` ilk oluşturma uç noktalarıyla birlikte Faz 4'te eklenecek. Kimlik tablolarının alan adları Better Auth'un beklediği adlardır (`users.email_verified` boolean; DATA_MODEL §3.1'deki `email_verified_at` yerine). Hız sınırı sayaçları `auth_rate_limits` tablosunda tutulur.

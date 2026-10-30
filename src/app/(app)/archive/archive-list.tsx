@@ -6,12 +6,14 @@ import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { apiPost } from '@/client/api';
-import type { ArchiveView } from '@/modules/tasks';
+import type { ArchiveContentsView } from '@/modules/lifecycle';
 import { Button } from '@/ui/components/button';
 import { Banner } from '@/ui/components/feedback';
 import { cn } from '@/ui/cn';
 import { ProjectDot } from '../projects/project-color';
 import { shortDate, todayIn } from '../tasks/dates';
+
+export type ArchiveType = 'projects' | 'tasks' | 'notes' | 'goals';
 
 export function ArchiveList({
   archive,
@@ -19,8 +21,8 @@ export function ArchiveList({
   workspaceId,
   timezone,
 }: {
-  archive: ArchiveView;
-  type: 'projects' | 'tasks';
+  archive: ArchiveContentsView;
+  type: ArchiveType;
   workspaceId: string;
   timezone: string;
 }) {
@@ -43,10 +45,10 @@ export function ArchiveList({
   return (
     <>
       <nav aria-label={t('tabs')} className="flex w-full gap-1 border-b border-border">
-        {(['projects', 'tasks'] as const).map((key) => (
+        {(['projects', 'tasks', 'notes', 'goals'] as const).map((key) => (
           <Link
             key={key}
-            href={(key === 'projects' ? '/archive' : '/archive?type=tasks') as Route}
+            href={(key === 'projects' ? '/archive' : `/archive?type=${key}`) as Route}
             aria-current={type === key ? 'page' : undefined}
             className={cn(
               'flex min-h-11 flex-col justify-center p-3 text-sm font-medium',
@@ -58,7 +60,44 @@ export function ArchiveList({
         ))}
       </nav>
       {failed ? <Banner>{t('failed')}</Banner> : null}
-      {type === 'projects' ? (
+      {type === 'notes' || type === 'goals' ? (
+        archive[type].length === 0 ? (
+          <p className="text-sm text-text-secondary">
+            {t(type === 'notes' ? 'emptyNotes' : 'emptyGoals')}
+          </p>
+        ) : (
+          <ul className="flex flex-col">
+            {archive[type].map((item) => (
+              <li key={item.id} className={row} data-archive-row>
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <Link
+                    href={
+                      (type === 'notes'
+                        ? `/notes?note=${item.id}`
+                        : `/goals?goal=${item.id}`) as Route
+                    }
+                    className="truncate text-base text-text"
+                  >
+                    {item.title}
+                  </Link>
+                  <p className="text-xs text-text-secondary">
+                    {t('archivedAt', { when: when(item.archivedAt) })}
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  className="text-sm text-primary"
+                  onClick={() =>
+                    void unarchive(`${base}/${type}/${item.id}/unarchive`, item.version)
+                  }
+                >
+                  {t('unarchive')}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )
+      ) : type === 'projects' ? (
         archive.projects.length === 0 ? (
           <p className="text-sm text-text-secondary">{t('emptyProjects')}</p>
         ) : (

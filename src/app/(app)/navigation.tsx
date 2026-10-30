@@ -9,6 +9,7 @@ import { BottomNav, BottomNavItem, NavItem } from '@/ui/components/nav';
 import { badge } from './badge';
 import { NotificationBell } from './notifications/notification-center';
 import { ProjectDot } from './projects/project-color';
+import { SearchButton } from './search/command-palette';
 import { SignOutButton } from './sign-out-button';
 
 function useSection() {
@@ -19,6 +20,8 @@ function useSection() {
     myTasks: pathname === '/my-tasks',
     upcoming: pathname === '/upcoming',
     calendar: pathname === '/calendar',
+    goals: pathname === '/goals',
+    notes: pathname === '/notes',
     projects: pathname === '/projects',
     project: (id: string) => pathname === `/projects/${id}`,
     view: (id: string) => pathname === `/views/${id}`,
@@ -42,7 +45,7 @@ const sectionLink = (active: boolean) =>
 /**
  * Figma UI/Sidebar (4:66491): 232 px, surface-muted zemin, 16 px iç boşluk, 12 px aralık. Faz 5: Projeler girişi,
  * "PROJELER" (renk ve ilerleme yüzdesiyle) ve "KAYITLI GÖRÜNÜMLER" bölümleri, Arşiv ve Çöp kutusu (Figma 4:67037).
- * Takvim, Hedefler ve Notlar ait oldukları fazda eklenir (D-071).
+ * Faz 7: Ara (Ctrl/⌘+K), Hedefler ve Notlar.
  */
 export function Sidebar({
   userName,
@@ -74,6 +77,7 @@ export function Sidebar({
         <Icon name="plus" tone="primary" />
         {t('addTask')}
       </Link>
+      <SearchButton />
       <nav aria-label={t('mainNav')} className="flex w-full flex-col gap-3">
         <NavItem
           href="/inbox"
@@ -122,6 +126,12 @@ export function Sidebar({
           countLabel={t('projectsCount', { count: projects.length })}
         >
           {t('projects')}
+        </NavItem>
+        <NavItem href="/goals" glyph="◎" active={section.goals}>
+          {t('goals')}
+        </NavItem>
+        <NavItem href="/notes" glyph="≡" active={section.notes}>
+          {t('notes')}
         </NavItem>
         <Divider />
         <div className="flex items-center gap-2 px-1">

@@ -130,7 +130,9 @@
     "trash": "Çöp kutusu",
     "projectProgress": "{name} · %{percent}",
     "calendar": "Takvim",
-    "notifications": "Bildirimler"
+    "notifications": "Bildirimler",
+    "goals": "Hedefler",
+    "notes": "Notlar"
   },
   "dashboard": {
     "greeting": {
@@ -151,7 +153,9 @@
       "today": "Bugün",
       "overdue": "Geciken",
       "upcoming": "Yaklaşan",
-      "priority": "Öncelikli"
+      "priority": "Öncelikli",
+      "projects": "Projeler",
+      "goals": "Hedefler"
     },
     "counts": {
       "today": "{count} görev",
@@ -163,14 +167,19 @@
       "today": "Bugün için planlanmış iş yok. Yaklaşanlara göz at.",
       "overdue": "Geciken görev yok.",
       "upcoming": "Sonraki 7 günde görev yok.",
-      "priority": "Yüksek öncelikli açık görev yok."
+      "priority": "Yüksek öncelikli açık görev yok.",
+      "projects": "Aktif proje yok.",
+      "goals": "Aktif hedef yok."
     },
     "allUpcoming": "{count} görevin tümünü gör",
     "toToday": "Bugüne taşı",
     "toTomorrow": "Yarına taşı",
     "noTasksTitle": "Gününü planlamaya bir görevle başla",
     "noTasksDescription": "Hızlı eklemeyle ilk görevini yaz; bugün, geciken ve yaklaşan görevlerin burada toplanır.",
-    "allHidden": "Tüm bölümler gizli. “Düzenle” ile bölüm ekleyebilirsin."
+    "allHidden": "Tüm bölümler gizli. “Düzenle” ile bölüm ekleyebilirsin.",
+    "allProjects": "Tümü",
+    "allGoals": "Tümü",
+    "projectProgress": "{done}/{total} · %{percent}"
   },
   "settings": {
     "title": "Ayarlar",
@@ -564,7 +573,8 @@
       "undo": "Son eylemi geri al (bildirim açıkken)",
       "help": "Bu rehberi aç",
       "gc": "Takvim’e git",
-      "gp": "Projeler’e git"
+      "gp": "Projeler’e git",
+      "search": "Global arama"
     }
   },
   "projects": {
@@ -780,7 +790,11 @@
     "emptyTasks": "Arşivde görev yok.",
     "archivedAt": "Arşivlendi: {when}",
     "inProject": "{project}",
-    "failed": "Arşivden çıkarılamadı. Tekrar dene."
+    "failed": "Arşivden çıkarılamadı. Tekrar dene.",
+    "notes": "Notlar",
+    "goals": "Hedefler",
+    "emptyNotes": "Arşivde not yok.",
+    "emptyGoals": "Arşivde hedef yok."
   },
   "trash": {
     "title": "Çöp kutusu",
@@ -806,7 +820,9 @@
     "choiceDescription": "Bu görevin projesi de çöp kutusunda. Nereye geri yüklensin?",
     "restoreProject": "Projeyi de geri yükle",
     "restoreToInbox": "Inbox’a geri yükle",
-    "failed": "İşlem tamamlanamadı. Tekrar dene."
+    "failed": "İşlem tamamlanamadı. Tekrar dene.",
+    "noteGroup": "Not: {title}",
+    "goalGroup": "Hedef: {title}"
   },
   "tags": {
     "title": "Etiketler",
@@ -864,5 +880,144 @@
     "tags": "Etiketler",
     "allTags": "Etiketler",
     "hours": "Saatler"
+  },
+  "notes": {
+    "title": "Notlar",
+    "subtitle": "Düşüncelerini, kararlarını ve küçük ayrıntıları kaybetme.",
+    "create": "Not oluştur",
+    "list": "Not listesi",
+    "search": "Notlarda ara",
+    "pinned": "Sabitlenenler",
+    "others": "Diğer notlar",
+    "emptyTitle": "Henüz not yok",
+    "emptyDescription": "Toplantı notları, fikirler, kararlar… Hepsini burada topla.",
+    "pick": "Okumak veya düzenlemek için bir not seç.",
+    "untitled": "Başlıksız not",
+    "editor": "Not düzenleyici",
+    "noteTitle": "Not başlığı",
+    "titlePlaceholder": "Başlık",
+    "body": "Not içeriği",
+    "saving": "Kaydediliyor…",
+    "savedAt": "Kaydedildi · {time}",
+    "savedLocally": "Kaydedilemedi, yerel olarak saklandı",
+    "saveFailed": "Kaydedilemedi. Tekrar dene.",
+    "conflictCopy": "çatışma kopyası",
+    "conflictBanner": "Bu not başka bir yerde değiştirilmiş. Senin sürümün çatışma kopyası olarak kaydedildi; hiçbir şey kaybolmadı.",
+    "draftFound": "Kaydedilmemiş bir taslak bulundu.",
+    "restoreDraft": "Taslağı geri getir",
+    "draftRestored": "Kaydedilmemiş taslak geri getirildi; kaydediliyor.",
+    "archivedBand": "Bu not arşivde. Düzenlemek için arşivden çıkar.",
+    "deletedBand": "Bu not çöp kutusunda. Geri yüklemek için Çöp kutusu sayfasını kullan.",
+    "more": "Not işlemleri",
+    "pin": "Sabitle",
+    "unpin": "Sabitlemeyi kaldır",
+    "pinnedChip": "Sabitlendi",
+    "archive": "Arşivle",
+    "unarchive": "Arşivden çıkar",
+    "delete": "Çöpe taşı",
+    "links": "Bağlı kayıtlar",
+    "noLinks": "Bağlı not veya hedef yok.",
+    "goals": "Hedefler",
+    "addLink": "Bağlantı ekle",
+    "linkTask": "Görev ara",
+    "linkProject": "Proje",
+    "unlink": "{name} bağlantısını kaldır",
+    "linkFailed": "Bağlantı kaydedilemedi. Tekrar dene.",
+    "toolbar": {
+      "label": "Biçimlendirme",
+      "h2": "Başlık",
+      "bold": "Kalın",
+      "italic": "İtalik",
+      "bullet": "Madde işaretli liste",
+      "ordered": "Numaralı liste",
+      "task": "Yapılacak listesi",
+      "code": "Kod bloğu",
+      "link": "Bağlantı",
+      "linkPrompt": "Bağlantı adresi (https://…)"
+    },
+    "tags": "Etiketler",
+    "tagsPlaceholder": "Etiket yaz, Enter’a bas",
+    "removeTag": "{tag} etiketini kaldır"
+  },
+  "goals": {
+    "title": "Hedefler",
+    "subtitle": "Büyük niyetleri küçük, anlamlı adımlara böl.",
+    "create": "Hedef ekle",
+    "tabs": "Hedef durumu",
+    "tab": {
+      "active": "Aktif",
+      "achieved": "Ulaşılan",
+      "abandoned": "Bırakılan"
+    },
+    "status": {
+      "active": "Aktif",
+      "achieved": "Ulaşıldı",
+      "abandoned": "Bırakıldı"
+    },
+    "modes": {
+      "auto": "Otomatik",
+      "manual": "Manuel"
+    },
+    "modeHint": {
+      "auto": "Otomatik varsayılandır. Bağlı görevlerin tamamlanmasına göre hesaplanır; her görev bir kez sayılır.",
+      "manual": "İlerlemeyi kendin gir (0–100)."
+    },
+    "noDate": "Tarih yok",
+    "noLinks": "Henüz bağlı kayıt yok.",
+    "noManual": "Henüz ilerleme girilmedi.",
+    "progressAuto": "{done}/{total} · %{percent}",
+    "progressManual": "%{percent}",
+    "emptyTitle": "Bir hedef belirle",
+    "emptyDescription": "Bir hedef belirle ve onu görevlerle besle.",
+    "more": "Hedef işlemleri",
+    "abandon": "Bırak",
+    "reactivate": "Yeniden etkinleştir",
+    "archive": "Arşivle",
+    "unarchive": "Arşivden çıkar",
+    "delete": "Çöpe taşı",
+    "archivedBand": "Bu hedef arşivde. Düzenlemek için arşivden çıkar.",
+    "failed": "İşlem tamamlanamadı. Tekrar dene.",
+    "suggestAchieved": "Bağlı tüm görevler tamamlandı. Hedefi \"Ulaşıldı\" olarak işaretlemek ister misin?",
+    "progressMode": "İlerleme modu",
+    "manualLabel": "İlerleme (%)",
+    "save": "Kaydet",
+    "linkedProjects": "Bağlı proje",
+    "linkedTasks": "Bağlı görev",
+    "add": "Ekle",
+    "addProject": "Proje bağla",
+    "addTask": "Görev bağla",
+    "searchTask": "Görev ara",
+    "unlink": "{name} bağlantısını kaldır",
+    "countedOnce": "Bu görev bağlı projede de bulunuyor; iki kez sayılmaz.",
+    "markAchieved": "Ulaşıldı olarak işaretle",
+    "goalTitle": "Hedef",
+    "targetDate": "Hedef tarihi",
+    "description": "Açıklama",
+    "titleRequired": "Hedef başlığı gerekli.",
+    "cancel": "Vazgeç"
+  },
+  "search": {
+    "title": "Global arama",
+    "description": "Komut paleti / türlere göre sonuçlar",
+    "label": "Her yerde ara",
+    "button": "Ara",
+    "results": "Arama sonuçları",
+    "archivedOff": "Arşivi dahil et: Kapalı",
+    "archivedOn": "Arşivi dahil et: Açık",
+    "archived": "arşivde",
+    "types": {
+      "task": "Görevler",
+      "project": "Projeler",
+      "note": "Notlar",
+      "goal": "Hedefler"
+    },
+    "empty": "“{q}” için sonuç bulunamadı.",
+    "tipSpelling": "Yazımı kontrol et; Türkçe harfler fark etmez (ı/i, ş/s…).",
+    "tipArchive": "Arşivdeki kayıtları da aramak için \"Arşivi dahil et\"i aç.",
+    "createTask": "“{title}” başlıklı görev oluştur",
+    "recent": "Son aramalar",
+    "addTask": "Görev ekle",
+    "settings": "Ayarlar",
+    "footer": "↑ ↓ gezin · Enter aç · Esc kapat · Çöpteki kayıtlar aranmaz"
   }
 }

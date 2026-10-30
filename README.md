@@ -8,17 +8,17 @@ Aysly; görevleri, projeleri, günlük planı, notları ve hedefleri tek, sakin 
 
 | | |
 |---|---|
-| Mevcut faz | **Faz 7 — Notlar, hedefler, arama** (devam ediyor; Faz 1–6 kapandı) |
-| Uygulama kodu | Hesap, onboarding, tercihler ve görev yönetimi çalışıyor (aşağıdaki "Özellikler") |
+| Mevcut faz | **Faz 7 — Notlar, hedefler, arama** (kapı kontrolünde; Faz 1–6 kapandı) |
+| Uygulama kodu | Hesap, görevler, projeler, takvim, notlar, hedefler ve arama çalışıyor (aşağıdaki "Özellikler") |
 | Çalışma ortamı | Yalnızca yerel bilgisayar; hosting ve ücretli servis yok |
 | Teknoloji | Next.js, TypeScript, PostgreSQL, Drizzle, Better Auth |
-| Sonraki adım | Faz 7: notlar, hedefler, global arama |
+| Sonraki adım | Faz 7 kapanış onayı, ardından Faz 8: test, güvenlik, dışa aktarma, hesap silme |
 
 Ayrıntılı durum: [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 
 ## Özellikler
 
-Şu an çalışanlar (Faz 1–6):
+Şu an çalışanlar (Faz 1–7):
 - **Hesap:** E-posta doğrulamalı kayıt, giriş, şifre sıfırlama, oturum ve cihaz yönetimi, profil.
 - **İlk kullanım:** Kullanım amacı ve tercihlere göre kurulum rehberi; "İlk adımlar" listesi.
 - **Tercihler:** Dil, saat dilimi, hafta başlangıcı, saat biçimi, tema.
@@ -31,9 +31,12 @@ Ayrıntılı durum: [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 - **Takvim:** Ay, hafta ve gün görünümleri; tarihsiz görevler paneli; masaüstünde sürükleyerek tarih değiştirme.
 - **Tekrarlayan görevler:** Günlük, haftalık, aylık ve yıllık kurallar; planlanan tarihe göre ya da tamamlandıktan sonra.
 - **Hatırlatıcılar ve bildirimler:** Son tarihe göre ya da belirli bir anda hatırlatıcı; uygulama açıkken bildirim merkezi.
-- **Klavye kısayolları:** `Q`, `G D/I/M/U`, `J/K`, `T/M/L`, `Ctrl/⌘+Z`, `?` rehberi.
+- **Notlar:** Başlık, liste, yapılacak listesi, bağlantı ve kod destekleyen editör; otomatik kayıt, çevrimdışı yerel taslak, çatışma kopyası; sabitleme; görev ve projelere bağlama.
+- **Hedefler:** Bağlı görevlerden otomatik ya da elle girilen ilerleme; "Ulaşıldı" önerisi; Aktif / Ulaşılan / Vazgeçilen sekmeleri; panoda Hedefler ve Projeler widget'ları.
+- **Arama:** `Ctrl/⌘+K` ile görev, proje, not ve hedeflerde Türkçe harflerden bağımsız arama.
+- **Klavye kısayolları:** `Q`, `G D/I/M/U`, `J/K`, `T/M/L`, `Ctrl/⌘+Z`, `Ctrl/⌘+K`, `?` rehberi.
 
-Plan gereği sonraki fazlarda: notlar, hedefler, arama (Faz 7).
+Plan gereği sonraki fazlarda: dışa aktarma, hesap silme, güvenlik ve erişilebilirlik denetimi (Faz 8).
 
 **Mimari özet:** Modüler monolit (`src/modules/<modül>/{domain,application,infrastructure,http}`), yetkilendirme her istekte sunucuda, Zod ile doğrulama, REST API (`/api/v1`), `pnpm verify` ile 13 adımlı yerel kalite kontrolü (birim, entegrasyon ve Playwright testleri dahil).
 

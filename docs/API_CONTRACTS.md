@@ -283,7 +283,7 @@ Yanıt: `{ data: { task, nextOccurrence: Task | null, completedSubtaskIds: [] } 
 | PATCH | `/workspaces/{ws}/tags/{id}` | Ad/renk; BR-TAG-001 |
 | DELETE | `/workspaces/{ws}/tags/{id}` | BR-TAG-002 (kalıcı); yanıt `{ removedFrom: { tasks, notes } }` |
 
-**Uygulandı (Faz 5):** `GET` (kullanım sayısı `tasks`), `PATCH`, `DELETE` (yanıt `{ removedFrom: { tasks } }`; notlar Faz 7). Ad çakışmasında `422 BR-TAG-001` + `details: [{ field: 'existingTagId', reason: <kimlik> }]`. `POST /tags` eklenmedi (D-086).
+**Uygulandı (Faz 5):** `GET` (kullanım sayısı `tasks`), `PATCH`, `DELETE` (yanıt `{ removedFrom: { tasks } }`; Faz 7 ile `notes` sayısı da eklendi). Ad çakışmasında `422 BR-TAG-001` + `details: [{ field: 'existingTagId', reason: <kimlik> }]`. `POST /tags` eklenmedi (D-086).
 
 ## 8. Hatırlatıcılar
 
@@ -310,6 +310,8 @@ Hatırlatıcılar görev detayında döner; ayrı listeleme yoktur.
 
 Gövde Markdown olarak döner; istemci sanitize edilmiş HTML'e çevirir (SECURITY §5). Sunucu kaydederken tehlikeli HTML'i temizler (savunma derinliği).
 
+**Uygulandı (Faz 7, D-091):** Eski `version` ile gelen PATCH 409 yerine 200 + `meta.outcome = "conflict_copy"` döner ve `data` yeni çatışma kopyasıdır; boşaltılan not silinir (`meta.outcome = "deleted"`, `data: null`). Listede `q` (tam metin) filtresi de var. Markdown gövde saklanırken değiştirilmez; gösterim her yerde `SafeMarkdown` (rehype-sanitize) ile yapılır.
+
 ## 10. Hedefler
 
 | Metot | Yol | Kural |
@@ -321,6 +323,8 @@ Gövde Markdown olarak döner; istemci sanitize edilmiş HTML'e çevirir (SECURI
 | POST | `/workspaces/{ws}/goals/{id}/achieve` / `abandon` / `reactivate` | BR-GOAL-003 |
 | POST | `/workspaces/{ws}/goals/{id}/archive` / `unarchive` | BR-DEL-002 |
 
+**Uygulandı (Faz 7, D-091):** `achieve` / `abandon` / `reactivate` uç noktaları yerine `PATCH { version, status }`. Yanıtta `progress: { mode, done?, total?, percent: 0-100 | null }` ve `suggestAchieved`. Listede `linkedTaskId` ve `linkedProjectId` filtreleri var.
+
 ## 11. Görünümler, arama, dashboard
 
 | Metot | Yol | Açıklama | Kural |
@@ -328,6 +332,8 @@ Gövde Markdown olarak döner; istemci sanitize edilmiş HTML'e çevirir (SECURI
 | GET | `/workspaces/{ws}/views` | Aktörün kayıtlı görünümleri | BR-VIEW-001 |
 | POST / PATCH / DELETE | `/workspaces/{ws}/views[/{id}]` | `{ name, viewType, filter (TaskFilter v1), sort, groupBy }` | BR-VIEW-001 |
 | GET | `/search?q=&types=task,project,note,goal&includeArchived=` | Global arama; erişilebilir tüm alanlar | BR-SRCH-001/002; hız sınırı yayına alma öncesi (D-061) |
+
+**Uygulandı (Faz 7, D-091):** `q` 2–200 karakter; tür başına en çok 20 sonuç; MVP'de kişisel çalışma alanı. Çöp kutusu aranmaz.
 | GET | `/workspaces/{ws}/dashboard` | Tek istekte widget verisi | BR-DASH-001/002 |
 
 **Uygulandı (Faz 5):** `/views` ve `/views/{id}` (`GET`, `POST` + `Idempotency-Key`, `PATCH` + `version`, `DELETE` → 204). `viewType`: `list|board`. Kullanıcı başına 50 (`422 BR-VIEW-001`).

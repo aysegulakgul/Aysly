@@ -57,7 +57,7 @@ export const patchTag = (ctx: ApiContext) =>
     return result.ok ? ctx.json(200, { data: result.value }) : ctx.fail(result.error);
   });
 
-/** DELETE /tags/{id}: kalıcı (BR-TAG-002); yanıt `{ removedFrom: { tasks } }`. */
+/** DELETE /tags/{id}: kalıcı (BR-TAG-002); yanıt `{ removedFrom: { tasks, notes } }`. */
 export const deleteOneTag = (ctx: ApiContext) =>
   withScope(ctx, async (scope) => {
     const result = await db().transaction((tx) =>

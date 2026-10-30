@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { apiPatch } from '@/client/api';
@@ -13,7 +14,10 @@ import { addDays } from '../tasks/dates';
 import { useTaskCompletion } from '../tasks/task-actions';
 import type { TaskUiContext } from '../tasks/task-context';
 import { TaskRow, isOverdue, useTaskMeta } from '../tasks/task-row';
-import { AVAILABLE_WIDGETS, type WidgetId } from './widget-ids';
+import type { GoalView } from '@/modules/goals';
+import type { ProjectView } from '@/modules/tasks';
+import { Progress } from '@/ui/components/progress';
+import { TASK_WIDGETS, type WidgetId } from './widget-ids';
 
 const UPCOMING_PREVIEW = 3;
 
@@ -25,10 +29,16 @@ export function DashboardWidgets({
   data,
   order,
   context,
+  projects,
+  goals,
 }: {
   data: DashboardView;
   order: WidgetId[];
   context: TaskUiContext;
+  /** FR-DASH-06: aktif projeler ve ilerleme. */
+  projects: ProjectView[];
+  /** FR-DASH-07: aktif hedefler ve ilerleme. */
+  goals: GoalView[];
 }) {
   const t = useTranslations('dashboard');
   const meta = useTaskMeta(context);
@@ -63,6 +73,91 @@ export function DashboardWidgets({
   );
 
   const widget = (id: WidgetId) => {
+    if (id === 'projects') {
+      const shown = projects.filter((p) => p.status === 'active');
+      return (
+        <Panel>
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <SectionHeading>{t('widgets.projects')}</SectionHeading>
+            </div>
+            <Link href="/projects" className="text-sm text-primary">
+              {t('allProjects')}
+            </Link>
+          </div>
+          {shown.length === 0 ? (
+            <p className="text-sm text-text-secondary">{t('empty.projects')}</p>
+          ) : (
+            <ul className="flex flex-col gap-3">
+              {shown.slice(0, 5).map((p) => {
+                const progress = p.progress ?? { done: 0, total: 0 };
+                const percent = progress.total
+                  ? Math.round((progress.done / progress.total) * 100)
+                  : null;
+                return (
+                  <li key={p.id} className="flex flex-col gap-1">
+                    <Link
+                      href={`/projects/${p.id}` as Route}
+                      className="text-sm font-medium text-text"
+                    >
+                      {p.name}
+                    </Link>
+                    {percent === null ? (
+                      <p className="text-xs text-text-secondary">—</p>
+                    ) : (
+                      <Progress
+                        done={progress.done}
+                        total={progress.total}
+                        label={t('projectProgress', { ...progress, percent })}
+                      />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </Panel>
+      );
+    }
+    if (id === 'goals') {
+      return (
+        <Panel>
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <SectionHeading>{t('widgets.goals')}</SectionHeading>
+            </div>
+            <Link href="/goals" className="text-sm text-primary">
+              {t('allGoals')}
+            </Link>
+          </div>
+          {goals.length === 0 ? (
+            <p className="text-sm text-text-secondary">{t('empty.goals')}</p>
+          ) : (
+            <ul className="flex flex-col gap-3">
+              {goals.slice(0, 5).map((g) => (
+                <li key={g.id} className="flex flex-col gap-1">
+                  <Link
+                    href={`/goals?goal=${g.id}` as Route}
+                    className="text-sm font-medium text-text"
+                  >
+                    {g.title}
+                  </Link>
+                  {g.progress.percent === null ? (
+                    <p className="text-xs text-text-secondary">—</p>
+                  ) : (
+                    <Progress
+                      done={g.progress.percent}
+                      total={100}
+                      label={`%${g.progress.percent}`}
+                    />
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </Panel>
+      );
+    }
     const items = visible(data[id]);
     const shown = id === 'upcoming' ? items.slice(0, UPCOMING_PREVIEW) : items;
     return (
@@ -102,7 +197,8 @@ export function DashboardWidgets({
     );
   };
 
-  const total = AVAILABLE_WIDGETS.reduce((n, id) => n + data[id].length, 0);
+  const total =
+    TASK_WIDGETS.reduce((n, id) => n + data[id].length, 0) + projects.length + goals.length;
   // Son görev tamamlansa da "Geri al" bildirimi kaybolmaz (BR-TASK-004).
   if (total === 0) {
     return (

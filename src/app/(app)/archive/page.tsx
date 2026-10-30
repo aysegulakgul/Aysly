@@ -1,8 +1,10 @@
 import { getTranslations } from 'next-intl/server';
-import { findArchive } from '@/modules/tasks';
+import { findArchiveContents } from '@/modules/lifecycle';
 import { getPersonalScope, getViewer } from '../../viewer';
 import { PageFrame } from '../page-frame';
 import { ArchiveList } from './archive-list';
+
+const TYPES = ['projects', 'tasks', 'notes', 'goals'] as const;
 
 /**
  * Arşiv (FR-SET-06, USER_FLOWS §2.13; Figma'da yok, D-065): tür sekmeleri, her satırda "Arşivden çıkar".
@@ -20,7 +22,7 @@ export default async function ArchivePage({
     searchParams,
   ]);
   if (!viewer || !scope) return null;
-  const archive = await findArchive(scope);
+  const archive = await findArchiveContents(scope);
   return (
     <PageFrame title={t('title')}>
       <div className="flex flex-col gap-2">
@@ -29,7 +31,7 @@ export default async function ArchivePage({
       </div>
       <ArchiveList
         archive={archive}
-        type={query.type === 'tasks' ? 'tasks' : 'projects'}
+        type={TYPES.find((x) => x === query.type) ?? 'projects'}
         workspaceId={scope.workspaceId}
         timezone={viewer.preferences.timezone}
       />

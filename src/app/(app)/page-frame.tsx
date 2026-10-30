@@ -2,6 +2,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { getViewer } from '../viewer';
 import { NotificationBell } from './notifications/notification-center';
+import { MobileSearchButton } from './search/mobile-search-button';
 import { longDate, timeZoneCity } from './time-display';
 
 /**
@@ -37,6 +38,7 @@ export async function PageFrame({
       <header className="flex h-16 w-full shrink-0 items-center gap-3 border-b border-border px-5 lg:hidden">
         <p className="flex-1 text-xl font-semibold text-text">{title}</p>
         {/* Bildirim merkezi mobilde başlıkta (FR-NOTIF-01; Figma mobil başlıkta zil yok, D-065). */}
+        <MobileSearchButton />
         <NotificationBell timezone={timeZone} />
       </header>
       <main className="flex w-full flex-col items-center p-5 lg:p-8">

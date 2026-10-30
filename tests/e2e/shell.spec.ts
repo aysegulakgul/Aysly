@@ -43,12 +43,14 @@ test.describe('Uygulama kabuğu ve ayarlar', () => {
       ? page.getByRole('navigation', { name: 'Alt menü' })
       : page.getByRole('navigation', { name: 'Ana menü' });
     await expect(nav.getByRole('link', { name: 'Bugün' })).toHaveAttribute('aria-current', 'page');
-    // Henüz yapılmamış bölümler menüde yer almaz (D-071); Projeler Faz 5'te, Takvim Faz 6'da eklendi.
-    if (!isMobile()) await expect(nav.getByRole('link', { name: /^Projeler/ })).toBeVisible();
-    await expect(nav.getByRole('link', { name: /Takvim/ })).toBeVisible();
-    for (const missing of ['Hedefler', 'Notlar']) {
-      await expect(page.getByRole('link', { name: missing })).toHaveCount(0);
+    // Henüz yapılmamış bölümler menüde yer almaz (D-071); Projeler Faz 5'te, Takvim Faz 6'da,
+    // Hedefler ve Notlar Faz 7'de eklendi.
+    if (!isMobile()) {
+      for (const name of [/^Projeler/, /^Hedefler/, /^Notlar/]) {
+        await expect(nav.getByRole('link', { name })).toBeVisible();
+      }
     }
+    await expect(nav.getByRole('link', { name: /Takvim/ })).toBeVisible();
   });
 
   test('BR-PREF-003: tema ve yoğunluk değişir, yeniden yüklemede korunur', async ({ page }) => {

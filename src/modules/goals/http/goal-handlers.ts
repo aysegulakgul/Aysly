@@ -134,6 +134,8 @@ export const getGoals = (ctx: ApiContext) =>
     const result = await listGoals(goalDeps(db()), scope, {
       status,
       includeArchived: query.get('includeArchived') === 'true',
+      linkedTaskId: query.get('linkedTaskId') ?? undefined,
+      linkedProjectId: query.get('linkedProjectId') ?? undefined,
     });
     if (!result.ok) return fail(ctx, scope, result.error);
     return ctx.json(200, { data: await toGoalJson(db(), scope, result.value) });
@@ -201,7 +203,11 @@ export const deleteOneGoal = (ctx: ApiContext) =>
 /** Sunucu bileşenleri için. */
 export async function findGoals(
   scope: WorkspaceScope,
-  filter: { status?: (typeof GOAL_STATUSES)[number] } = {},
+  filter: {
+    status?: (typeof GOAL_STATUSES)[number];
+    linkedTaskId?: string;
+    linkedProjectId?: string;
+  } = {},
 ) {
   const result = await listGoals(goalDeps(db()), scope, filter);
   return result.ok ? toGoalJson(db(), scope, result.value) : [];

@@ -97,6 +97,12 @@ export function createDrizzleGoalRepository(db: DbExecutor): GoalRepository {
             inScope(scope),
             filter.includeArchived ? undefined : isNull(goals.archivedAt),
             filter.status ? eq(goals.status, filter.status) : undefined,
+            filter.linkedTaskId && isUuid(filter.linkedTaskId)
+              ? sql`exists (select 1 from ${goalTaskLinks} l where l.goal_id = ${goals.id} and l.task_id = ${filter.linkedTaskId})`
+              : undefined,
+            filter.linkedProjectId && isUuid(filter.linkedProjectId)
+              ? sql`exists (select 1 from ${goalProjectLinks} l where l.goal_id = ${goals.id} and l.project_id = ${filter.linkedProjectId})`
+              : undefined,
           ),
         )
         .orderBy(sql`${goals.targetDate} is null`, asc(goals.targetDate), desc(goals.updatedAt));

@@ -33,6 +33,7 @@ const focusedRow = () =>
 
 const LIST: [string, string][] = [
   ['Q', 'q'],
+  ['Ctrl/⌘ + K', 'search'],
   ['G D', 'gd'],
   ['G I', 'gi'],
   ['G M', 'gm'],

@@ -154,6 +154,7 @@ Ayrıntı: [ONBOARDING_AND_PERSONALIZATION.md](ONBOARDING_AND_PERSONALIZATION.md
 | Detay | Açıklama, ilerleme modu, bağlı projeler ve görevler (ekle/kaldır), "Ulaşıldı olarak işaretle" |
 | Boş | "Bir hedef belirle ve onu görevlerle besle." |
 | Kurallar | BR-GOAL-001..004 |
+| Uygulama (Faz 7, D-091) | Detay ayrı sayfa değil, `/goals?goal=` ile listenin yanında açılır (mobilde tam ekran). Sekme adı "Vazgeçilen". "Ulaşıldı" yalnızca tüm bağlı görevler tamamlanınca önerilir; durum kendiliğinden değişmez. |
 
 ### 2.10. Notlar (`/notes`, `/notes/:id`)
 | | |
@@ -161,6 +162,7 @@ Ayrıntı: [ONBOARDING_AND_PERSONALIZATION.md](ONBOARDING_AND_PERSONALIZATION.md
 | Liste | Sabitlenenler üstte; başlık, ilk satır önizleme, etiketler, son düzenleme; arama/filtre |
 | Editör | Başlık, gövde, kayıt durumu göstergesi, bağlantılar (görev/proje), etiketler |
 | Kurallar | BR-NOTE-001..004 |
+| Uygulama (Faz 7, D-090/D-091) | Editör `/notes?note=` ile listenin yanında açılır (mobilde tam ekran). Editör Tiptap; sabitleme, arşiv ve çöp "⋯" menüsünde. Etiketler başlığın altında görev detayındaki gibi eklenir ve kaldırılır. |
 
 ### 2.11. Global arama (komut paleti)
 | | |
@@ -168,6 +170,7 @@ Ayrıntı: [ONBOARDING_AND_PERSONALIZATION.md](ONBOARDING_AND_PERSONALIZATION.md
 | Bileşenler | Arama girişi, türe göre gruplu sonuçlar, klavye gezinme, son aramalar (yerel), "Arşivi dahil et" düğmesi, hızlı komutlar ("Görev ekle", "Ayarlar") |
 | Boş sonuç | FR-SRCH-03 |
 | Kurallar | BR-SRCH-001/002 |
+| Uygulama (Faz 7) | `Ctrl/⌘+K` veya kenar çubuğundaki "Ara"; mobilde sayfa başlığındaki arama simgesi. Çöp kutusu aranmaz. |
 
 ### 2.12. Bildirimler
 Zil simgesi açılır paneli (son 20) + tam sayfa `/notifications`. Okunmamış vurgusu, "Tümünü okundu say". Tıklama → ilgili kayıt.
@@ -290,6 +293,8 @@ Uygulama kapalıyken zamanı gelen hatırlatıcılar, uygulama açıldığında 
 2. Göstergeler: "Kaydediliyor…" → "Kaydedildi".
 3. Ağ hatası → "Kaydedilemedi, yerel olarak saklandı" + otomatik yeniden deneme (artan aralıklarla); taslak tarayıcıda.
 4. `409` → BR-NOTE-002 (çatışma kopyası).
+
+Uygulama (Faz 7, D-091): Yeniden deneme sabit aralıkla değil, tarayıcı yeniden çevrimiçi olduğunda yapılır. Eski sürümle kayıt 409 yerine çatışma kopyası sonucuyla döner; kullanıcı bir bilgi bandı görür. Açılışta kaydedilmemiş daha yeni bir yerel taslak varsa "Taslağı geri getir" önerilir.
 5. Sayfadan çıkışta kaydedilmemiş değişiklik varsa tarayıcı uyarısı.
 
 ### 3.9. Şifre sıfırlama
