@@ -8,11 +8,11 @@ Aysly; görevleri, projeleri, günlük planı, notları ve hedefleri tek, sakin 
 
 | | |
 |---|---|
-| Mevcut faz | **Faz 7 — Notlar, hedefler, arama** (kapı kontrolünde; Faz 1–6 kapandı) |
+| Mevcut faz | **Faz 8 — Test, güvenlik, kalite; dışa aktarma, hesap silme** (başlamadı; Faz 1–7 kapandı) |
 | Uygulama kodu | Hesap, görevler, projeler, takvim, notlar, hedefler ve arama çalışıyor (aşağıdaki "Özellikler") |
 | Çalışma ortamı | Yalnızca yerel bilgisayar; hosting ve ücretli servis yok |
 | Teknoloji | Next.js, TypeScript, PostgreSQL, Drizzle, Better Auth |
-| Sonraki adım | Faz 7 kapanış onayı, ardından Faz 8: test, güvenlik, dışa aktarma, hesap silme |
+| Sonraki adım | Faz 8: hesap silme, JSON dışa aktarma, güvenlik ve erişilebilirlik denetimi, performans testi |
 
 Ayrıntılı durum: [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 

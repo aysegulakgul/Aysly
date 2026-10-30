@@ -13,7 +13,7 @@
 | 4 | Görev yönetimi, Inbox, My Tasks, dashboard | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
 | 5 | Projeler ve görev görünümleri | **Kapandı** | — | 2026-10-29 | 2026-10-29 |
 | 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | **Kapandı** | — | 2026-10-29 | 2026-10-30 |
-| 7 | Notlar, hedefler, arama | Kapı kontrolünde | — (OQ-042 → D-090) | — | — |
+| 7 | Notlar, hedefler, arama | **Kapandı** | — | 2026-10-30 | 2026-10-30 |
 | 8 | Test, güvenlik, kalite; dışa aktarma, hesap silme | Başlamadı | — | — | — |
 | 9 | Kullanım geri bildirimine göre iyileştirmeler | Başlamadı | — | — | — |
 | 10 | (Doğrulanırsa) Ekip ve paylaşılan çalışma alanları | Başlamadı | Ayrı karar seti; yayına alma (OQ-032); abonelik yönü D-048 | — | — |
@@ -151,6 +151,7 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
   - Hedefler: otomatik/manuel ilerleme, "Ulaşıldı" önerisi, bağlı görev/proje, Aktif/Ulaşılan/Vazgeçilen sekmeleri.
   - Global arama (`Ctrl/⌘+K`), panoda Projeler ve Hedefler widget'ları, `lifecycle` modülü (arşiv/çöp tüm türler için).
   - Doğrulama (2026-10-30): `pnpm verify` 13/13 yeşil — birim 199, entegrasyon 64, tarayıcı 322 (2 atlandı: erişilebilirlik taraması ve AC-05 yalnızca masaüstünde). Faz 7 kabulü: AC-08 (otomatik kayıt, çevrimdışı yerel saklama, bağlantı gelince kayıt), AC-10 (Türkçe harften bağımsız arama, türe göre gruplu sonuç), XSS yük testleri (10 yük), hedef ilerlemesi (otomatik/manuel, tekrar sayılmama, "Ulaşıldı" yalnızca öneri), not etiketleri, erişilebilirlik taraması.
+  - Ürün sahibi kapanışı onayladı (2026-10-30).
   - Uygulama sırasında bulunan hata: Yeni not ilk kaydında düzenleyici yeniden açılıyor ve eski sürümle yazıp sahte çatışma kopyası oluşturuyordu; kayıtlar sıraya alındı, düzenleyici korunuyor (D-091).
 
 ### Faz 8 — Test, güvenlik, kalite; dışa aktarma, hesap silme; yayına hazırlık
