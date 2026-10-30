@@ -3,7 +3,7 @@ import type { WorkspaceScope } from '@/modules/workspaces';
 import type { DbExecutor } from '@/shared/db/client';
 import { uuidv7 } from '@/shared/kernel/id';
 import { normalizeTagName } from '../domain/tag';
-import { tags, taskTags } from './schema';
+import { noteTags, tags, taskTags } from './schema';
 
 export type TagView = { id: string; name: string; color: string };
 
@@ -47,6 +47,88 @@ export async function replaceTaskTags(
   names: readonly string[],
   now: Date,
 ): Promise<void> {
+  const ids = await ensureTags(db, scope, names, now);
+  await db
+    .delete(taskTags)
+    .where(
+      and(
+        eq(taskTags.workspaceId, scope.workspaceId),
+        eq(taskTags.taskId, taskId),
+        ids.length ? notInArray(taskTags.tagId, ids) : undefined,
+      ),
+    );
+  if (ids.length) {
+    await db
+      .insert(taskTags)
+      .values(ids.map((tagId) => ({ taskId, tagId, workspaceId: scope.workspaceId })))
+      .onConflictDoNothing();
+  }
+}
+
+/** Notun etiket kümesini adlarla değiştirir (BR-TAG-001; görevle aynı yöntem). */
+export async function replaceNoteTags(
+  db: DbExecutor,
+  scope: WorkspaceScope,
+  noteId: string,
+  names: readonly string[],
+  now: Date,
+): Promise<void> {
+  const ids = await ensureTags(db, scope, names, now);
+  await db
+    .delete(noteTags)
+    .where(
+      and(
+        eq(noteTags.workspaceId, scope.workspaceId),
+        eq(noteTags.noteId, noteId),
+        ids.length ? notInArray(noteTags.tagId, ids) : undefined,
+      ),
+    );
+  if (ids.length) {
+    await db
+      .insert(noteTags)
+      .values(ids.map((tagId) => ({ noteId, tagId, workspaceId: scope.workspaceId })))
+      .onConflictDoNothing();
+  }
+}
+
+/** Notların etiketleri (ada göre sıralı). */
+export async function findTagsForNotes(
+  db: DbExecutor,
+  scope: WorkspaceScope,
+  noteIds: readonly string[],
+): Promise<Map<string, TagView[]>> {
+  const result = new Map<string, TagView[]>();
+  if (noteIds.length === 0) return result;
+  const rows = await db
+    .select({ noteId: noteTags.noteId, id: tags.id, name: tags.name, color: tags.color })
+    .from(noteTags)
+    .innerJoin(tags, eq(tags.id, noteTags.tagId))
+    .where(and(eq(noteTags.workspaceId, scope.workspaceId), inArray(noteTags.noteId, [...noteIds])))
+    .orderBy(asc(tags.name));
+  for (const { noteId, ...tag } of rows) result.set(noteId, [...(result.get(noteId) ?? []), tag]);
+  return result;
+}
+
+/** Not listesinde etiket filtresi. */
+export async function noteIdsWithTag(
+  db: DbExecutor,
+  scope: WorkspaceScope,
+  tagId: string,
+): Promise<Set<string>> {
+  const rows = await db
+    .select({ noteId: noteTags.noteId })
+    .from(noteTags)
+    .where(and(eq(noteTags.workspaceId, scope.workspaceId), eq(noteTags.tagId, tagId)));
+  return new Set(rows.map((r) => r.noteId));
+}
+
+/** Adlardan etiket kimlikleri; olmayanlar oluşturulur (BR-TAG-001). Çağıranın işlemi içinde çalışır. */
+async function ensureTags(
+  db: DbExecutor,
+  scope: WorkspaceScope,
+  names: readonly string[],
+  now: Date,
+): Promise<string[]> {
   let ids: string[] = [];
   if (names.length > 0) {
     await db
@@ -73,21 +155,7 @@ export async function replaceTaskTags(
       );
     ids = rows.map((r) => r.id);
   }
-  await db
-    .delete(taskTags)
-    .where(
-      and(
-        eq(taskTags.workspaceId, scope.workspaceId),
-        eq(taskTags.taskId, taskId),
-        ids.length ? notInArray(taskTags.tagId, ids) : undefined,
-      ),
-    );
-  if (ids.length) {
-    await db
-      .insert(taskTags)
-      .values(ids.map((tagId) => ({ taskId, tagId, workspaceId: scope.workspaceId })))
-      .onConflictDoNothing();
-  }
+  return ids;
 }
 
 /** Görevlerin etiketleri (ada göre sıralı). */
@@ -149,7 +217,7 @@ export async function taskIdsWithTags(
   return new Set(rows.map((r) => r.taskId));
 }
 
-export type TagWithUsage = TagView & { tasks: number };
+export type TagWithUsage = TagView & { tasks: number; notes: number };
 
 /** Ayarlar · Etiketler (D-085): etiketler kullanım sayılarıyla (API_CONTRACTS §7). */
 export async function listTagsWithUsage(
@@ -161,12 +229,17 @@ export async function listTagsWithUsage(
       id: tags.id,
       name: tags.name,
       color: tags.color,
-      tasks: sql<number>`count(${taskTags.taskId})`.mapWith(Number),
+      tasks:
+        sql<number>`(select count(*) from ${taskTags} where ${taskTags.tagId} = ${tags.id})`.mapWith(
+          Number,
+        ),
+      notes:
+        sql<number>`(select count(*) from ${noteTags} where ${noteTags.tagId} = ${tags.id})`.mapWith(
+          Number,
+        ),
     })
     .from(tags)
-    .leftJoin(taskTags, eq(taskTags.tagId, tags.id))
     .where(eq(tags.workspaceId, scope.workspaceId))
-    .groupBy(tags.id)
     .orderBy(asc(tags.name));
   return rows;
 }

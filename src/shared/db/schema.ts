@@ -13,3 +13,5 @@ export * from '@/modules/tags/infrastructure/schema';
 export * from '@/modules/views/infrastructure/schema';
 export * from '@/modules/reminders/infrastructure/schema';
 export * from '@/modules/notifications/infrastructure/schema';
+export * from '@/modules/notes/infrastructure/schema';
+export * from '@/modules/goals/infrastructure/schema';

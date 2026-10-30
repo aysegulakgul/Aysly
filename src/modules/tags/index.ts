@@ -10,9 +10,12 @@ export {
 export {
   countTags,
   existingTagIds,
+  findTagsForNotes,
   findTagsForTasks,
   listTags,
   missingTagNames,
+  noteIdsWithTag,
+  replaceNoteTags,
   replaceTaskTags,
   taskIdsWithTags,
   type TagView,

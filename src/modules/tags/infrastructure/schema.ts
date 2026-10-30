@@ -10,10 +10,11 @@ import {
   unique,
   uuid,
 } from 'drizzle-orm/pg-core';
+import { notes } from '@/modules/notes/infrastructure/schema';
 import { tasks } from '@/modules/tasks/infrastructure/schema';
 import { workspaces } from '@/modules/workspaces/infrastructure/schema';
 
-/** Etiketler (DATA_MODEL §3.8). `note_tags` notlarla birlikte Faz 7'de eklenir. */
+/** Etiketler (DATA_MODEL §3.8); `note_tags` Faz 7'de eklendi. */
 export const tags = pgTable(
   'tags',
   {
@@ -56,5 +57,29 @@ export const taskTags = pgTable(
       foreignColumns: [tags.workspaceId, tags.id],
     }).onDelete('cascade'),
     index('task_tags_tag_idx').on(t.tagId),
+  ],
+);
+
+/** Not–etiket bağlantısı (Faz 7); iki yabancı anahtar da `workspace_id` ile bileşiktir (BR-WS-002). */
+export const noteTags = pgTable(
+  'note_tags',
+  {
+    noteId: uuid('note_id').notNull(),
+    tagId: uuid('tag_id').notNull(),
+    workspaceId: uuid('workspace_id').notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.noteId, t.tagId] }),
+    foreignKey({
+      name: 'note_tags_note_fk',
+      columns: [t.workspaceId, t.noteId],
+      foreignColumns: [notes.workspaceId, notes.id],
+    }).onDelete('cascade'),
+    foreignKey({
+      name: 'note_tags_tag_fk',
+      columns: [t.workspaceId, t.tagId],
+      foreignColumns: [tags.workspaceId, tags.id],
+    }).onDelete('cascade'),
+    index('note_tags_tag_idx').on(t.tagId),
   ],
 );

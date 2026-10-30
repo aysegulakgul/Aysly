@@ -50,6 +50,20 @@
       "when": 1793304769168,
       "tag": "0006_recurrence_reminders_notifications",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793374926607,
+      "tag": "0007_notes_goals",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793375128412,
+      "tag": "0008_search_vectors",
+      "breakpoints": true
     }
   ]
 }

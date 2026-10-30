@@ -1,5 +1,5 @@
 import { getCurrentActor } from '@/modules/identity';
-import { deleteTrash, getTrash } from '@/modules/tasks';
+import { deleteTrash, getTrash } from '@/modules/lifecycle';
 import { apiRoute } from '@/shared/http/api-route';
 
 /** API_CONTRACTS §13: çöp kutusu ve çöpü boşaltma (BR-DEL-003/005). */

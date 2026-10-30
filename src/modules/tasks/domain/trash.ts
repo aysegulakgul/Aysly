@@ -10,3 +10,10 @@ export const isExpired = (deletedAt: Date, now: Date) => purgeAt(deletedAt) <= n
 /** Kalan gün (yukarı yuvarlanmış); süresi dolduysa 0. */
 export const daysLeft = (deletedAt: Date, now: Date) =>
   Math.max(0, Math.ceil((purgeAt(deletedAt).getTime() - now.getTime()) / DAY));
+
+/** Çöp kaydının zamanlaması (not ve hedef grupları da aynı kuralla, BR-DEL-003). */
+export const trashTiming = (deletedAt: Date, now: Date) => ({
+  purgeAt: purgeAt(deletedAt),
+  daysLeft: daysLeft(deletedAt, now),
+  expired: isExpired(deletedAt, now),
+});

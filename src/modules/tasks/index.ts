@@ -49,4 +49,10 @@ export {
 } from './http/task-queries';
 export { BULK_LIMIT, type BulkAction } from './application/bulk';
 export { DUE_GROUPS, type DueGroup } from './domain/schedule';
-export { purgeExpiredTasks, reassignTrashedTasks } from './infrastructure/drizzle-task-repository';
+export {
+  findLiveTaskRefs,
+  linkedTaskProgress,
+  purgeExpiredTasks,
+  reassignTrashedTasks,
+} from './infrastructure/drizzle-task-repository';
+export { trashTiming } from './domain/trash';

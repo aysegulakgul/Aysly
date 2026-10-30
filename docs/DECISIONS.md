@@ -1,6 +1,6 @@
 # Karar Kaydı (Decision Log)
 
-> Durum: v0.7 · Son güncelleme: 2026-10-29
+> Durum: v0.8 · Son güncelleme: 2026-10-30
 
 Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar silinmez; değiştirilen karar `YERİNE GEÇİLDİ (D-yyy)` olarak işaretlenir ve yeni kayıt açılır.
 
@@ -458,6 +458,12 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - **Görünüm türü:** `calendar` `VIEW_TYPES`'a ve `saved_views` kısıtına eklendi. Proje ve kayıtlı görünüm sayfalarında "Takvim" sekmesi var (FR-VIEW-03).
 - Kenar çubuğuna ve alt menüye Takvim, kısayollara `G C` (Takvim) ve `G P` (Projeler) eklendi.
 - Takvim, Hafta ve Gün görünümleri Figma 4:67372 ve 4:68640 düzenini izler. Ay görünümü Figma'da yoktur; mevcut token'larla kuruldu (D-065).
+
+### D-090 — Not editörü: Tiptap, Markdown olarak saklama (OQ-042)
+- Durum: ONAYLI · Tarih: 2026-10-30 · Karar veren: Ürün sahibi ("A: Tiptap")
+- Karar: Not editörü Tiptap (ProseMirror, MIT): başlık, liste, yapılacak listesi, bağlantı, kod (D-042). İçerik `@tiptap/markdown` ile Markdown olarak saklanır. Görüntüleme `SafeMarkdown` (`react-markdown` + `remark-gfm` + `rehype-sanitize`) ile yapılır (SECURITY §5).
+- Paketler (D-058, tam sürüm sabit): `@tiptap/react`, `@tiptap/pm`, `@tiptap/starter-kit`, `@tiptap/extension-task-list`, `@tiptap/extension-task-item`, `@tiptap/markdown` 3.32.0; `react-markdown` 10.1.0, `remark-gfm` 4.0.1, `rehype-sanitize` 6.0.0. En yeni Tiptap sürümü (3.32.2) karar günü yayımlandığı için en az iki haftalık 3.32.0 seçildi.
+- Alternatifler: CodeMirror 6 + önizleme; düz metin alanı + önizleme.
 
 ---
 

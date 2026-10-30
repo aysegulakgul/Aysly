@@ -13,7 +13,7 @@
 | 4 | Görev yönetimi, Inbox, My Tasks, dashboard | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
 | 5 | Projeler ve görev görünümleri | **Kapandı** | — | 2026-10-29 | 2026-10-29 |
 | 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | **Kapandı** | — | 2026-10-29 | 2026-10-30 |
-| 7 | Notlar, hedefler, arama | Devam ediyor | Not editörü paketi seçimi (Faz 7 başında sunulur) | — | — |
+| 7 | Notlar, hedefler, arama | Devam ediyor | — (OQ-042 → D-090) | — | — |
 | 8 | Test, güvenlik, kalite; dışa aktarma, hesap silme | Başlamadı | — | — | — |
 | 9 | Kullanım geri bildirimine göre iyileştirmeler | Başlamadı | — | — | — |
 | 10 | (Doğrulanırsa) Ekip ve paylaşılan çalışma alanları | Başlamadı | Ayrı karar seti; yayına alma (OQ-032); abonelik yönü D-048 | — | — |

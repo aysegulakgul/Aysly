@@ -1,4 +1,17 @@
-import { and, asc, count, desc, eq, inArray, isNotNull, isNull, lt, ne, sql } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  inArray,
+  isNotNull,
+  isNull,
+  lt,
+  ne,
+  or,
+  sql,
+} from 'drizzle-orm';
 import type { WorkspaceScope } from '@/modules/workspaces';
 import type { DbExecutor } from '@/shared/db/client';
 import { isUuid } from '@/shared/kernel/id';
@@ -514,4 +527,56 @@ export async function purgeExpiredTasks(db: DbExecutor, before: Date): Promise<n
     .where(and(isNotNull(tasks.deletedAt), lt(tasks.deletedAt, before)))
     .returning({ id: tasks.id });
   return rows.length;
+}
+
+/**
+ * Not ve hedef bağlantıları için çöpte olmayan görevlerin kısa bilgisi (BR-NOTE-003, BR-GOAL-004: çöpteki kayda
+ * bağlantı gizlenir).
+ */
+export async function findLiveTaskRefs(
+  db: DbExecutor,
+  scope: WorkspaceScope,
+  ids: readonly string[],
+): Promise<{ id: string; title: string; status: TaskStatus; projectId: string }[]> {
+  const valid = ids.filter(isUuid);
+  if (valid.length === 0) return [];
+  const rows = await db
+    .select({ id: tasks.id, title: tasks.title, status: tasks.status, projectId: tasks.projectId })
+    .from(tasks)
+    .where(
+      and(
+        eq(tasks.workspaceId, scope.workspaceId),
+        isNull(tasks.deletedAt),
+        inArray(tasks.id, valid),
+      ),
+    );
+  return rows.map((r) => ({ ...r, status: r.status as TaskStatus }));
+}
+
+/**
+ * BR-GOAL-002 otomatik ilerleme: (doğrudan bağlı görevler ∪ bağlı projelerin üst düzey görevleri) içinde
+ * arşivlenmemiş ve çöpte olmayanların tamamlanma oranı; aynı görev bir kez sayılır.
+ */
+export async function linkedTaskProgress(
+  db: DbExecutor,
+  scope: WorkspaceScope,
+  links: { taskIds: readonly string[]; projectIds: readonly string[] },
+): Promise<{ done: number; total: number }> {
+  const taskIds = links.taskIds.filter(isUuid);
+  const projectIds = links.projectIds.filter(isUuid);
+  if (taskIds.length === 0 && projectIds.length === 0) return { done: 0, total: 0 };
+  const either = [
+    taskIds.length ? inArray(tasks.id, taskIds) : undefined,
+    projectIds.length
+      ? and(inArray(tasks.projectId, projectIds), isNull(tasks.parentTaskId))
+      : undefined,
+  ].filter((c) => c !== undefined);
+  const [row] = await db
+    .select({
+      total: count(),
+      done: sql<number>`count(*) filter (where ${tasks.status} = 'done')`.mapWith(Number),
+    })
+    .from(tasks)
+    .where(and(inScope(scope), isNull(tasks.archivedAt), or(...either)));
+  return { done: row?.done ?? 0, total: row?.total ?? 0 };
 }

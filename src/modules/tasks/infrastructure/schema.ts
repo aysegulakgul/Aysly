@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import {
   check,
+  customType,
   date,
   foreignKey,
   index,
@@ -18,10 +19,12 @@ import { projects } from '@/modules/projects/infrastructure/schema';
 import { workspaces } from '@/modules/workspaces/infrastructure/schema';
 
 /**
- * Görevler (DATA_MODEL §3.7). Tekrar alanları Faz 6'da eklendi (D-087); arama vektörü Faz 7'de eklenir (kullanılmayan kolon
+ * Görevler (DATA_MODEL §3.7). Tekrar alanları Faz 6'da eklendi (D-087); arama vektörü Faz 7'de eklendi (D-022) (kullanılmayan kolon
  * eklenmez, CLAUDE.md §2.11). Proje ve ebeveyn bağlantıları `workspace_id` ile bileşiktir: görev başka çalışma
  * alanındaki projeye veya göreve bağlanamaz (BR-WS-002).
  */
+const tsvector = customType<{ data: string }>({ dataType: () => 'tsvector' });
+
 export const tasks = pgTable(
   'tasks',
   {
@@ -55,6 +58,10 @@ export const tasks = pgTable(
     archivedAt: timestamp('archived_at', { withTimezone: true }),
     deletedAt: timestamp('deleted_at', { withTimezone: true }),
     deletedBatchId: uuid('deleted_batch_id'),
+    // D-022: arama vektörü (başlık A, açıklama B; Türkçe harf ve aksan farkı yok, `aysly_search_text`).
+    searchVector: tsvector('search_vector').generatedAlwaysAs(
+      sql`setweight(to_tsvector('simple', aysly_search_text(title)), 'A') || setweight(to_tsvector('simple', aysly_search_text(description)), 'B')`,
+    ),
     version: integer('version').notNull().default(1),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
@@ -116,6 +123,7 @@ export const tasks = pgTable(
     index('tasks_parent_idx')
       .on(t.parentTaskId)
       .where(sql`${t.deletedAt} is null`),
+    index('tasks_search_idx').using('gin', t.searchVector),
     index('tasks_trash_idx')
       .on(t.workspaceId, t.deletedAt)
       .where(sql`${t.deletedAt} is not null`),

@@ -1,6 +1,6 @@
 # Açık Sorular (Karar Bekleyen Konular)
 
-> Durum: v0.6 · Son güncelleme: 2026-10-29 · Sahibi: Ürün sahibi (karar), Claude (hazırlık)
+> Durum: v0.7 · Son güncelleme: 2026-10-30 · Sahibi: Ürün sahibi (karar), Claude (hazırlık)
 
 Bu dosya, **ürün sahibinin kararını bekleyen** konuların tek kaynağıdır. Bir konu burada `AÇIK` durumdayken, ona bağlı geliştirme **yapılamaz** ve ilgili belgeler bu kararı kesinleşmiş gibi yazamaz (bkz. [CLAUDE.md](../CLAUDE.md) §5).
 
@@ -20,6 +20,18 @@ Bu dosya, **ürün sahibinin kararını bekleyen** konuların tek kaynağıdır.
 | ID | Konu | Engellediği faz | Öneri (kısa) | Durum |
 |---|---|---|---|---|
 | OQ-032 | Yayına alma (hosting, alan adı, e-posta sağlayıcı, hata izleme, yedekleme) | Yayın kararı (MVP sonrası) | Şimdi karar gerekmiyor | AÇIK (ertelendi) |
+
+### OQ-042 — Not editörü paketi — KAPANDI (D-090: seçenek A)
+
+**Bağlam.** D-042 sade, Markdown tabanlı bir editör ister: başlık, liste, yapılacak listesi, bağlantı, kod. İçerik Markdown olarak saklanır. Paket seçimi plan gereği Faz 7 başında sunulur. Figma Notlar ekranı (`4:67588`) notu biçimlenmiş hâliyle gösterir: başlıklar, madde işaretleri. Ekranda ham Markdown işaretleri görünmez.
+
+| Seçenek | Sonuç |
+|---|---|
+| A. Tiptap (ProseMirror, MIT) + Markdown dönüştürücü | Yazarken biçim görünür (Figma ile uyumlu). Yapılacak listesi, kısayollar ve yapıştırma hazır. İstemci paketi en büyük seçenek (~150 KB). Markdown'a çeviride bazı biçimler sadeleşebilir. **Önerilen.** |
+| B. CodeMirror 6 (Markdown modu) + önizleme | Ham Markdown sözdizimi renklendirmesiyle yazılır, okurken önizleme gösterilir. Figma'daki biçimli görünüm yalnızca önizlemede olur. Orta boy (~90 KB). |
+| C. Ek editör paketi yok: düz metin alanı + Markdown önizleme (remark/rehype) | En küçük ve en basit seçenek. Yazarken ham işaretler görünür. Yapılacak listesi kutuları yalnızca önizlemede tıklanır. |
+
+Üç seçenekte de görüntüleme `SafeMarkdown` (remark/rehype + `rehype-sanitize`) ile yapılır (SECURITY §5).
 
 ### OQ-038 — Proje rengi ve simgesi — KAPANDI (D-082: seçenek A)
 
@@ -152,5 +164,6 @@ D-045 gereği şimdilik yalnızca yerel ortam kullanılıyor. Yayına alma karar
 | OQ-039 | Mobil panoda durum | Masaüstünde sürükle-bırak, mobilde kart menüsü. | D-083 |
 | OQ-040 | Toplu işlem kapsamı | Tamamla, taşı, durum, öncelik, tarih, etiket, arşivle, çöpe taşı. | D-084 |
 | OQ-041 | Etiket yönetimi | Faz 5'te Ayarlar · Etiketler. | D-085 |
+| OQ-042 | Not editörü paketi | Tiptap; içerik Markdown olarak saklanır. | D-090 |
 
 Kapanan soruların değerlendirilen seçenekleri DECISIONS.md'deki ilgili kaydın "Alternatifler" alanında özetlenmiştir.

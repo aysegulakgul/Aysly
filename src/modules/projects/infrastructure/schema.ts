@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import {
   check,
+  customType,
   index,
   integer,
   pgTable,
@@ -16,6 +17,8 @@ import { workspaces } from '@/modules/workspaces/infrastructure/schema';
 /**
  * Projeler ve Inbox (DATA_MODEL §3.6, D-030). Proje yönetimi Faz 5'te (FR-PROJ); simge MVP'de seçilmez (D-082).
  */
+const tsvector = customType<{ data: string }>({ dataType: () => 'tsvector' });
+
 export const projects = pgTable(
   'projects',
   {
@@ -35,6 +38,10 @@ export const projects = pgTable(
     archivedAt: timestamp('archived_at', { withTimezone: true }),
     deletedAt: timestamp('deleted_at', { withTimezone: true }),
     deletedBatchId: uuid('deleted_batch_id'),
+    // D-022: arama vektörü (ad A, açıklama B).
+    searchVector: tsvector('search_vector').generatedAlwaysAs(
+      sql`setweight(to_tsvector('simple', aysly_search_text(name)), 'A') || setweight(to_tsvector('simple', aysly_search_text(description)), 'B')`,
+    ),
     version: integer('version').notNull().default(1),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
@@ -63,6 +70,7 @@ export const projects = pgTable(
     uniqueIndex('projects_one_inbox_per_workspace')
       .on(t.workspaceId)
       .where(sql`${t.kind} = 'inbox'`),
+    index('projects_search_idx').using('gin', t.searchVector),
     index('projects_workspace_position_idx')
       .on(t.workspaceId, t.position)
       .where(sql`${t.deletedAt} is null and ${t.archivedAt} is null`),

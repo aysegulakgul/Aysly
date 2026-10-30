@@ -423,6 +423,128 @@
       "method": "POST",
       "path": "/api/v1/notifications/read-all",
       "access": "self"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/[ws]/notes",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/notes"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/notes",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/notes",
+      "body": {
+        "body": "x"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/[ws]/notes/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/notes/01900000-0000-7000-8000-000000000002"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/workspaces/[ws]/notes/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/notes/01900000-0000-7000-8000-000000000002",
+      "body": {
+        "version": 1
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/workspaces/[ws]/notes/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/notes/01900000-0000-7000-8000-000000000002"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/workspaces/[ws]/notes/[id]/links",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/notes/01900000-0000-7000-8000-000000000002/links",
+      "body": {
+        "taskIds": [],
+        "projectIds": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/notes/[id]/archive",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/notes/01900000-0000-7000-8000-000000000002/archive"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/notes/[id]/unarchive",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/notes/01900000-0000-7000-8000-000000000002/unarchive"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/[ws]/goals",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/goals"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/goals",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/goals",
+      "body": {
+        "title": "x"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/[ws]/goals/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/goals/01900000-0000-7000-8000-000000000002"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/workspaces/[ws]/goals/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/goals/01900000-0000-7000-8000-000000000002",
+      "body": {
+        "version": 1
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/workspaces/[ws]/goals/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/goals/01900000-0000-7000-8000-000000000002"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/workspaces/[ws]/goals/[id]/links",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/goals/01900000-0000-7000-8000-000000000002/links",
+      "body": {
+        "taskIds": [],
+        "projectIds": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/goals/[id]/archive",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/goals/01900000-0000-7000-8000-000000000002/archive"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/goals/[id]/unarchive",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/goals/01900000-0000-7000-8000-000000000002/unarchive"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/search",
+      "access": "self",
+      "sample": "/api/v1/search?q=ab"
     }
   ]
 }

@@ -5,7 +5,7 @@ import { isUuid } from '@/shared/kernel/id';
 import { err, ok, type Result } from '@/shared/kernel/result';
 import { prepareTagNames, type TagColor } from '../domain/tag';
 
-export type ManagedTag = { id: string; name: string; color: string; tasks: number };
+export type ManagedTag = { id: string; name: string; color: string; tasks: number; notes: number };
 
 /** Etiket yönetimi deposu (D-085). */
 export type TagStore = {
@@ -66,12 +66,12 @@ export async function deleteTag(
   deps: TagDeps,
   scope: WorkspaceScope,
   id: string,
-): Promise<Result<{ removedFrom: { tasks: number } }, DomainError>> {
+): Promise<Result<{ removedFrom: { tasks: number; notes: number } }, DomainError>> {
   const allowed = authorize(scope, 'tag.manage');
   if (!allowed.ok) return allowed;
   if (!isUuid(id)) return err(notFound());
   const tag = await deps.tags.find(scope, id);
   if (!tag) return err(notFound());
   await deps.tags.remove(scope, id);
-  return ok({ removedFrom: { tasks: tag.tasks } });
+  return ok({ removedFrom: { tasks: tag.tasks, notes: tag.notes } });
 }
