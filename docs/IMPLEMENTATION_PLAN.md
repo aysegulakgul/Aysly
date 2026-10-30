@@ -12,8 +12,8 @@
 | 3 | Kimlik doğrulama, hesap, tercihler, onboarding | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
 | 4 | Görev yönetimi, Inbox, My Tasks, dashboard | **Kapandı** | — | 2026-10-28 | 2026-10-28 |
 | 5 | Projeler ve görev görünümleri | **Kapandı** | — | 2026-10-29 | 2026-10-29 |
-| 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | Kapı kontrolünde | — | 2026-10-29 | — |
-| 7 | Notlar, hedefler, arama | Başlamadı | Not editörü paketi seçimi (Faz 7 başında sunulur) | — | — |
+| 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | **Kapandı** | — | 2026-10-29 | 2026-10-30 |
+| 7 | Notlar, hedefler, arama | Devam ediyor | Not editörü paketi seçimi (Faz 7 başında sunulur) | — | — |
 | 8 | Test, güvenlik, kalite; dışa aktarma, hesap silme | Başlamadı | — | — | — |
 | 9 | Kullanım geri bildirimine göre iyileştirmeler | Başlamadı | — | — | — |
 | 10 | (Doğrulanırsa) Ekip ve paylaşılan çalışma alanları | Başlamadı | Ayrı karar seti; yayına alma (OQ-032); abonelik yönü D-048 | — | — |
@@ -138,7 +138,7 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
   - Bildirim zili, `/notifications`, Ayarlar · Bildirimler, tüm gün hatırlatıcı saati.
   - Not: Tekrar kuralı testleri örnek tabanlıdır (ay sonu, artık yıl, n. hafta günü, bitiş koşulları). Özellik tabanlı test paketi (fast-check) eklenmedi (D-058: yeni paket ancak gerekirse).
   - Kapsam dışı: FR-CAL-05 (P2).
-  - Doğrulama (2026-10-29): `pnpm verify` 13/13 yeşil — birim 173, entegrasyon 60, tarayıcı 281 (1 atlandı: AC-05 yalnızca masaüstünde). Faz 6 kabulü: AC-04 (iki mod), AC-05 (tek bildirim, tıklanınca görev), paralel dağıtımda tek bildirim, E18 gecikmeli/atlanan, New York yaz saati sonrası seri saati, takvim sürükle-bırak, yeni sayfaların erişilebilirlik taraması. Kapanış ürün sahibinin onayını bekliyor.
+  - Doğrulama (2026-10-29): `pnpm verify` 13/13 yeşil — birim 173, entegrasyon 60, tarayıcı 281 (1 atlandı: AC-05 yalnızca masaüstünde). Faz 6 kabulü: AC-04 (iki mod), AC-05 (tek bildirim, tıklanınca görev), paralel dağıtımda tek bildirim, E18 gecikmeli/atlanan, New York yaz saati sonrası seri saati, takvim sürükle-bırak, yeni sayfaların erişilebilirlik taraması. Ürün sahibi kapanışı onayladı (2026-10-30).
 
 ### Faz 7 — Notlar, hedefler, arama
 - **Bağımlılık:** Faz 5; not editörü paketinin onayı.
