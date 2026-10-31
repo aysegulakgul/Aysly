@@ -20,6 +20,8 @@ const CONTENT_TABLES = [
   'goals',
   'goal_task_links',
   'goal_project_links',
+  'contacts',
+  'task_comments',
 ] as const;
 
 type Rows = { rows: Record<string, unknown>[] };

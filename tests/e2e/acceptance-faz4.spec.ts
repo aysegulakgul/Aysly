@@ -1,15 +1,9 @@
-import { expect, test, type Browser, type Page } from '@playwright/test';
+import { expect, test, type Browser } from '@playwright/test';
 import { E2E_BASE_URL } from './e2e-env';
 import { signUp } from './helpers';
 
 /** Faz 4 kabul senaryoları (TESTING_STRATEGY §6). AC-09 sunucu saatine bağlı olduğundan birim testiyle doğrulanır. */
 const origin = { origin: E2E_BASE_URL };
-const isMobile = () => test.info().project.name === 'mobile';
-
-const inboxBadge = (page: Page) =>
-  isMobile()
-    ? page.getByText(/açık görev\.$/)
-    : page.getByRole('navigation', { name: 'Ana menü' }).getByRole('link', { name: /Inbox/ });
 
 async function newUser(browser: Browser) {
   const context = await browser.newContext({ locale: 'tr-TR', timezoneId: 'Europe/Istanbul' });
@@ -20,28 +14,28 @@ async function newUser(browser: Browser) {
 }
 
 test.describe('Faz 4 kabul', () => {
-  test('AC-01: kayıt, onboarding atlanır, Q ile ilk görev Inbox’a eklenir ve sayaç 1 olur', async ({
+  test('AC-01: kayıt, onboarding atlanır, Q ile ilk görev Görevlerim’e eklenir (D-098)', async ({
     page,
   }) => {
     await signUp(page, undefined, undefined, { keepOnboarding: true });
     await page.waitForLoadState('networkidle');
     await page.getByRole('button', { name: 'Atla' }).click();
     await expect(page).toHaveURL('/');
-    await page.goto('/inbox');
+    await page.goto('/my-tasks');
     await expect(page.getByText('Açık görev yok.', { exact: false })).toBeVisible();
 
     await page.goto('/');
     await page.waitForLoadState('networkidle');
     await page.locator('body').click({ position: { x: 5, y: 5 } });
     await page.keyboard.press('q');
-    await expect(page).toHaveURL('/inbox?add=1');
+    await expect(page).toHaveURL('/my-tasks?add=1');
     await page.getByLabel('Hızlı ekle').fill('Fatura öde');
     await page.getByLabel('Hızlı ekle').press('Enter');
     await expect(page.getByRole('listitem').filter({ hasText: 'Fatura öde' })).toBeVisible();
-    await expect(inboxBadge(page)).toContainText('1');
+    await expect(page.getByText('1 açık görev.')).toBeVisible();
   });
 
-  test('AC-02: Inbox’taki iki görev Ev’e taşınır; sayaç 1 olur, tarih ve etiketler korunur', async ({
+  test('AC-02: projesiz iki görev Ev’e taşınır; tarih ve etiketler korunur (D-098)', async ({
     page,
   }) => {
     // Not: çoklu seçim (BR-TASK-008) Faz 5'te; burada iki görev tek tek taşınır, sonuç aynıdır.
@@ -57,18 +51,20 @@ test.describe('Faz 4 kabul', () => {
         headers: { ...origin, 'idempotency-key': `ac02-${Date.now()}-${i}` },
       });
     }
-    await page.goto('/inbox');
+    await page.goto('/my-tasks');
     await page.waitForLoadState('networkidle');
     for (const title of ['A görevi', 'B görevi']) {
-      const row = page.getByRole('listitem').filter({ hasText: title });
+      const row = page.locator('[data-task-row]').filter({ hasText: title });
       await row
         .getByRole('button', { name: /Projeye taşı/ })
         .first()
         .click();
       await page.getByRole('button', { name: 'Ev', exact: true }).click();
-      await expect(row).toHaveCount(0);
+      await expect(row).not.toContainText('Projesiz');
     }
-    await expect(page.getByText('1 açık görev.')).toBeVisible();
+    await expect(page.locator('[data-task-row]').filter({ hasText: 'C görevi' })).toContainText(
+      'Projesiz',
+    );
 
     const tasks = (
       await (await page.request.get(`/api/v1/workspaces/${ws}/my-tasks`)).json()

@@ -20,6 +20,10 @@ export type Task = {
   description: string | null;
   status: TaskStatus;
   priority: Priority;
+  /** D-099 / BR-TASK-011: isteğe bağlı story point (0–100). */
+  storyPoints: number | null;
+  /** D-097: atanan kişi (contacts). */
+  assigneeId: string | null;
   startDate: string | null;
   due: Due | null;
   completedAt: Date | null;
@@ -36,6 +40,15 @@ export type Task = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+/** BR-TASK-011: story point 0–100 tam sayı (önerilen değerler arayüzde). */
+export const STORY_POINTS_MAX = 100;
+export function checkStoryPoints(value: number | null): FieldIssue[] {
+  if (value === null) return [];
+  return Number.isInteger(value) && value >= 0 && value <= STORY_POINTS_MAX
+    ? []
+    : [{ field: 'storyPoints', reason: 'out_of_range' }];
+}
 
 export const TITLE_MAX = 500;
 export const DESCRIPTION_MAX = 20_000;

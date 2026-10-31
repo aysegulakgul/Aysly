@@ -147,6 +147,18 @@ Ayrıntı: [ONBOARDING_AND_PERSONALIZATION.md](ONBOARDING_AND_PERSONALIZATION.md
 | Kurallar | BR-DATE-001..006, FR-CAL |
 | Uygulama (Faz 6, D-089) | Ay görünümü Figma'da yok (D-065). Boş güne ekleme Gün görünümündeki "Bu güne görev ekle" alanıyla (Inbox'a). Proje ve etiket seçimi URL'de. |
 
+### 2.8a. Faz 9 ekran değişiklikleri (D-097..D-100)
+| | |
+|---|---|
+| Kabuk | Kenar çubuğunda Inbox, Yaklaşanlar ve "Görev ekle" yok. Sağ üst başlıkta bildirim zili ve **Paylaş**. Mobil alt menü: Bugün, Görevlerim, Ekle, Takvim, Menü. |
+| Görevlerim | Inbox ile birleşik tek görev ekranı: üstte hızlı ekleme (projesiz), "Tarihe göre / Projeye göre" bölümler; sütunlar Ad, Atanan, Son tarih, Proje, Öncelik, Statü, Puan; bölüm başına "+ Görev ekle" ve puan toplamı. Satır yan panelde detayı açar. `/inbox` adresi buraya yönlenir. |
+| Görev detayı | Atanan (Kişiler), story point ve **Yorumlar** eklendi. |
+| Bugün | "Yaklaşan görevler" sayfanın altında, tam genişlikte (Yaklaşanlar sayfasının yerine; `/upcoming` buraya yönlenir). |
+| Takvim | Alt görevler de tarihleriyle, "↳" işaretiyle görünür. |
+| Projeler | Durum sütunlu (Aktif, Beklemede, Tamamlandı) renkli pano; özet şeridi; kartlarda ilerleme, görevler statüleriyle, alt görev sayıları, atananlar, sıradaki tarih. Kart sürüklenerek (masaüstü) ya da menüden durum değişir. |
+| Paylaş | Sayfa bağlantısını kopyalar; kişiye e-posta uygulamasında davet taslağı açar. Yerel ortamda bağlantının başka bilgisayarda açılmadığı pencerede yazar. |
+| Ayarlar · Kişiler | Kişi ekle (ad, e-posta), düzenle, renk, sil. |
+
 ### 2.9. Hedefler (`/goals`, `/goals/:id`)
 | | |
 |---|---|

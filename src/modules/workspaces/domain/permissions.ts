@@ -27,6 +27,7 @@ export const PERMISSIONS = [
   'goal.archive',
   'goal.delete',
   'tag.manage',
+  'contact.manage',
   'view.manage_own',
   'trash.empty',
 ] as const;

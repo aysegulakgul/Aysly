@@ -10,7 +10,12 @@ import {
   myTasksCount,
 } from '../application/organize';
 import { listTrash } from '../application/lifecycle';
-import { archiveContents, projectDetail, projectOverview } from '../application/projects';
+import {
+  archiveContents,
+  projectBoardTasks,
+  projectDetail,
+  projectOverview,
+} from '../application/projects';
 import { queryTasks } from '../application/query';
 import { inboxBadge, listTasks } from '../application/tasks';
 import { todayIn } from '../domain/schedule';
@@ -110,6 +115,19 @@ export async function findProjectOverview(
 ): Promise<ProjectView[]> {
   const result = await projectOverview(taskDeps(db()), scope, filter);
   return result.ok ? result.value.map((p) => toProjectJson(p.project, p.progress)) : [];
+}
+
+/** D-100: Projeler panosundaki kartların görevleri (proje kimliğine göre gruplu). */
+export async function findProjectBoardTasks(
+  scope: WorkspaceScope,
+  projectIds: readonly string[],
+): Promise<Record<string, TaskView[]>> {
+  const result = await projectBoardTasks(taskDeps(db()), scope, projectIds);
+  const grouped: Record<string, TaskView[]> = {};
+  for (const item of result.ok ? result.value : []) {
+    (grouped[item.task.projectId] ??= []).push(toSummaryJson(item));
+  }
+  return grouped;
 }
 
 /** Proje sayfası; BR-DEL-007: çöpteki projeye gidilirse "çöp kutusunda" ekranı için döner. */

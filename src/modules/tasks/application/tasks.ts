@@ -12,6 +12,7 @@ import { checkStartBeforeDue, prepareDue, type DueInput } from '../domain/due';
 import {
   OPEN_STATUSES,
   checkDescription,
+  checkStoryPoints,
   completion,
   normalizeTitle,
   reopening,
@@ -37,6 +38,10 @@ export type CreateTaskCommand = {
   description?: string | null | undefined;
   projectId?: string | null | undefined;
   priority?: Priority | undefined;
+  /** D-099 / BR-TASK-011 */
+  storyPoints?: number | null | undefined;
+  /** D-097: atanan kişi. */
+  assigneeId?: string | null | undefined;
   startDate?: string | null | undefined;
   due?: DueInput | null | undefined;
   parentTaskId?: string | null | undefined;
@@ -48,6 +53,17 @@ export type CreateTaskCommand = {
 };
 
 export const SUBTASKS_PER_TASK = 100; // BR-SUB-005
+
+/** D-097: atanan kişi aynı çalışma alanında olmalı (BR-WS-002); yoksa alan hatası. */
+async function checkAssignee(
+  deps: TaskDeps,
+  scope: WorkspaceScope,
+  assigneeId: string | null | undefined,
+): Promise<FieldIssue[]> {
+  if (!assigneeId) return [];
+  const found = await deps.contacts.refs(scope, [assigneeId]);
+  return found.has(assigneeId) ? [] : [{ field: 'assigneeId', reason: 'not_found' }];
+}
 
 /**
  * BR-TAG-001/003: adlar normalleştirilir; kayıt başına en fazla 20, çalışma alanında en fazla 500 etiket.
@@ -90,6 +106,8 @@ export async function createTask(
   issues.push(...dueIssues);
   const startDate = command.startDate ?? null;
   issues.push(...checkStartBeforeDue(startDate, due));
+  issues.push(...checkStoryPoints(command.storyPoints ?? null));
+  issues.push(...(await checkAssignee(deps, scope, command.assigneeId)));
   if (issues.length > 0 || !title.ok) return err(validationError(issues));
   const tagNames = await checkTags(deps, scope, command.tagNames);
   if (!tagNames.ok) return tagNames;
@@ -140,6 +158,8 @@ export async function createTask(
     title: title.value,
     description,
     priority: command.priority ?? 0,
+    storyPoints: command.storyPoints ?? null,
+    assigneeId: command.assigneeId ?? null,
     startDate,
     due,
     position: generateKeyBetween(last, null),
@@ -160,6 +180,8 @@ export type UpdateTaskCommand = {
   description?: string | null | undefined;
   status?: TaskStatus | undefined;
   priority?: Priority | undefined;
+  storyPoints?: number | null | undefined;
+  assigneeId?: string | null | undefined;
   startDate?: string | null | undefined;
   due?: DueInput | null | undefined;
   tagNames?: readonly string[] | undefined;
@@ -204,6 +226,14 @@ export async function updateTask(
     } else changes.status = command.status;
   }
   if (command.priority !== undefined) changes.priority = command.priority;
+  if (command.storyPoints !== undefined) {
+    issues.push(...checkStoryPoints(command.storyPoints));
+    changes.storyPoints = command.storyPoints;
+  }
+  if (command.assigneeId !== undefined) {
+    issues.push(...(await checkAssignee(deps, scope, command.assigneeId)));
+    changes.assigneeId = command.assigneeId;
+  }
   if (command.due !== undefined) {
     const prepared = prepareDue(command.due);
     issues.push(...prepared.issues);

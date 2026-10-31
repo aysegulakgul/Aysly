@@ -16,6 +16,7 @@ import { longDay, offsetLabel, shortTime } from './dates';
 import { useTaskCompletion } from './task-actions';
 import type { TaskUiContext } from './task-context';
 import { LinkedRecords } from '../notes/linked-records';
+import { CommentsSection } from './comments-section';
 import { RecurrenceField, RecurrenceScopeDialog, RemindersSection } from './schedule-fields';
 
 type Patch = Record<string, unknown>;
@@ -316,6 +317,54 @@ function DetailBody({ detail, context }: { detail: TaskDetailView; context: Task
               ))}
             </select>
           </Field>
+          {/* D-097: atanan kişi (Ayarlar · Kişiler). */}
+          <Field label={t('detail.assignee')}>
+            <select
+              id="detail-assignee"
+              aria-label={t('detail.assignee')}
+              value={detail.assigneeId ?? ''}
+              onChange={(e) => void save({ assigneeId: e.target.value || null })}
+              className={selectClass}
+            >
+              <option value="">{t('detail.unassigned')}</option>
+              {context.contacts.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </Field>
+          {/* D-099 / BR-TASK-011: story point. */}
+          <Field label={t('detail.storyPoints')}>
+            <select
+              aria-label={t('detail.storyPoints')}
+              value={detail.storyPoints ?? ''}
+              onChange={(e) =>
+                void save({ storyPoints: e.target.value === '' ? null : Number(e.target.value) })
+              }
+              className={selectClass}
+            >
+              <option value="">—</option>
+              {[
+                ...new Set([
+                  1,
+                  2,
+                  3,
+                  5,
+                  8,
+                  13,
+                  21,
+                  ...(detail.storyPoints ? [detail.storyPoints] : []),
+                ]),
+              ]
+                .sort((a, b) => a - b)
+                .map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+            </select>
+          </Field>
           <Field label={t('detail.start')}>
             <input
               type="date"
@@ -410,6 +459,8 @@ function DetailBody({ detail, context }: { detail: TaskDetailView; context: Task
             className="w-full resize-y rounded-sm bg-transparent p-2 text-base whitespace-pre-wrap text-text placeholder:text-text-secondary hover:bg-surface-muted"
           />
         </section>
+
+        <CommentsSection taskId={detail.id} context={context} />
 
         {detail.parentTaskId ? null : (
           <section className="flex flex-col gap-1 border-b border-border pb-4">

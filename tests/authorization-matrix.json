@@ -566,6 +566,57 @@
       "path": "/api/v1/search",
       "access": "self",
       "sample": "/api/v1/search?q=ab"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/[ws]/contacts",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/contacts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/contacts",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/contacts",
+      "body": {
+        "name": "Ayşe"
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/workspaces/[ws]/contacts/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/contacts/01900000-0000-7000-8000-000000000002",
+      "body": {
+        "name": "Ayşe"
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/workspaces/[ws]/contacts/[id]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/contacts/01900000-0000-7000-8000-000000000002"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/[ws]/tasks/[id]/comments",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tasks/01900000-0000-7000-8000-000000000002/comments"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/[ws]/tasks/[id]/comments",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tasks/01900000-0000-7000-8000-000000000002/comments",
+      "body": {
+        "body": "Yorum"
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/workspaces/[ws]/tasks/[id]/comments/[commentId]",
+      "access": "workspace",
+      "sample": "/api/v1/workspaces/01900000-0000-7000-8000-000000000001/tasks/01900000-0000-7000-8000-000000000002/comments/01900000-0000-7000-8000-000000000002"
     }
   ]
 }

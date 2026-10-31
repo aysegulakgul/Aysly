@@ -1,3 +1,4 @@
+import { findContacts } from '@/modules/contacts';
 import { findActiveProjects } from '@/modules/projects';
 import type { WorkspaceScope } from '@/modules/workspaces';
 import type { Viewer } from '../../viewer';
@@ -17,5 +18,6 @@ export async function buildTaskContext(
     timeFormat,
     today: todayIn(timezone, new Date()),
     projects: await findActiveProjects(scope),
+    contacts: (await findContacts(scope)).map(({ id, name, color }) => ({ id, name, color })),
   };
 }

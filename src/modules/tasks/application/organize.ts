@@ -14,6 +14,8 @@ export type TaskSummary = {
   project: { id: string; name: string; kind: 'inbox' | 'standard'; color: string };
   tags: Tag[];
   subtasks: { total: number; done: number };
+  /** D-097: atanan kişi. */
+  assignee: { id: string; name: string; color: string } | null;
 };
 
 async function versionChecked(
@@ -118,9 +120,11 @@ export async function summarize(
   projects: Map<string, ProjectRef>,
 ): Promise<TaskSummary[]> {
   const ids = tasks.map((t) => t.id);
-  const [tags, counts] = await Promise.all([
+  const assigneeIds = [...new Set(tasks.flatMap((t) => (t.assigneeId ? [t.assigneeId] : [])))];
+  const [tags, counts, people] = await Promise.all([
     deps.tags.forTasks(scope, ids),
     deps.tasks.subtaskCounts(scope, ids),
+    deps.contacts.refs(scope, assigneeIds),
   ]);
   return tasks.map((task) => {
     const project = projects.get(task.projectId);
@@ -134,6 +138,7 @@ export async function summarize(
       },
       tags: tags.get(task.id) ?? [],
       subtasks: counts.get(task.id) ?? { total: 0, done: 0 },
+      assignee: (task.assigneeId && people.get(task.assigneeId)) || null,
     };
   });
 }

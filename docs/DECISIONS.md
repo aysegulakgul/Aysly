@@ -510,6 +510,31 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Karar: Uygulamayı şimdilik yalnızca ürün sahibi kullandığı için NVDA ile manuel dinleme testi yapılmaz; yayına alma öncesine (OQ-032) ertelenir. Otomatik erişilebilirlik taraması (tüm sayfalar) ve yalnızca klavye testi `pnpm verify` içinde çalışmaya devam eder. Kontrol listesi `docs/SCREEN_READER_CHECKLIST.md` o zaman kullanılmak üzere saklanır.
 - Sonuçlar: AC-11 otomatik kısmıyla karşılandı; NFR-04'ün manuel doğrulaması yayın öncesi kontrol listesinde.
 
+
+### D-097 — Kişiler, atama ve paylaşma (OQ-045, Faz 9)
+- Durum: ONAYLI · Tarih: 2026-10-31 · Karar veren: Ürün sahibi ("Hepsinde öneriler")
+- Karar: Çalışma alanına bir **Kişiler** listesi eklenir (ad, e-posta, renk). Görevlere bir kişi atanabilir ve görevlerde avatarla görünür. Kişiler hesap değildir, uygulamaya giriş yapamaz. Sağ üstteki **Paylaş** düğmesi bulunulan sayfanın bağlantısını kopyalar ve seçilen kişiye e-posta uygulamasında hazır bir davet taslağı açar (`mailto:`); uygulama e-posta göndermez (D-055, D-062 değişmez). Gerçek davet ve erişim yayına almayla (OQ-032) ve Faz 10'da.
+- Sonuçlar: BR-CONTACT-001, DATA_MODEL (`contacts`, `tasks.assignee_contact_id`), API_CONTRACTS, USER_FLOWS.
+
+### D-098 — Inbox sayfası kaldırıldı (OQ-046, Faz 9)
+- Durum: ONAYLI · Tarih: 2026-10-31 · Karar veren: Ürün sahibi
+- Karar: `/inbox` sayfası ve kenar çubuğu sayacı kaldırılır; adres Görevlerim'e yönlenir. Görevlerim'deki hızlı ekleme görevi Inbox projesine ekler (BR-INBOX-001 veri düzeyinde sürer); bu görevler "Projesiz" grubunda görünür. `Q` kısayolu Görevlerim'in hızlı eklemesini açar. BR-INBOX-003 (rozet) yürürlükten kalkar.
+- Sonuçlar: BR-INBOX-001/003/004, USER_FLOWS, UI kısayolları.
+
+### D-099 — Story point ve yorumlar (OQ-047, Faz 9)
+- Durum: ONAYLI · Tarih: 2026-10-31 · Karar veren: Ürün sahibi
+- Karar: Görevlerde isteğe bağlı **story point** (0–100 tam sayı; önerilen değerler 1, 2, 3, 5, 8, 13, 21) ve Görevlerim'de grup başına toplam. Görev detayında **yorumlar** (en çok 5.000 karakter; yazan kendi yorumunu siler). Statü Yapılacak / Devam ediyor / Tamamlandı olarak kalır.
+- Sonuçlar: BR-TASK-011, BR-COMMENT-001, DATA_MODEL (`tasks.story_points`, `task_comments`).
+
+### D-100 — Tasarım kaynağı: Figma ve ürün sahibinin ekran görüntüleri (OQ-048, D-063'ü genişletir)
+- Durum: ONAYLI · Tarih: 2026-10-31 · Karar veren: Ürün sahibi
+- Karar: Figma token'ları ve bileşenleri korunur. Ürün sahibinin verdiği ekran görüntüleri yeni ekranlar için referanstır: renkli liste satırları ve rozetler (Görevlerim), renkli pano kartları (Projeler). Bildirimler ve Paylaş sağ üst başlıkta; kenar çubuğundaki "Görev ekle" ve Yaklaşanlar sayfası kaldırılır (Yaklaşan görevler Bugün sayfasının altında). Claude'un önerdiği iyileştirmeler (yan panel detay, avatarlar, özet şeritleri) onaylıdır.
+- Sonuçlar: D-063 madde 12 (Figma tek kaynak) bu kapsamla genişler; UI_UX_DESIGN_SYSTEM, FIGMA_INVENTORY.
+
+### D-101 — Demo verisi (OQ-049, Faz 9)
+- Durum: ONAYLI · Tarih: 2026-10-31 · Karar veren: Ürün sahibi
+- Karar: `pnpm db:seed-demo` ayrı bir demo hesabı (`demo@aysly.local`) oluşturur ve tüm ekranları dolduracak örnek veriyle doldurur; varsa önce o hesabı siler. Diğer hesaplara dokunmaz. Şifre README'de; yalnızca yerel geliştirme içindir.
+
 ---
 
 ## 5. Faz kapanış kayıtları

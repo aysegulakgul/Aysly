@@ -153,7 +153,7 @@
     "widgets": {
       "today": "Today",
       "overdue": "Overdue",
-      "upcoming": "Upcoming",
+      "upcoming": "Upcoming tasks",
       "priority": "Priority",
       "projects": "Projects",
       "goals": "Goals"
@@ -303,7 +303,8 @@
       "password": "Your password",
       "confirm": "Confirm deletion request",
       "cancel": "Cancel"
-    }
+    },
+    "contacts": "People"
   },
   "onboarding": {
     "title": "Welcome to Aysly",
@@ -338,14 +339,14 @@
       "label": "Quick add",
       "placeholder": "What’s on your mind?",
       "titleLabel": "Task title",
-      "target": "Inbox",
-      "hint": "If you don’t pick a project, the task goes to the Inbox.",
+      "target": "No project",
+      "hint": "Without a project, the task is added with no project.",
       "keys": "Enter to add · Esc to clear",
       "submit": "Add task",
       "failed": "Couldn’t save. Your text is still here; you can try again.",
       "kept": "Your title and chosen fields were kept.",
       "retry": "Try again",
-      "added": "Task added to the Inbox."
+      "added": "Task added."
     },
     "date": {
       "button": "Date",
@@ -394,7 +395,7 @@
     },
     "myTasks": {
       "title": "My tasks",
-      "subtitle": "{count, plural, =0 {No open tasks} one {# open task} other {# open tasks}} across your projects and Inbox.",
+      "subtitle": "{count, plural, =0 {No open tasks.} one {# open task.} other {# open tasks.}}",
       "emptyTitle": "No open tasks",
       "emptyDescription": "Add a task with quick add; it appears here by its due date.",
       "collapse": "Collapse {group}",
@@ -453,7 +454,10 @@
       "restore": "Restore",
       "restoreFailed": "Couldn’t restore.",
       "deleteConfirm": "The task and its subtasks will move to the trash. You can restore them within 30 days.",
-      "deleteOccurrence": "Delete only this occurrence"
+      "deleteOccurrence": "Delete only this occurrence",
+      "assignee": "Assignee",
+      "unassigned": "Unassigned",
+      "storyPoints": "Story points"
     },
     "completeDialog": {
       "title": "Complete the subtasks too?",
@@ -554,6 +558,40 @@
       },
       "remove": "Remove reminder {when}",
       "failed": "The reminder couldn’t be saved. Try again."
+    },
+    "status": {
+      "todo": "To do",
+      "in_progress": "In progress",
+      "done": "Done"
+    },
+    "table": {
+      "name": "Name",
+      "assignee": "Assignee",
+      "due": "Due date",
+      "project": "Project",
+      "priority": "Priority",
+      "status": "Status",
+      "points": "Points",
+      "pointsShort": "{points} pts",
+      "sum": "SUM",
+      "noProject": "No project",
+      "addTask": "+ Add task",
+      "addTaskTo": "Add a task to {section}",
+      "addPlaceholder": "Type a task name, press Enter",
+      "addFailed": "The task couldn't be added. Try again.",
+      "groupBy": "Grouping",
+      "byDate": "By date",
+      "byProject": "By project"
+    },
+    "comments": {
+      "title": "Comments",
+      "empty": "No comments yet.",
+      "label": "Comment",
+      "placeholder": "Write a comment…",
+      "send": "Send",
+      "delete": "Delete",
+      "unknown": "Deleted user",
+      "failed": "The comment couldn't be added. Try again."
     }
   },
   "firstSteps": {
@@ -696,7 +734,22 @@
       "today": "Today, {time}",
       "yesterday": "Yesterday, {time}"
     },
-    "calendar": "Calendar"
+    "calendar": "Calendar",
+    "overview": {
+      "subtitle": "Status, progress and tasks of your projects at a glance. Drag a card or use its menu to change status.",
+      "emptyColumn": "No projects in this column.",
+      "statusOf": "Status of {name}",
+      "progress": "{done}/{total} tasks done",
+      "progressOf": "Progress of {name}",
+      "more": "+{count} more tasks",
+      "next": "Next: {date}",
+      "stats": {
+        "projects": "Projects",
+        "active": "Active projects",
+        "open": "Open tasks",
+        "done": "Completed"
+      }
+    }
   },
   "views": {
     "filter": "Filter",
@@ -1048,5 +1101,38 @@
     "cancel": "Cancel deletion",
     "signOut": "Sign out",
     "cancelFailed": "The deletion could not be cancelled. Try again."
+  },
+  "share": {
+    "button": "Share",
+    "title": "Share “{title}”",
+    "linkTitle": "Page link",
+    "copy": "Copy",
+    "copied": "Copied",
+    "inviteTitle": "Invite a teammate",
+    "invite": "Invite",
+    "emailLabel": "Email to invite",
+    "emailPlaceholder": "name@team.com",
+    "mailSubject": "Aysly: {title}",
+    "mailBody": "Hi,\n\nI’m sharing the “{title}” page in Aysly with you:\n{link}\n",
+    "localNote": "The invite opens as a draft in your email app. Aysly currently runs only on this computer, so the link won’t open on another computer."
+  },
+  "contacts": {
+    "title": "People",
+    "description": "Teammates you can assign to tasks and invite with Share.",
+    "addTitle": "Add a person",
+    "addDescription": "People don’t sign in; they appear on tasks with their avatar.",
+    "name": "Name",
+    "email": "Email (optional)",
+    "add": "Add",
+    "listTitle": "{count, plural, =0 {No people} one {# person} other {# people}}",
+    "empty": "You haven’t added anyone yet.",
+    "nameOf": "Name of {name}",
+    "emailOf": "Email of {name}",
+    "colorOf": "Color of {name}",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "deleteTitle": "Delete {name}?",
+    "deleteBody": "They are unassigned from their tasks; the tasks are kept.",
+    "failed": "The change couldn’t be saved. Try again."
   }
 }

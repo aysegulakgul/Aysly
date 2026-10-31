@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { findInboxCount, findMyTasksCount, findProjectOverview } from '@/modules/tasks';
+import { findMyTasksCount, findProjectOverview } from '@/modules/tasks';
 import { findViews } from '@/modules/views';
 import { getDashboard, getPersonalScope, getViewer } from '../viewer';
 import { KeyboardShortcuts } from './shortcuts';
@@ -17,26 +17,19 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const [viewer, scope] = await Promise.all([getViewer(), getPersonalScope()]);
   if (!viewer || !scope) redirect('/sign-in');
   if (viewer.user.deletionRequestedAt) redirect('/account-deletion'); // D-092
-  const [inboxCount, myTasksCount, dashboard, projects, views] = await Promise.all([
-    findInboxCount(scope),
+  const [myTasksCount, dashboard, projects, views] = await Promise.all([
     findMyTasksCount(scope),
     getDashboard(),
     findProjectOverview(scope),
     findViews(scope),
   ]);
-  const counts = {
-    inbox: inboxCount,
-    myTasks: myTasksCount,
-    today: dashboard?.today.length ?? 0,
-    upcoming: dashboard?.upcoming.length ?? 0,
-  };
+  const counts = { myTasks: myTasksCount, today: dashboard?.today.length ?? 0 };
   return (
     <NotificationProvider>
       <SearchPaletteProvider workspaceId={scope.workspaceId}>
         <div className="flex min-h-dvh">
           <Sidebar
             userName={viewer.user.name}
-            timezone={viewer.preferences.timezone}
             counts={counts}
             projects={projects.map((p) => ({
               id: p.id,

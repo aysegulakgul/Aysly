@@ -153,7 +153,7 @@
     "widgets": {
       "today": "Bugün",
       "overdue": "Geciken",
-      "upcoming": "Yaklaşan",
+      "upcoming": "Yaklaşan görevler",
       "priority": "Öncelikli",
       "projects": "Projeler",
       "goals": "Hedefler"
@@ -303,7 +303,8 @@
       "password": "Şifren",
       "confirm": "Silme talebini onayla",
       "cancel": "Vazgeç"
-    }
+    },
+    "contacts": "Kişiler"
   },
   "onboarding": {
     "title": "Aysly’ye hoş geldin",
@@ -338,14 +339,14 @@
       "label": "Hızlı ekle",
       "placeholder": "Aklında ne var?",
       "titleLabel": "Görev başlığı",
-      "target": "Inbox",
-      "hint": "Bir proje seçmediğinde görev Inbox’a eklenir.",
+      "target": "Projesiz",
+      "hint": "Bir proje seçmediğinde görev projesiz eklenir.",
       "keys": "Enter ile ekle · Esc ile temizle",
       "submit": "Görev ekle",
       "failed": "Kaydedilemedi. Metnin burada, tekrar deneyebilirsin.",
       "kept": "Başlık ve seçtiğin alanlar korundu.",
       "retry": "Tekrar dene",
-      "added": "Görev Inbox’a eklendi."
+      "added": "Görev eklendi."
     },
     "date": {
       "button": "Tarih",
@@ -394,7 +395,7 @@
     },
     "myTasks": {
       "title": "Görevlerim",
-      "subtitle": "Tüm projelerin ve Inbox’tan {count, plural, =0 {açık görev yok.} other {# açık görev.}}",
+      "subtitle": "{count, plural, =0 {Açık görev yok.} other {# açık görev.}}",
       "emptyTitle": "Açık görevin yok",
       "emptyDescription": "Hızlı eklemeyle bir görev ekle; burada son tarihine göre görünür.",
       "collapse": "{group} grubunu daralt",
@@ -453,7 +454,10 @@
       "restore": "Geri yükle",
       "restoreFailed": "Geri yüklenemedi.",
       "deleteConfirm": "Görev ve alt görevleri çöp kutusuna taşınacak. 30 gün içinde geri yükleyebilirsin.",
-      "deleteOccurrence": "Yalnızca bu örneği sil"
+      "deleteOccurrence": "Yalnızca bu örneği sil",
+      "assignee": "Atanan",
+      "unassigned": "Atanmamış",
+      "storyPoints": "Story point"
     },
     "completeDialog": {
       "title": "Alt görevler de tamamlansın mı?",
@@ -554,6 +558,40 @@
       },
       "remove": "{when} hatırlatıcısını kaldır",
       "failed": "Hatırlatıcı kaydedilemedi. Tekrar dene."
+    },
+    "status": {
+      "todo": "Yapılacak",
+      "in_progress": "Devam ediyor",
+      "done": "Tamamlandı"
+    },
+    "table": {
+      "name": "Ad",
+      "assignee": "Atanan",
+      "due": "Son tarih",
+      "project": "Proje",
+      "priority": "Öncelik",
+      "status": "Statü",
+      "points": "Puan",
+      "pointsShort": "{points} puan",
+      "sum": "TOPLAM",
+      "noProject": "Projesiz",
+      "addTask": "+ Görev ekle",
+      "addTaskTo": "{section} bölümüne görev ekle",
+      "addPlaceholder": "Görev adı yaz, Enter’a bas",
+      "addFailed": "Görev eklenemedi. Tekrar dene.",
+      "groupBy": "Gruplama",
+      "byDate": "Tarihe göre",
+      "byProject": "Projeye göre"
+    },
+    "comments": {
+      "title": "Yorumlar",
+      "empty": "Henüz yorum yok.",
+      "label": "Yorum",
+      "placeholder": "Yorum yaz…",
+      "send": "Gönder",
+      "delete": "Sil",
+      "unknown": "Silinmiş kullanıcı",
+      "failed": "Yorum eklenemedi. Tekrar dene."
     }
   },
   "firstSteps": {
@@ -696,7 +734,22 @@
       "today": "Bugün, {time}",
       "yesterday": "Dün, {time}"
     },
-    "calendar": "Takvim"
+    "calendar": "Takvim",
+    "overview": {
+      "subtitle": "Projelerin durumu, ilerlemesi ve görevleri tek bakışta. Kartı sürükleyerek ya da menüden durumunu değiştir.",
+      "emptyColumn": "Bu sütunda proje yok.",
+      "statusOf": "{name} durumu",
+      "progress": "{done}/{total} görev tamamlandı",
+      "progressOf": "{name} ilerlemesi",
+      "more": "+{count} görev daha",
+      "next": "Sıradaki: {date}",
+      "stats": {
+        "projects": "Proje",
+        "active": "Aktif proje",
+        "open": "Açık görev",
+        "done": "Tamamlanan"
+      }
+    }
   },
   "views": {
     "filter": "Filtrele",
@@ -1048,5 +1101,38 @@
     "cancel": "Silmeyi iptal et",
     "signOut": "Çıkış yap",
     "cancelFailed": "Silme iptal edilemedi. Tekrar dene."
+  },
+  "share": {
+    "button": "Paylaş",
+    "title": "“{title}” sayfasını paylaş",
+    "linkTitle": "Sayfa bağlantısı",
+    "copy": "Kopyala",
+    "copied": "Kopyalandı",
+    "inviteTitle": "Ekip arkadaşını davet et",
+    "invite": "Davet et",
+    "emailLabel": "Davet edilecek e-posta",
+    "emailPlaceholder": "ornek@ekip.com",
+    "mailSubject": "Aysly: {title}",
+    "mailBody": "Merhaba,\n\nAysly’deki “{title}” sayfasını seninle paylaşıyorum:\n{link}\n",
+    "localNote": "Davet, e-posta uygulamanda hazır bir taslak olarak açılır. Uygulama şimdilik yalnızca bu bilgisayarda çalıştığı için bağlantı başka bir bilgisayarda açılmaz."
+  },
+  "contacts": {
+    "title": "Kişiler",
+    "description": "Görevlere atayabileceğin ve Paylaş ile davet edebileceğin ekip arkadaşların.",
+    "addTitle": "Kişi ekle",
+    "addDescription": "Kişiler uygulamaya giriş yapmaz; görevlerde avatarlarıyla görünür.",
+    "name": "Ad",
+    "email": "E-posta (isteğe bağlı)",
+    "add": "Ekle",
+    "listTitle": "{count, plural, =0 {Kişi yok} other {# kişi}}",
+    "empty": "Henüz kişi eklemedin.",
+    "nameOf": "{name} adı",
+    "emailOf": "{name} e-postası",
+    "colorOf": "{name} rengi",
+    "delete": "Sil",
+    "cancel": "Vazgeç",
+    "deleteTitle": "{name} silinsin mi?",
+    "deleteBody": "Atandığı görevlerde atama kaldırılır; görevler silinmez.",
+    "failed": "Değişiklik kaydedilemedi. Tekrar dene."
   }
 }

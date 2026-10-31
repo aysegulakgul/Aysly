@@ -19,6 +19,10 @@ const HOURS = Array.from({ length: 24 }, (_, h) => h);
 const MONTH_CELL_LIMIT = 3;
 
 /** FR-CAL-06: saatli görev kullanıcının saat diliminde gösterilir; tüm gün görevin tarihi yüzendir (BR-DATE-001). */
+/** D-100: alt görev takvimde ↳ ile işaretlenir. */
+const taskLabel = (task: { title: string; parentTaskId: string | null }) =>
+  task.parentTaskId ? `↳ ${task.title}` : task.title;
+
 function placement(
   task: TaskView,
   timezone: string,
@@ -166,7 +170,7 @@ export function Calendar({
       )}
     >
       <span aria-hidden="true">{task.status === 'in_progress' ? '◐ ' : '○ '}</span>
-      {task.title}
+      {taskLabel(task)}
       {minutes !== null && task.due?.at
         ? ` · ${shortTime(`${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`, locale, context.timeFormat)}`
         : ''}
@@ -385,7 +389,7 @@ export function Calendar({
                   scroll={false}
                   className="min-w-0 flex-1 text-sm text-text"
                 >
-                  {task.title}
+                  {taskLabel(task)}
                   <span className="block text-xs text-text-secondary">
                     {`${task.project.name} · ${tTasks('row.noDate')}`}
                   </span>
@@ -482,7 +486,7 @@ function DayView({
                 scroll={false}
                 className="min-w-0 flex-1 text-sm text-text"
               >
-                ○ {task.title}
+                ○ {taskLabel(task)}
               </Link>
               <GiveDate task={task} context={context} />
             </li>
@@ -511,7 +515,7 @@ function DayView({
             <p className="text-xs text-primary">{`${time(minutes!)} · ${context.timezone.split('/').pop()?.replace('_', ' ')}`}</p>
             <Link href={href({ task: task.id })} scroll={false} className="text-base text-text">
               {task.status === 'in_progress' ? '◐ ' : '○ '}
-              {task.title}
+              {taskLabel(task)}
               {task.recurrence ? ' ↻' : ''}
             </Link>
             <GiveDate task={task} context={context} />

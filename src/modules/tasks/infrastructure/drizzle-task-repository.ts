@@ -39,6 +39,8 @@ function toTask(row: Row): Task {
     description: row.description,
     status: row.status as TaskStatus,
     priority: row.priority as Priority,
+    storyPoints: row.storyPoints,
+    assigneeId: row.assigneeContactId,
     startDate: row.startDate,
     due: row.dueDate
       ? {
@@ -84,9 +86,10 @@ const recurrenceColumns = (recurrence: Recurrence | null) => ({
 
 /** Domain değişikliklerini kolonlara çevirir; `due` dört kolonu birlikte yazar (BR-DATE-001). */
 function toColumns(changes: TaskChanges) {
-  const { due, recurrence, ...rest } = changes;
+  const { due, recurrence, assigneeId, ...rest } = changes;
   return {
     ...rest,
+    ...(assigneeId === undefined ? {} : { assigneeContactId: assigneeId }),
     ...(recurrence === undefined ? {} : recurrenceColumns(recurrence)),
     ...(due === undefined
       ? {}
@@ -116,6 +119,8 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
           title: t.title,
           description: t.description,
           priority: t.priority,
+          storyPoints: t.storyPoints ?? null,
+          assigneeContactId: t.assigneeId ?? null,
           startDate: t.startDate,
           ...toColumns({ due: t.due }),
           ...recurrenceColumns(t.recurrence ?? null),

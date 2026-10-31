@@ -15,7 +15,7 @@
 | 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | **Kapandı** | — | 2026-10-29 | 2026-10-30 |
 | 7 | Notlar, hedefler, arama | **Kapandı** | — | 2026-10-30 | 2026-10-30 |
 | 8 | Test, güvenlik, kalite; dışa aktarma, hesap silme | **Kapandı** | — | 2026-10-30 | 2026-10-31 |
-| 9 | Kullanım geri bildirimine göre iyileştirmeler | Başlamadı | — | — | — |
+| 9 | Kullanım geri bildirimine göre iyileştirmeler | Devam ediyor | — (OQ-045..049 → D-097..D-101) | 2026-10-31 | — |
 | 10 | (Doğrulanırsa) Ekip ve paylaşılan çalışma alanları | Başlamadı | Ayrı karar seti; yayına alma (OQ-032); abonelik yönü D-048 | — | — |
 
 Durum değerleri: `Başlamadı` · `Devam ediyor` · `Kapı kontrolünde` · `Kapandı`.
@@ -173,6 +173,13 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
 ### Faz 9 — Kullanım geri bildirimine göre iyileştirmeler
 - **Kapsam:** Ürün sahibinin kendi kullanımından (ve yayına alınırsa beta kullanıcılarından) gelen geri bildirim, P1'den kalanlar, P2 adaylarının önceliklendirilmesi (ör. e-posta bildirimleri, Google girişi, PWA, CSV, içe aktarma). Beta yapılacaksa analitik ihtiyacı yeniden değerlendirilir (D-052).
 - **Kural:** Her iyileştirme önce PRD/BR güncellemesi ve ürün sahibi onayıyla başlar.
+- **İlerleme (2026-10-31) — ürün sahibinin 9 maddelik geri bildirimi:**
+  - Kararlar D-097 (kişiler, atama, paylaş), D-098 (Inbox sayfası kaldırıldı), D-099 (story point, yorumlar), D-100 (tasarım kaynağı ve ekran değişiklikleri), D-101 (demo verisi). Yeni kurallar BR-TASK-011, BR-COMMENT-001, BR-CONTACT-001; BR-INBOX-003 yürürlükten kalktı.
+  - Migration 0009 (`contacts`, `tasks.story_points`, `tasks.assignee_contact_id`, `task_comments`).
+  - Bildirim ve Paylaş sağ üst başlıkta; Yaklaşanlar Bugün'ün altında; takvimde alt görevler; kenar çubuğundan "Görev ekle" kalktı.
+  - Görevlerim tablosu, görev detayında atanan/puan/yorumlar, Ayarlar · Kişiler, Projeler panosu, `pnpm db:seed-demo`.
+  - Görevlerim'de çoklu seçim, toplu işlemler ve satırdan "Projeye taşı" korundu (BR-TASK-008, AC-02).
+  - Doğrulama (2026-10-31): `pnpm verify` 14/14 yeşil — birim 203, entegrasyon 76, tarayıcı 351 (3 atlandı). Eski Inbox/Yaklaşanlar testleri yeni ekranlara göre güncellendi.
 
 ### Faz 10 — Ekip ve paylaşılan çalışma alanları (koşullu)
 - **Ön koşul:** Ekip ihtiyacının doğrulanması, yayına alma kararı (OQ-032) ve ayrı bir karar seti (yetki matrisi §6.2 onayı, davet akışı, atama, yorumlar, bildirim türleri, abonelik yönü D-048).

@@ -1,6 +1,6 @@
 # Veri Modeli
 
-> Durum: v0.6 · Son güncelleme: 2026-10-29 · Uygulama durumu: Migration 0000–0008 uygulandı (§7.1); diğer tablolar ilgili fazlarda.
+> Durum: v0.6 · Son güncelleme: 2026-10-29 · Uygulama durumu: Migration 0000–0009 uygulandı (§7.1); diğer tablolar ilgili fazlarda.
 > PostgreSQL + Drizzle ONAYLI (D-044); Docker Desktop üzerinde yerel (D-056). Alan ayrıntıları ve sınırlar D-060 ile onaylı; D-061 sadeleştirmeleri uygulanmıştır.
 > Veritabanı: PostgreSQL 16+ (ONAYLI, D-044). Bu belgedeki alanlar **hedef şemadır**; açık sorulara bağlı alanlar işaretlenmiştir.
 
@@ -261,6 +261,11 @@ Kısıtlar: `UNIQUE (task_id, remind_at)`; `CHECK (kind <> 'relative' OR offset_
 `goals`: `id`, `workspace_id`, `title` (1–200), `description` (≤ 5.000), `target_date date`, `status` (`active/achieved/abandoned`), `progress_mode` (`auto/manual`, varsayılan `auto`, D-034), `manual_progress smallint CHECK 0–100`, `achieved_at`, `created_by`, `archived_at`, `deleted_at`, `deleted_batch_id`, `version`, zaman damgaları.
 `goal_task_links (goal_id, task_id, workspace_id)` ve `goal_project_links (goal_id, project_id, workspace_id)`.
 
+### 3.11a. `contacts` ve `task_comments` (Faz 9)
+- `contacts` — modül: contacts (D-097, BR-CONTACT-001): `id`, `workspace_id` (FK, CASCADE), `name` (1–100), `email` (isteğe bağlı, ≤ 254), `color` (12 renk), `created_at`, `updated_at`. Hesap değildir.
+- `tasks.story_points` (smallint, 0–100, BR-TASK-011) ve `tasks.assignee_contact_id` (FK `contacts.id`, SET NULL).
+- `task_comments` — modül: tasks (D-099, BR-COMMENT-001): `id`, `workspace_id` + `task_id` (bileşik FK, CASCADE), `author_user_id` (FK, SET NULL), `body` (1–5.000), `created_at`.
+
 ### 3.12. `notifications`, `notification_deliveries` — modül: notifications
 
 `notifications`:
@@ -340,6 +345,7 @@ Ayrıntı: ARCHITECTURE §12.4. Ek kurallar:
 | 0006 | `drizzle/0006_recurrence_reminders_notifications.sql` | `tasks.recurrence_*` (kural, mod, seri, planlanan tarih, sıra, üreten görev; D-087), `reminders` (`failed` durumu yok), `notifications` (`notification_deliveries` SONRA), `saved_views.view_type` + `calendar` | 6 |
 | 0007 | `drizzle/0007_notes_goals.sql` | `notes`, `note_task_links`, `note_project_links`, `note_tags`, `goals`, `goal_task_links`, `goal_project_links` | 7 |
 | 0008 | `drizzle/0008_search_vectors.sql` | `aysly_search_text()` (ı/İ, `unaccent`, küçük harf; D-091), `tasks`/`projects`/`notes`/`goals` üretilmiş `search_vector` + GIN | 7 |
+| 0009 | `drizzle/0009_contacts_points_comments.sql` | `contacts` (D-097), `tasks.story_points` (0–100) ve `tasks.assignee_contact_id` (kişi silinince boşalır; aynı çalışma alanı uygulamada denetlenir), `task_comments` (görevle bileşik FK, görev silinince silinir; D-099) | 9 |
 | 0005 | `drizzle/0005_projects_views.sql` | `saved_views` (`pinned` kolonu ve takvim türü yok; D-086), `projects_color` CHECK (12 renk, D-082) | 5 |
 
 Notlar: `idempotency_keys` ilk oluşturma uç noktalarıyla birlikte Faz 4'te eklenecek. Kimlik tablolarının alan adları Better Auth'un beklediği adlardır (`users.email_verified` boolean; DATA_MODEL §3.1'deki `email_verified_at` yerine). Hız sınırı sayaçları `auth_rate_limits` tablosunda tutulur.

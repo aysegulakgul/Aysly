@@ -277,6 +277,18 @@ Yanıt: `{ data: { task, nextOccurrence: Task | null, completedSubtaskIds: [] } 
 - Başarı: `{ data: { affected: 37, batchId?: "..." } }`; ret: `422 BULK_OPERATION_REJECTED` + `failures: [{ id, code, rule }]`.
 - Uygulanan gövde (Faz 5): `{ action, taskIds, params? }`; `params` işleme göre `{ projectId }`, `{ status }`, `{ due }`, `{ priority }`, `{ tagNames }`.
 
+### 6.7. Faz 9 ekleri (D-097, D-099)
+- Görev nesnesinde `storyPoints` (0–100 `| null`) ve `assigneeId` (`| null`); oluşturma ve `PATCH` gövdesi de bu alanları kabul eder (BR-TASK-011). Özet nesnesinde `assignee: { id, name, color } | null`.
+- `GET / POST /workspaces/{ws}/tasks/{id}/comments` — `{ body }`; yanıt `{ id, body, authorName, mine, createdAt }` (BR-COMMENT-001).
+- `DELETE /workspaces/{ws}/tasks/{id}/comments/{commentId}` — yalnızca yazan; başkasınınki 404.
+
+### 6.8. Kişiler (D-097)
+| Metot | Yol | Açıklama |
+|---|---|---|
+| GET | `/workspaces/{ws}/contacts` | Ada göre sıralı `[{ id, name, email, color, createdAt }]` |
+| POST | `/workspaces/{ws}/contacts` | `{ name, email?, color? }` — BR-CONTACT-001 |
+| PATCH / DELETE | `/workspaces/{ws}/contacts/{id}` | Silinince atandığı görevlerde atama boşalır |
+
 ## 7. Etiketler
 
 | Metot | Yol | Kural |

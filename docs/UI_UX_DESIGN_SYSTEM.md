@@ -131,6 +131,11 @@ Sabit 12 renklik palet (`slate, red, orange, amber, green, teal, cyan, blue, ind
 | **ProgressBar** | Proje, hedef | Değer metniyle birlikte (`3/9 · %33`); `role="progressbar"`. |
 | **CommandPalette** | Global arama | Bkz. USER_FLOWS §2.11. |
 
+## 6a. Renkli rozetler ve avatarlar (Faz 9, D-100)
+- Rozet: 12 renklik proje paletiyle dolu zemin, koyu (#111) yazı — açık ve koyu temada okunur. Öncelik: Yüksek kırmızı, Orta amber, Düşük turkuaz. Statü: Yapılacak arduvaz, Devam ediyor mavi, Tamamlandı yeşil. Rozet her zaman metin taşır.
+- Avatar: baş harfler, kişinin rengi; atanmamış görevde kesikli boş daire.
+- Özet şeridi: sayılarla dört kart (Projeler panosu).
+
 ## 7. Görev listeleri ve tablolar
 - Liste, varsayılan görünümdür; tablolar yalnızca Arşiv/Çöp gibi yönetim ekranlarında.
 - Gruplar katlanabilir; grup başlığında sayı.

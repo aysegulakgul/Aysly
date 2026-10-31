@@ -12,6 +12,8 @@ export type TaskChanges = Partial<{
   description: string | null;
   status: TaskStatus;
   priority: Priority;
+  storyPoints: number | null;
+  assigneeId: string | null;
   startDate: string | null;
   due: Due | null;
   completedAt: Date | null;
@@ -29,6 +31,8 @@ export type NewTask = {
   title: string;
   description: string | null;
   priority: Priority;
+  storyPoints?: number | null | undefined;
+  assigneeId?: string | null | undefined;
   startDate: string | null;
   due: Due | null;
   position: string;
@@ -235,7 +239,16 @@ export type CalendarPort = {
 };
 
 /** Görev kullanım senaryolarının bağımlılıkları (CODING_STANDARDS §2.1: elle bağlanır). */
+/** D-097: atanabilecek kişiler (contacts modülü). */
+export type ContactPort = {
+  refs(
+    scope: WorkspaceScope,
+    ids: readonly string[],
+  ): Promise<Map<string, { id: string; name: string; color: string }>>;
+};
+
 export type TaskDeps = {
+  contacts: ContactPort;
   tasks: TaskRepository;
   projects: ProjectDirectory;
   tags: TagPort;

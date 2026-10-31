@@ -43,10 +43,10 @@ test.describe('Erişilebilirlik (AC-11)', () => {
     });
     const pages = [
       '/',
-      '/inbox',
-      `/inbox?task=${task.id}`,
+      `/my-tasks?task=${task.id}`,
+      '/my-tasks?group=project',
       '/my-tasks',
-      '/upcoming',
+      '/settings/contacts',
       '/calendar',
       '/projects',
       `/projects/${project.id}`,
@@ -82,7 +82,7 @@ test.describe('Erişilebilirlik (AC-11)', () => {
     const ws = (await (await page.request.get('/api/v1/workspaces')).json()).data[0].id as string;
     await post(page, `/api/v1/workspaces/${ws}/projects`, { name: 'Ev', color: 'green' });
 
-    await page.goto('/inbox');
+    await page.goto('/my-tasks');
     await page.waitForLoadState('networkidle');
     await page.locator('body').click({ position: { x: 5, y: 5 } });
     for (const title of ['Birinci', 'İkinci', 'Üçüncü']) {
@@ -114,14 +114,16 @@ test.describe('Erişilebilirlik (AC-11)', () => {
     await expect(projectField).toBeFocused();
     await page.keyboard.press('ArrowDown');
     await expect(projectField.locator('option:checked')).toHaveText('Ev');
-    await page.goto('/inbox');
-    await expect(rows).toHaveCount(1);
+    // D-098: taşınan görev Görevlerim'de kalır; proje rozeti değişir.
+    await page.goto('/my-tasks');
+    await expect(rows).toHaveCount(2);
+    await expect(rows.filter({ hasText: 'Ev' })).toHaveCount(1);
 
     // Sil: J ile odaklan, Delete.
     await focusRow();
     const last = (await rows.first().getAttribute('data-task-id'))!;
     await page.keyboard.press('Delete');
-    await expect(rows).toHaveCount(0);
+    await expect(rows).toHaveCount(1);
     const trashed = await page.request.get(`/api/v1/workspaces/${ws}/trash`);
     expect(JSON.stringify(await trashed.json())).toContain(last);
   });

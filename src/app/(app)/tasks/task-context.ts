@@ -8,4 +8,6 @@ export type TaskUiContext = {
   today: string;
   /** Taşıma ve proje seçimi için etkin projeler; Inbox ilk sırada. */
   projects: { id: string; name: string; kind: 'inbox' | 'standard' }[];
+  /** D-097: görevlere atanabilecek kişiler. */
+  contacts: { id: string; name: string; color: string }[];
 };

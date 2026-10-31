@@ -46,6 +46,7 @@
 | Bildirim merkezi, Ayarlar · Bildirimler, hatırlatıcı ve tekrar düzenleyicileri, takvim Ay görünümü | FR-NOTIF-01, FR-NOTIF-04, BR-REM, BR-REC, FR-CAL-01 | 6 (kuruldu, onaya sunuldu) |
 | Arşiv ve Çöp kutusu sayfaları | FR-SET-06/07, BR-DEL-* | 5 (kuruldu, onaya sunuldu) |
 | Hedef detayı (bağlı görev/projeler) | FR-GOAL-02 | 7 |
+| Görevlerim tablosu, Projeler panosu, Paylaş penceresi, Ayarlar · Kişiler, yorumlar | D-097..D-100 (ürün sahibinin ekran görüntüleri) | 9 (kuruldu, onaya sunuldu) |
 | Kayıtlı görünüm oluşturma/düzenleme | FR-VIEW-07, D-051 | 5 (kuruldu, onaya sunuldu) |
 | Proje oluşturma/düzenleme formu, filtre paneli, Ayarlar · Etiketler | FR-PROJ-01, FR-VIEW-04, D-085 | 5 (kuruldu, onaya sunuldu) |
 | Desktop "Menü" karşılığı (kenar çubuğu çerçeve içinde olabilir; Faz 3'te ekranlardan doğrulanacak) | — | 3 |

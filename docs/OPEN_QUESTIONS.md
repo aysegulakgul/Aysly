@@ -189,5 +189,10 @@ D-045 gereği şimdilik yalnızca yerel ortam kullanılıyor. Yayına alma karar
 | OQ-042 | Not editörü paketi | Tiptap; içerik Markdown olarak saklanır. | D-090 |
 | OQ-043 | Silme talebinden sonraki 14 günde giriş | Girişte yalnızca "Silmeyi iptal et / Çıkış yap" ekranı; iptal etmeden uygulamaya girilemez. | D-092 |
 | OQ-044 | Ekran okuyucu manuel testi | Claude otomatik denetim + kontrol listesi; ürün sahibi NVDA ile uygular. | D-093 |
+| OQ-045 | Ekip özellikleri (paylaş, davet, atama) | Yerelde "Kişiler" listesi; görevlere kişi atanır; Paylaş bağlantıyı kopyalar ve e-posta taslağı açar. Gerçek davet yayına almayla. | D-097 |
+| OQ-046 | Inbox sayfası | Kaldırıldı; görevler Görevlerim'e eklenir, projesiz görevler "Projesiz" grubunda. | D-098 |
+| OQ-047 | Yeni görev alanları | Story point (bölüm toplamıyla), yorumlar; statü üç değerde kalır. | D-099 |
+| OQ-048 | Tasarım kaynağı | Figma + ürün sahibinin ekran görüntüleri; renkli rozet paleti. | D-100 |
+| OQ-049 | Örnek veri | Ayrı demo hesabı, tek komut; mevcut veriye dokunulmaz. | D-101 |
 
 Kapanan soruların değerlendirilen seçenekleri DECISIONS.md'deki ilgili kaydın "Alternatifler" alanında özetlenmiştir.

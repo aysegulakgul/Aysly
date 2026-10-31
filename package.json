@@ -26,6 +26,7 @@
     "db:backup": "node --env-file-if-exists=.env scripts/db-backup.mjs",
     "db:restore": "node --env-file-if-exists=.env scripts/db-restore.mjs",
     "db:restore-drill": "node --env-file-if-exists=.env scripts/db-restore-drill.mjs",
+    "db:seed-demo": "tsx --env-file-if-exists=.env scripts/db-seed-demo.ts",
     "audit:deps": "pnpm audit --audit-level=high",
     "verify": "node scripts/verify.mjs",
     "hooks:install": "git config core.hooksPath .githooks",

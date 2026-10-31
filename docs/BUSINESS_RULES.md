@@ -216,6 +216,16 @@ Ayrıntılı matris: [ROLES_AND_PERMISSIONS.md](ROLES_AND_PERMISSIONS.md).
 - **Davranış:** Her güncelleme isteği `version` gönderir. Sunucudaki sürüm farklıysa `409 VERSION_CONFLICT` döner ve yanıt güncel kaydı içerir. Arayüz: değişen alanlar çakışmıyorsa kullanıcının değişikliğini güncel kayda otomatik yeniden uygular ve tekrar dener; çakışıyorsa "Bu görev başka bir yerde değiştirildi" uyarısı ile iki seçenek sunar (benimkini uygula / güncel olanı al). Hiçbir durumda kullanıcı girişi sessizce kaybolmaz.
 - **Kabul:** Given iki sekmede açık görev, When ikisi de başlığı değiştirir, Then ikinci kayıt 409 alır ve kullanıcıya seçim sunulur.
 
+### BR-TASK-011 — Story point ve atama
+- **Durum:** ONAYLI (D-097, D-099)
+- **Davranış:** Görevde isteğe bağlı story point vardır: 0–100 tam sayı (arayüz 1, 2, 3, 5, 8, 13, 21 önerir). Görevlerim'de her bölüm puan toplamını gösterir. Görev bir kişiye atanabilir (BR-CONTACT-001); kişi aynı çalışma alanında olmalıdır, değilse `400 VALIDATION_FAILED` (`field: assigneeId, reason: not_found`). Kişi silinince atama boşalır. Tekrarlayan görevin yeni örneği puanı ve atamayı devralır.
+- **Kabul:** Given başka çalışma alanındaki bir kişinin kimliği, When görev ona atanmak istenir, Then 400. Given puanı 101, Then 400.
+
+### BR-COMMENT-001 — Görev yorumları
+- **Durum:** ONAYLI (D-099)
+- **Davranış:** Görev detayında yorum yazılır: kırpılmış metin 1–5.000 karakter, görev başına en çok 500 yorum. Yorumlar eskiden yeniye listelenir. Yazan yalnızca kendi yorumunu siler; başkasının yorumu bulunamadı sayılır (404). Görev çöpe gidince yorumları görünmez; görev kalıcı silinince yorumları da silinir.
+- **Kabul:** Given boş yorum, Then 400. Given başkasının yorumu, When silinmek istenir, Then 404.
+
 ---
 
 ## 5. Alt görevler
@@ -402,7 +412,7 @@ Ayrıntılı matris: [ROLES_AND_PERMISSIONS.md](ROLES_AND_PERMISSIONS.md).
 
 ### BR-INBOX-003 — Inbox rozeti
 - **Durum:** ONAYLI (D-060)
-- **Davranış:** Rozet = Inbox'taki açık, arşivlenmemiş, çöpte olmayan **üst düzey** görev sayısı. 99'dan fazlası "99+".
+- **Davranış:** Rozet = Inbox'taki açık, arşivlenmemiş, çöpte olmayan **üst düzey** görev sayısı. 99'dan fazlası "99+". **Yürürlükten kalktı (D-098):** Inbox sayfası ve rozeti kaldırıldı; projesiz görevler Görevlerim'de "Projesiz" olarak görünür.
 
 ### BR-INBOX-004 — My Tasks kapsamı
 - **Durum:** ONAYLI (D-060)
@@ -471,6 +481,13 @@ Bir kayıt hem arşivli hem çöpte olabilir; geri yüklenince arşivli durumuna
 - **Davranış:** Görev veya not başına en fazla 20 etiket; çalışma alanı başına en fazla 500 etiket.
 
 ---
+
+## 12a. Kişiler
+
+### BR-CONTACT-001 — Kişiler
+- **Durum:** ONAYLI (D-097)
+- **Davranış:** Çalışma alanında görevlere atanabilen kişiler tutulur: ad (kırpılır, 1–100 karakter), isteğe bağlı e-posta (temel biçim denetimi, küçük harfe çevrilir), renk (12 renklik palet). Çalışma alanında en çok 200 kişi. Kişiler hesap değildir, uygulamaya giriş yapamaz; Paylaş penceresinde davet taslağı için kullanılır (uygulama e-posta göndermez).
+- **Kabul:** Given boş ad, Then 400. Given geçersiz e-posta, Then 400. Given kişi silinir, Then atandığı görevlerin ataması boşalır, görevler kalır.
 
 ## 13. Notlar
 

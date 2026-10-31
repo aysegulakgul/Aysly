@@ -10,14 +10,14 @@ async function addTask(page: Page, title: string) {
   await expect(page.getByRole('listitem').filter({ hasText: title })).toBeVisible();
 }
 
-test.describe('Inbox ve hızlı ekleme', () => {
-  test('BR-INBOX-001: hızlı ekleme Inbox’a ekler; tarih ve öncelik kaydedilir; sayaç güncellenir', async ({
+test.describe('Görevlerim ve hızlı ekleme (D-098: Inbox sayfası kaldırıldı)', () => {
+  test('BR-INBOX-001: hızlı ekleme projesiz ekler; tarih ve öncelik kaydedilir', async ({
     page,
   }) => {
     await signUp(page);
-    await page.goto('/inbox');
+    await page.goto('/my-tasks');
     await page.waitForLoadState('networkidle');
-    await expect(page.getByText('Inbox boş')).toBeVisible();
+    await expect(page.getByText('Açık görevin yok')).toBeVisible();
 
     await page.getByLabel('Hızlı ekle').fill('Diş hekimi randevusu al');
     await page.getByRole('button', { name: 'Öncelik' }).click();
@@ -29,14 +29,10 @@ test.describe('Inbox ve hızlı ekleme', () => {
 
     const row = page.getByRole('listitem').filter({ hasText: 'Diş hekimi randevusu al' });
     await expect(row).toBeVisible();
-    await expect(row).toContainText(/Inbox · \d+ \S+ · ⚑ Yüksek/);
+    await expect(row).toContainText('Projesiz');
+    await expect(row).toContainText('Yüksek');
     await expect(page.getByText('1 açık görev.')).toBeVisible();
     await expect(page.getByLabel('Hızlı ekle')).toHaveValue('');
-    if (!isMobile()) {
-      await expect(
-        page.getByRole('navigation', { name: 'Ana menü' }).getByRole('link', { name: /Inbox/ }),
-      ).toContainText('1');
-    }
 
     // Kalıcı: yeniden yüklemede de var
     await page.reload();
@@ -45,7 +41,7 @@ test.describe('Inbox ve hızlı ekleme', () => {
 
   test('BR-TASK-001: boş başlık eklenmez; Esc alanı temizler', async ({ page }) => {
     await signUp(page);
-    await page.goto('/inbox');
+    await page.goto('/my-tasks');
     await page.waitForLoadState('networkidle');
     await page.getByLabel('Hızlı ekle').fill('   ');
     await page.getByLabel('Hızlı ekle').press('Enter');
@@ -57,7 +53,7 @@ test.describe('Inbox ve hızlı ekleme', () => {
 
   test('BR-TASK-004: tamamlanan görev listeden çıkar, "Geri al" geri getirir', async ({ page }) => {
     await signUp(page);
-    await page.goto('/inbox');
+    await page.goto('/my-tasks');
     await page.waitForLoadState('networkidle');
     await addTask(page, 'Garanti belgesini bul');
 
@@ -80,7 +76,7 @@ test.describe('Inbox ve hızlı ekleme', () => {
     page,
   }) => {
     await signUp(page);
-    await page.goto('/inbox');
+    await page.goto('/my-tasks');
     await page.waitForLoadState('networkidle');
     // İlk gönderim sunucuya ulaşır ama yanıt kaybolur (ağ kesintisi); ikinci gönderim aynı anahtarla gider.
     let first = true;
@@ -106,7 +102,7 @@ test.describe('Inbox ve hızlı ekleme', () => {
     ).toHaveCount(1);
   });
 
-  test('Görev ekle / Ekle hızlı eklemeyi açar; Bugün sayfasından eklenen görev Inbox’a düşer', async ({
+  test('Q / Ekle hızlı eklemeyi açar; Bugün sayfasından eklenen görev Görevlerim’de projesiz görünür', async ({
     page,
   }) => {
     await signUp(page);
@@ -116,23 +112,25 @@ test.describe('Inbox ve hızlı ekleme', () => {
         .getByRole('link', { name: 'Ekle' })
         .click();
     } else {
-      await page.getByRole('link', { name: 'Görev ekle' }).click();
+      await page.waitForLoadState('networkidle');
+      await page.locator('body').click({ position: { x: 5, y: 5 } });
+      await page.keyboard.press('q');
     }
-    await expect(page).toHaveURL('/inbox?add=1');
+    await expect(page).toHaveURL('/my-tasks?add=1');
     await expect(page.getByLabel('Hızlı ekle')).toBeFocused();
 
     await page.goto('/');
     await page.waitForLoadState('networkidle');
     await page.getByLabel('Hızlı ekle').fill('Bugünden eklendi');
     await page.getByLabel('Hızlı ekle').press('Enter');
-    await expect(page.getByText('Görev Inbox’a eklendi.')).toBeVisible();
-    await page.goto('/inbox');
+    await expect(page.getByText('Görev eklendi.')).toBeVisible();
+    await page.goto('/my-tasks');
     await expect(page.getByRole('listitem').filter({ hasText: 'Bugünden eklendi' })).toBeVisible();
   });
 
-  test('/inbox erişilebilirlik taraması, tarih seçici açıkken (AC-11)', async ({ page }) => {
+  test('/my-tasks erişilebilirlik taraması, tarih seçici açıkken (AC-11)', async ({ page }) => {
     await signUp(page);
-    await page.goto('/inbox');
+    await page.goto('/my-tasks');
     await page.waitForLoadState('networkidle');
     await addTask(page, 'Erişilebilirlik görevi');
     await page.getByRole('button', { name: 'Tarih', exact: true }).click();

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { findContactRefs } from '@/modules/contacts';
 import { findUserPreferences } from '@/modules/preferences';
 import {
   PROJECT_STATUSES,
@@ -103,6 +104,8 @@ const Fields = {
   title: z.string().max(2000),
   description: z.string().max(40_000).nullable(),
   priority: Priority,
+  storyPoints: z.number().int().nullable(),
+  assigneeId: z.string().max(100).nullable(),
   startDate: z.string().max(20).nullable(),
   due: Due.nullable(),
 };
@@ -112,6 +115,8 @@ const CreateBody = z.strictObject({
   projectId: z.string().max(100).nullable().optional(),
   parentTaskId: z.string().max(100).nullable().optional(),
   priority: Fields.priority.optional(),
+  storyPoints: Fields.storyPoints.optional(),
+  assigneeId: Fields.assigneeId.optional(),
   startDate: Fields.startDate.optional(),
   due: Fields.due.optional(),
   tagNames: TagNames.optional(),
@@ -124,6 +129,8 @@ const PatchBody = z.strictObject({
   description: Fields.description.optional(),
   status: z.enum(TASK_STATUSES).optional(),
   priority: Fields.priority.optional(),
+  storyPoints: Fields.storyPoints.optional(),
+  assigneeId: Fields.assigneeId.optional(),
   startDate: Fields.startDate.optional(),
   due: Fields.due.optional(),
   tagNames: TagNames.optional(),
@@ -191,6 +198,8 @@ export function toTaskJson(task: Task) {
     description: task.description,
     status: task.status,
     priority: task.priority,
+    storyPoints: task.storyPoints,
+    assigneeId: task.assigneeId,
     startDate: task.startDate,
     due: task.due ? { ...task.due, at: task.due.at?.toISOString() ?? null } : null,
     completedAt: task.completedAt?.toISOString() ?? null,
@@ -217,6 +226,7 @@ export function toSummaryJson(summary: TaskSummary) {
     project: summary.project,
     tags: summary.tags,
     subtaskCount: summary.subtasks,
+    assignee: summary.assignee,
   };
 }
 
@@ -232,6 +242,7 @@ export function toReminderJson(r: Reminder) {
 
 export function taskDeps(executor: DbExecutor): TaskDeps {
   return {
+    contacts: { refs: (scope, ids) => findContactRefs(executor, scope, ids) },
     reminders: {
       forTasks: (scope, ids) => findRemindersForTasks(executor, scope, ids),
       insert: (scope, r) => insertReminder(executor, scope, r),

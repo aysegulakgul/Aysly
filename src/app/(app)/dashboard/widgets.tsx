@@ -19,8 +19,6 @@ import type { ProjectView } from '@/modules/tasks';
 import { Progress } from '@/ui/components/progress';
 import { TASK_WIDGETS, type WidgetId } from './widget-ids';
 
-const UPCOMING_PREVIEW = 3;
-
 /**
  * Bugün ekranı bölümleri (Figma 4:66545 "Dashboard widgets"): masaüstünde iki sütun (sıradaki bölümler sırayla
  * sol/sağ), mobilde tek sütun. Sıra ve görünürlük kullanıcı tercihinden (BR-DASH-001).
@@ -159,7 +157,7 @@ export function DashboardWidgets({
       );
     }
     const items = visible(data[id]);
-    const shown = id === 'upcoming' ? items.slice(0, UPCOMING_PREVIEW) : items;
+    const shown = items;
     return (
       <Panel>
         <div className="flex items-center gap-3">
@@ -188,11 +186,6 @@ export function DashboardWidgets({
         ) : (
           rows(shown)
         )}
-        {id === 'upcoming' && items.length > UPCOMING_PREVIEW ? (
-          <Link href="/upcoming" className="text-sm text-primary underline">
-            {t('allUpcoming', { count: items.length })}
-          </Link>
-        ) : null}
       </Panel>
     );
   };
@@ -223,6 +216,8 @@ export function DashboardWidgets({
     );
   }
 
+  // D-100: Yaklaşan görevler (Yaklaşanlar sayfasının yerine) her zaman en altta, tam genişlikte.
+  const grid = order.filter((id) => id !== 'upcoming');
   return (
     <>
       {completion.ui}
@@ -230,7 +225,7 @@ export function DashboardWidgets({
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start">
         {[0, 1].map((col) => (
           <div key={col} className="contents lg:flex lg:min-w-0 lg:flex-1 lg:flex-col lg:gap-5">
-            {order.map((id, index) =>
+            {grid.map((id, index) =>
               index % 2 === col ? (
                 <div key={id} style={{ order: index }}>
                   {widget(id)}
@@ -240,6 +235,7 @@ export function DashboardWidgets({
           </div>
         ))}
       </div>
+      {order.includes('upcoming') ? <div id="upcoming">{widget('upcoming')}</div> : null}
     </>
   );
 }

@@ -20,6 +20,8 @@ const CATEGORIES = [
   { href: '/settings/security', glyph: '▣', key: 'security' },
   // D-036, D-046: Figma'da kategori var (4:67746); sayfa içeriği Figma'da yok (D-065).
   { href: '/settings/data-privacy', glyph: '◇', key: 'dataPrivacy' },
+  // D-097: kişiler (Figma'da yok, D-100).
+  { href: '/settings/contacts', glyph: '◉', key: 'contacts' },
   // D-085: etiket yönetimi (Figma'da yok, D-065).
   { href: '/settings/tags', glyph: '#', key: 'tags' },
 ] as const satisfies readonly { href: Route; glyph: string; key: string }[];

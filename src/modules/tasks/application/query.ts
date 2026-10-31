@@ -103,7 +103,8 @@ export async function queryTasks(
     statuses,
     priorities: filter.priority,
     includeArchived: filter.includeArchived,
-    topLevelOnly: true,
+    // D-100: takvimde alt görevler de tarihleriyle görünür.
+    topLevelOnly: context.viewType !== 'calendar',
   });
 
   if (filter.tagId.length) {

@@ -64,7 +64,7 @@ test.describe('Faz 5 kabul', () => {
     }
   });
 
-  test('AC-02 (çoklu seçim): Inbox’ta 2 görev seçilip Ev’e taşınır; sayaç 1, tarih ve etiketler korunur', async ({
+  test('AC-02 (çoklu seçim): Görevlerim’de 2 görev seçilip Ev’e taşınır; tarih ve etiketler korunur', async ({
     page,
   }) => {
     await signUp(page);
@@ -73,7 +73,7 @@ test.describe('Faz 5 kabul', () => {
     for (const [i, title] of ['A görevi', 'B görevi', 'C görevi'].entries()) {
       await createTask(page, ws, { title, due: { date: `2026-12-0${i + 1}` }, tagNames: ['ev'] });
     }
-    await page.goto('/inbox');
+    await page.goto('/my-tasks');
     await page.waitForLoadState('networkidle');
     await page.getByRole('button', { name: 'Seç', exact: true }).click();
     await page.getByRole('checkbox', { name: 'A görevi görevini seç' }).check();
@@ -83,7 +83,6 @@ test.describe('Faz 5 kabul', () => {
     await bar.getByRole('button', { name: 'Projeye taşı' }).click();
     await page.getByRole('button', { name: 'Ev', exact: true }).click();
     await expect(page.getByText('2 görev güncellendi.')).toBeVisible();
-    await expect(page.getByText('1 açık görev.')).toBeVisible();
 
     const tasks = (
       await (await page.request.get(`/api/v1/workspaces/${ws}/tasks?status=todo`)).json()
@@ -164,9 +163,9 @@ test.describe('Faz 5 kabul', () => {
       headers: origin,
     });
     await page.goto('/projects');
-    await expect(page.locator('[data-project-card]').first()).toContainText(
-      '1/3 · %33 · 2 açık görev',
-    );
+    const card = page.locator('[data-project-card]').first();
+    await expect(card).toContainText('1/3 görev tamamlandı');
+    await expect(card).toContainText('%33');
     if (test.info().project.name === 'desktop') {
       await expect(page.getByRole('link', { name: 'Okul · %33' })).toBeVisible();
     }

@@ -84,6 +84,8 @@ function setup(projects: ProjectRef[] = [], tagCount = 0) {
         description: t.description,
         status: 'todo',
         priority: t.priority,
+        storyPoints: t.storyPoints ?? null,
+        assigneeId: t.assigneeId ?? null,
         startDate: t.startDate,
         due: t.due,
         completedAt: null,
@@ -288,6 +290,7 @@ function setup(projects: ProjectRef[] = [], tagCount = 0) {
     },
   };
   const deps: TaskDeps = {
+    contacts: { refs: async () => new Map() },
     tasks: repo,
     projects: {
       find: async (_s, id) => {

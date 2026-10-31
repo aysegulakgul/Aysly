@@ -47,10 +47,15 @@ test.describe('Görevlerim ve görev detayı', () => {
     await page.goto('/my-tasks');
     await expect(page.getByRole('heading', { level: 2, name: /Geciken/ })).toBeVisible();
     await expect(page.getByRole('heading', { level: 2, name: /Tarihsiz/ })).toBeVisible();
-    await expect(row(page, 'Elektrik faturasını öde')).toContainText(
-      'Ev · 5 Oca · Gecikti · ⚑ Yüksek',
-    );
-    await expect(row(page, 'Mobil görünüm testleri')).toContainText('Inbox · Tarihsiz');
+    // D-100: sütunlu satır — proje, tarih (gecikmişte tehlike renginde), öncelik rozeti.
+    const overdue = row(page, 'Elektrik faturasını öde');
+    await expect(overdue).toContainText('Ev');
+    await expect(overdue).toContainText('5 Oca');
+    await expect(overdue).toContainText('Yüksek');
+    await expect(
+      overdue.locator('.text-danger:visible', { hasText: '5 Oca' }).first(),
+    ).toBeVisible();
+    await expect(row(page, 'Mobil görünüm testleri')).toContainText('Projesiz');
 
     await page.getByRole('button', { name: 'Geciken grubunu daralt' }).click();
     await expect(row(page, 'Elektrik faturasını öde')).toHaveCount(0);
@@ -69,7 +74,7 @@ test.describe('Görevlerim ve görev detayı', () => {
     await panel.getByLabel('Başlık').press('Tab');
     await expect(page.getByText('Kaydedildi', { exact: false })).toBeVisible();
     await panel.getByLabel('Öncelik').selectOption('3');
-    await expect(row(page, 'Ana sayfa tasarımı v2')).toContainText('⚑ Yüksek');
+    await expect(row(page, 'Ana sayfa tasarımı v2')).toContainText('Yüksek');
 
     await panel.getByRole('textbox', { name: 'Etiketler' }).fill('tasarım');
     await panel.getByRole('textbox', { name: 'Etiketler' }).press('Enter');
@@ -80,7 +85,7 @@ test.describe('Görevlerim ve görev detayı', () => {
       await panel.getByLabel('Alt görev ekle').press('Enter');
       await expect(panel.getByRole('link', { name: title })).toBeVisible();
     }
-    await expect(row(page, 'Ana sayfa tasarımı v2')).toContainText('0/2 alt görev');
+    await expect(row(page, 'Ana sayfa tasarımı v2')).toContainText('0/2 ⑂');
 
     // Kalıcı
     await page.reload();
@@ -109,22 +114,25 @@ test.describe('Görevlerim ve görev detayı', () => {
     await expect(panel.getByText('2/2')).toBeVisible();
   });
 
-  test('BR-INBOX-002: Inbox’tan projeye taşıma; tarih ve öncelik korunur', async ({ page }) => {
+  test('BR-INBOX-002: projesiz görev projeye taşınır; tarih ve öncelik korunur', async ({
+    page,
+  }) => {
     const { create } = await setupUser(page);
     await create({ title: 'Garanti belgesini bul', priority: 2, due: { date: '2026-12-01' } });
-    await page.goto('/inbox');
+    await page.goto('/my-tasks');
     await page.waitForLoadState('networkidle');
     const target = row(page, 'Garanti belgesini bul');
     await target
       .getByRole('button', { name: /Projeye taşı/ })
       .first()
       .click();
-    await page.getByRole('button', { name: 'Ev' }).click();
+    await page.getByRole('button', { name: 'Ev', exact: true }).click();
     await expect(page.getByText('“Garanti belgesini bul” Ev projesine taşındı.')).toBeVisible();
-    await expect(target).toHaveCount(0);
-
-    await page.goto('/my-tasks');
-    await expect(row(page, 'Garanti belgesini bul')).toContainText('Ev · 1 Ara · ⚑ Orta');
+    await expect(target).not.toContainText('Projesiz');
+    await page.reload();
+    await expect(target).toContainText('Ev');
+    await expect(target).toContainText('1 Ara');
+    await expect(target).toContainText('Orta');
   });
 
   test('/my-tasks ve açık detay paneli erişilebilirlik taraması (AC-11)', async ({ page }) => {

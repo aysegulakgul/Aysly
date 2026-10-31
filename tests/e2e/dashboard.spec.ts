@@ -52,7 +52,7 @@ test.describe('Bugün ekranı', () => {
 
     await expect(panel(page, 'Bugün')).toContainText('Market alışverişi');
     await expect(panel(page, 'Geciken')).toContainText('Elektrik faturasını öde');
-    await expect(panel(page, 'Yaklaşan')).toContainText('İçerik toplama');
+    await expect(panel(page, 'Yaklaşan görevler')).toContainText('İçerik toplama');
     await expect(panel(page, 'Öncelikli')).toContainText('Elektrik faturasını öde');
 
     await panel(page, 'Geciken').getByRole('button', { name: 'Bugüne taşı' }).click();
@@ -97,19 +97,22 @@ test.describe('Bugün ekranı', () => {
     await expect(page.getByRole('heading', { level: 2, name: 'İlk adımlar' })).toHaveCount(0);
   });
 
-  test('FR-DASH-03: Yaklaşanlar sonraki 7 günü gün gün gösterir', async ({ page }) => {
+  test('FR-DASH-03 / D-100: Yaklaşan görevler Bugün’ün altında sonraki 7 günü gösterir; /upcoming yönlenir', async ({
+    page,
+  }) => {
     const { create } = await setup(page);
     await create({ title: 'Yarın işi', due: { date: day(1) } });
     await create({ title: 'Haftaya işi', due: { date: day(7) } });
     await create({ title: 'Uzak iş', due: { date: day(8) } });
     await page.goto('/upcoming');
-    await expect(page.getByRole('main').getByRole('heading', { level: 2 })).toHaveCount(2);
-    await expect(page.getByText('Yarın işi')).toBeVisible();
-    await expect(page.getByText('Haftaya işi')).toBeVisible();
-    await expect(page.getByText('Uzak iş')).toHaveCount(0);
+    await expect(page).toHaveURL(/\/#upcoming$|\/$/);
+    const upcoming = panel(page, 'Yaklaşan görevler');
+    await expect(upcoming).toContainText('Yarın işi');
+    await expect(upcoming).toContainText('Haftaya işi');
+    await expect(upcoming).not.toContainText('Uzak iş');
   });
 
-  test('klavye kısayolları: ?, G I, J, Ctrl+Enter ve Ctrl+Z', async ({ page }) => {
+  test('klavye kısayolları: ?, G M, J, Ctrl+Enter ve Ctrl+Z', async ({ page }) => {
     const { create } = await setup(page);
     await create({ title: 'Kısayol görevi' });
     await page.goto('/');
@@ -121,8 +124,8 @@ test.describe('Bugün ekranı', () => {
     await page.keyboard.press('Escape');
 
     await page.keyboard.press('g');
-    await page.keyboard.press('i');
-    await expect(page).toHaveURL('/inbox');
+    await page.keyboard.press('m');
+    await expect(page).toHaveURL('/my-tasks');
     await page.waitForLoadState('networkidle');
     await page.locator('body').click({ position: { x: 5, y: 5 } });
     await page.keyboard.press('j');
@@ -137,11 +140,11 @@ test.describe('Bugün ekranı', () => {
     await expect(panel(page, 'İlk adımlar')).toContainText('2/4');
   });
 
-  test('/ ve /upcoming erişilebilirlik taraması (AC-11)', async ({ page }) => {
+  test('/ ve /my-tasks erişilebilirlik taraması (AC-11)', async ({ page }) => {
     const { create } = await setup(page);
     await create({ title: 'Geciken', due: { date: day(-1) } });
     await create({ title: 'Yaklaşan', due: { date: day(1) } });
-    for (const path of ['/', '/upcoming']) {
+    for (const path of ['/', '/my-tasks']) {
       await page.goto(path);
       await expect(page.getByRole('main')).toBeVisible();
       const results = await new AxeBuilder({ page })

@@ -1,8 +1,10 @@
 import { getLocale, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
-import { getViewer } from '../viewer';
+import { findContacts } from '@/modules/contacts';
+import { getPersonalScope, getViewer } from '../viewer';
 import { NotificationBell } from './notifications/notification-center';
 import { MobileSearchButton } from './search/mobile-search-button';
+import { ShareButton } from './share-button';
 import { longDate, timeZoneCity } from './time-display';
 
 /**
@@ -20,11 +22,13 @@ export async function PageFrame({
   wide?: boolean;
   children: ReactNode;
 }) {
-  const [viewer, locale, t] = await Promise.all([
+  const [viewer, scope, locale, t] = await Promise.all([
     getViewer(),
+    getPersonalScope(),
     getLocale(),
     getTranslations('shell'),
   ]);
+  const people = scope ? await findContacts(scope) : [];
   const timeZone = viewer?.preferences.timezone ?? 'UTC';
   return (
     <>
@@ -34,12 +38,16 @@ export async function PageFrame({
         <p className="text-xs text-text-secondary">
           {`${longDate(new Date(), locale, timeZone)} · ${timeZoneCity(timeZone)}`}
         </p>
+        {/* D-100: bildirimler ve paylaş sağ üst başlıkta. */}
+        <NotificationBell timezone={timeZone} />
+        <ShareButton people={people} title={title} />
       </header>
       <header className="flex h-16 w-full shrink-0 items-center gap-3 border-b border-border px-5 lg:hidden">
         <p className="flex-1 text-xl font-semibold text-text">{title}</p>
         {/* Bildirim merkezi mobilde başlıkta (FR-NOTIF-01; Figma mobil başlıkta zil yok, D-065). */}
         <MobileSearchButton />
         <NotificationBell timezone={timeZone} />
+        <ShareButton people={people} title={title} />
       </header>
       <main className="flex w-full flex-col items-center p-5 lg:p-8">
         <div

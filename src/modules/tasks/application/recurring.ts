@@ -87,6 +87,8 @@ export async function generateNextOccurrence(
     title: completed.title,
     description: completed.description,
     priority: completed.priority,
+    storyPoints: completed.storyPoints,
+    assigneeId: completed.assigneeId,
     startDate: completed.startDate ? addDays(completed.startDate, shift) : null,
     due,
     position: generateKeyBetween(last, null),

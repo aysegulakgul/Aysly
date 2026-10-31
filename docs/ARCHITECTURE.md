@@ -152,6 +152,8 @@ Kod iş alanlarına (bounded context benzeri) göre **modüllere**, her modül *
 | `audit` | Güvenlik ve yıkıcı işlem olayları | `audit_events` |
 | `data-portability` | JSON dışa aktarma (Faz 8, D-046) | — (diğer modüllerin okuma servislerini kullanır) |
 
+**Uygulama notu (Faz 9, D-097..D-101):** `contacts` modülü kuruldu; `tasks` kişi özetlerini `contacts` modülünün `index.ts`'inden okur (`tasks → contacts`). Yorumlar `tasks` modülündedir (`task_comments`); yazar adı kimlik tablosundan parametreli SQL ile okunur. Demo verisi `scripts/db-seed-demo.ts`.
+
 **Uygulama notu (Faz 8, D-094):** `data-portability` modülü kuruldu (ham SQL okuma modeli). Hesap silme `identity` modülündedir; silme işi `instrumentation.ts`'te kaydedilir. İçerik Güvenlik Politikası `src/proxy.ts`'te üretilir.
 
 **Uygulama notu (Faz 7, D-091):** `notes`, `goals`, `search` ve `lifecycle` modülleri kuruldu. `notes` ve `goals` görev/proje referanslarını `tasks` ve `projects` modüllerinin `index.ts`'inden okur; `search` ham SQL okuma modelidir; `lifecycle` arşiv/çöp/geri yükleme ve temizliği dört tür için yönetir, görev ve proje işlemlerini `tasks`'a devreder.

@@ -28,7 +28,7 @@ test.describe('Arşiv ve çöp kutusu', () => {
   }) => {
     const { create } = await setup(page);
     const task = await create({ title: 'Arşivlenecek görev' });
-    await page.goto(`/inbox?task=${task.id}`);
+    await page.goto(`/my-tasks?task=${task.id}`);
     const panel = page.getByRole('complementary', { name: 'Görev detayı' });
     await panel.getByRole('button', { name: 'Diğer işlemler' }).click();
     await page.getByRole('button', { name: 'Arşivle', exact: true }).click();
@@ -51,7 +51,7 @@ test.describe('Arşiv ve çöp kutusu', () => {
     const { ws, create } = await setup(page);
     const parent = await create({ title: 'Silinecek görev' });
     await create({ title: 'Alt görev', parentTaskId: parent.id });
-    await page.goto(`/inbox?task=${parent.id}`);
+    await page.goto(`/my-tasks?task=${parent.id}`);
     const panel = page.getByRole('complementary', { name: 'Görev detayı' });
     await panel.getByRole('button', { name: 'Diğer işlemler' }).click();
     await page.getByRole('button', { name: 'Çöpe taşı' }).click();
@@ -66,7 +66,7 @@ test.describe('Arşiv ve çöp kutusu', () => {
     await expect(panel.getByText('Bu görev çöp kutusunda', { exact: false })).toHaveCount(0);
     await expect(
       page.getByRole('main').getByRole('listitem').filter({ hasText: 'Silinecek görev' }),
-    ).toContainText('0/1 alt görev');
+    ).toContainText('0/1 ⑂');
   });
 
   test('BR-DEL-005: kalıcı silme onay ister; çöpteki göreve API ile doğrudan erişim 404', async ({

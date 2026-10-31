@@ -14,6 +14,7 @@ import {
   unique,
   uuid,
 } from 'drizzle-orm/pg-core';
+import { contacts } from '@/modules/contacts/infrastructure/schema';
 import { users } from '@/modules/identity/infrastructure/schema';
 import { projects } from '@/modules/projects/infrastructure/schema';
 import { workspaces } from '@/modules/workspaces/infrastructure/schema';
@@ -47,6 +48,12 @@ export const tasks = pgTable(
     // Hesap silinince kişi bilgisi boşalır; kayıt sahibi çalışma alanıdır (D-068 ile aynı ilke).
     completedBy: uuid('completed_by').references(() => users.id, { onDelete: 'set null' }),
     position: text('position').notNull(),
+    // D-099 / BR-TASK-011: isteğe bağlı story point.
+    storyPoints: smallint('story_points'),
+    // D-097: atanan kişi; aynı çalışma alanında olması uygulamada denetlenir, kişi silinince boşalır.
+    assigneeContactId: uuid('assignee_contact_id').references(() => contacts.id, {
+      onDelete: 'set null',
+    }),
     // BR-REC-* (D-087): tekrar kuralı yalnızca son tarihli üst düzey görevde.
     recurrenceRule: text('recurrence_rule'),
     recurrenceMode: text('recurrence_mode'),
@@ -87,6 +94,10 @@ export const tasks = pgTable(
     // BR-TASK-003, BR-TASK-005
     check('tasks_status', sql`${t.status} in ('todo','in_progress','done')`),
     check('tasks_priority', sql`${t.priority} between 0 and 3`),
+    check(
+      'tasks_story_points',
+      sql`${t.storyPoints} is null or ${t.storyPoints} between 0 and 100`,
+    ),
     // BR-TASK-004
     check(
       'tasks_completed_consistent',
@@ -123,9 +134,34 @@ export const tasks = pgTable(
     index('tasks_parent_idx')
       .on(t.parentTaskId)
       .where(sql`${t.deletedAt} is null`),
+    index('tasks_assignee_idx')
+      .on(t.assigneeContactId)
+      .where(sql`${t.assigneeContactId} is not null`),
     index('tasks_search_idx').using('gin', t.searchVector),
     index('tasks_trash_idx')
       .on(t.workspaceId, t.deletedAt)
       .where(sql`${t.deletedAt} is not null`),
+  ],
+);
+
+/** Görev yorumları (D-099, BR-COMMENT-001). Görev silinince yorumları da silinir. */
+export const taskComments = pgTable(
+  'task_comments',
+  {
+    id: uuid('id').primaryKey(),
+    workspaceId: uuid('workspace_id').notNull(),
+    taskId: uuid('task_id').notNull(),
+    authorUserId: uuid('author_user_id').references(() => users.id, { onDelete: 'set null' }),
+    body: text('body').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    foreignKey({
+      name: 'task_comments_task_fk',
+      columns: [t.workspaceId, t.taskId],
+      foreignColumns: [tasks.workspaceId, tasks.id],
+    }).onDelete('cascade'),
+    check('task_comments_body_length', sql`char_length(btrim(${t.body})) between 1 and 5000`),
+    index('task_comments_task_idx').on(t.taskId, t.createdAt),
   ],
 );

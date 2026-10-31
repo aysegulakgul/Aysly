@@ -46,6 +46,7 @@ export {
   type TaskListView,
   type TaskView,
   type TrashGroupView,
+  findProjectBoardTasks,
 } from './http/task-queries';
 export { BULK_LIMIT, type BulkAction } from './application/bulk';
 export { DUE_GROUPS, type DueGroup } from './domain/schedule';
@@ -56,3 +57,10 @@ export {
   reassignTrashedTasks,
 } from './infrastructure/drizzle-task-repository';
 export { trashTiming } from './domain/trash';
+export {
+  deleteOneComment,
+  findComments,
+  getComments,
+  postComment,
+  type CommentView,
+} from './http/comment-handlers';

@@ -13,9 +13,7 @@ export const UNDO_EVENT = 'aysly:undo';
 
 const GO: Record<string, Route> = {
   d: '/',
-  i: '/inbox',
   m: '/my-tasks',
-  u: '/upcoming',
   c: '/calendar',
   p: '/projects',
 };
@@ -35,9 +33,7 @@ const LIST: [string, string][] = [
   ['Q', 'q'],
   ['Ctrl/⌘ + K', 'search'],
   ['G D', 'gd'],
-  ['G I', 'gi'],
   ['G M', 'gm'],
-  ['G U', 'gu'],
   ['G C', 'gc'],
   ['G P', 'gp'],
   ['J / K · ↓ / ↑', 'jk'],
@@ -97,10 +93,10 @@ export function KeyboardShortcuts({ workspaceId }: { workspaceId: string }) {
       }
       if (key === 'q') {
         event.preventDefault();
-        // AC-11: Inbox'ta zaten açıkken sayfa yeniden yüklenmez; odak doğrudan hızlı ekleme alanına geçer.
+        // AC-11 / D-098: Görevlerim'de zaten açıkken sayfa yeniden yüklenmez; odak hızlı ekleme alanına geçer.
         const quickAdd = document.querySelector<HTMLInputElement>('[data-quick-add]');
-        if (pathname === '/inbox' && quickAdd) quickAdd.focus();
-        else router.push('/inbox?add=1');
+        if (pathname === '/my-tasks' && quickAdd) quickAdd.focus();
+        else router.push('/my-tasks?add=1');
         return;
       }
       if (['j', 'k', 'arrowdown', 'arrowup'].includes(key)) {

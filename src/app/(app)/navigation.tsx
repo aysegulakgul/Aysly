@@ -7,7 +7,6 @@ import { useTranslations } from 'next-intl';
 import { Icon } from '@/ui/components/icon';
 import { BottomNav, BottomNavItem, NavItem } from '@/ui/components/nav';
 import { badge } from './badge';
-import { NotificationBell } from './notifications/notification-center';
 import { ProjectDot } from './projects/project-color';
 import { SearchButton } from './search/command-palette';
 import { SignOutButton } from './sign-out-button';
@@ -16,9 +15,7 @@ function useSection() {
   const pathname = usePathname();
   return {
     today: pathname === '/',
-    inbox: pathname === '/inbox',
     myTasks: pathname === '/my-tasks',
-    upcoming: pathname === '/upcoming',
     calendar: pathname === '/calendar',
     goals: pathname === '/goals',
     notes: pathname === '/notes',
@@ -45,18 +42,17 @@ const sectionLink = (active: boolean) =>
 /**
  * Figma UI/Sidebar (4:66491): 232 px, surface-muted zemin, 16 px iç boşluk, 12 px aralık. Faz 5: Projeler girişi,
  * "PROJELER" (renk ve ilerleme yüzdesiyle) ve "KAYITLI GÖRÜNÜMLER" bölümleri, Arşiv ve Çöp kutusu (Figma 4:67037).
- * Faz 7: Ara (Ctrl/⌘+K), Hedefler ve Notlar.
+ * Faz 7: Ara (Ctrl/⌘+K), Hedefler ve Notlar. Faz 9 (D-098, D-100): Inbox ve Yaklaşanlar sayfaları, "Görev ekle"
+ * düğmesi ve zil kenar çubuğundan kalktı; zil ve Paylaş sağ üst başlıkta.
  */
 export function Sidebar({
   userName,
   counts,
   projects,
   views,
-  timezone,
 }: {
   userName: string;
-  timezone: string;
-  counts: { inbox: number; myTasks: number; today: number; upcoming: number };
+  counts: { myTasks: number; today: number };
   projects: SidebarProject[];
   views: SidebarView[];
 }) {
@@ -67,27 +63,9 @@ export function Sidebar({
       <div className="flex h-11 w-full items-center gap-2.5">
         <Icon name="moon" tone="primary" />
         <p className="flex-1 text-xl font-semibold text-text">aysly</p>
-        <NotificationBell timezone={timezone} />
       </div>
-      {/* Figma UI/Button/Secondary "Görev ekle" (4:71820): Inbox'taki hızlı eklemeyi açar. */}
-      <Link
-        href="/inbox?add=1"
-        className="inline-flex min-h-11 items-center justify-center gap-2 self-start rounded-md border border-border bg-surface-muted px-4 py-2.5 text-base font-medium text-text"
-      >
-        <Icon name="plus" tone="primary" />
-        {t('addTask')}
-      </Link>
       <SearchButton />
       <nav aria-label={t('mainNav')} className="flex w-full flex-col gap-3">
-        <NavItem
-          href="/inbox"
-          glyph="▱"
-          active={section.inbox}
-          count={badge(counts.inbox)}
-          countLabel={t('inboxCount', { count: counts.inbox })}
-        >
-          {t('inbox')}
-        </NavItem>
         <NavItem
           href="/my-tasks"
           glyph="✓"
@@ -105,15 +83,6 @@ export function Sidebar({
           countLabel={t('todayCount', { count: counts.today })}
         >
           {t('today')}
-        </NavItem>
-        <NavItem
-          href="/upcoming"
-          glyph="▦"
-          active={section.upcoming}
-          count={badge(counts.upcoming)}
-          countLabel={t('upcomingCount', { count: counts.upcoming })}
-        >
-          {t('upcoming')}
         </NavItem>
         <NavItem href="/calendar" glyph="▦" active={section.calendar}>
           {t('calendar')}
@@ -220,7 +189,7 @@ export function Sidebar({
   );
 }
 
-/** Figma UI/BottomNav (4:69074): Bugün, Inbox, Ekle, Takvim, Menü. */
+/** Figma UI/BottomNav (4:69074): Bugün, Görevlerim, Ekle, Takvim, Menü (D-098: Inbox yerine Görevlerim). */
 export function MobileNavigation() {
   const t = useTranslations('shell');
   const section = useSection();
@@ -230,10 +199,10 @@ export function MobileNavigation() {
         <BottomNavItem href="/" glyph="☼" active={section.today}>
           {t('today')}
         </BottomNavItem>
-        <BottomNavItem href="/inbox" glyph="▱" active={section.inbox}>
-          {t('inbox')}
+        <BottomNavItem href="/my-tasks" glyph="✓" active={section.myTasks}>
+          {t('myTasks')}
         </BottomNavItem>
-        <BottomNavItem href="/inbox?add=1" glyph="⊕" accent>
+        <BottomNavItem href="/my-tasks?add=1" glyph="⊕" accent>
           {t('add')}
         </BottomNavItem>
         <BottomNavItem href="/calendar" glyph="▦" active={section.calendar}>

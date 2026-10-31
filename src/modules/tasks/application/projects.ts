@@ -2,7 +2,8 @@ import type { Progress, Project, ProjectStatus } from '@/modules/projects';
 import { authorize, type WorkspaceScope } from '@/modules/workspaces';
 import { businessRule, notFound, type DomainError } from '@/shared/kernel/errors';
 import { err, ok, type Result } from '@/shared/kernel/result';
-import type { Task } from '../domain/task';
+import { TASK_STATUSES, type Task } from '../domain/task';
+import { summarize, type TaskSummary } from './organize';
 import type { TaskDeps } from './tasks';
 
 /**
@@ -173,4 +174,26 @@ export async function archiveContents(
       project: { id: task.projectId, name: names.get(task.projectId) ?? '' },
     })),
   });
+}
+
+/**
+ * D-100: Projeler panosu — standart projelerin üst düzey görevleri (tamamlananlar dahil) özetleriyle (alt görev
+ * sayısı, atanan, etiketler). Çöpteki ve arşivdeki görevler dahil değildir.
+ */
+export async function projectBoardTasks(
+  deps: TaskDeps,
+  scope: WorkspaceScope,
+  projectIds: readonly string[],
+): Promise<Result<TaskSummary[], DomainError>> {
+  const allowed = authorize(scope, 'task.read');
+  if (!allowed.ok) return allowed;
+  if (projectIds.length === 0) return ok([]);
+  const tasks = await deps.tasks.query(scope, {
+    projectIds,
+    statuses: TASK_STATUSES,
+    includeArchived: false,
+    topLevelOnly: true,
+  });
+  const projects = new Map((await deps.projects.listActive(scope)).map((p) => [p.id, p]));
+  return ok(await summarize(deps, scope, tasks, projects));
 }

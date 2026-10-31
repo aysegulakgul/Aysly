@@ -23,7 +23,8 @@ export function useTaskMeta(context: TaskUiContext) {
   const t = useTranslations('tasks');
   const locale = useLocale();
   return (task: TaskView) => {
-    const parts = [task.project.name];
+    // D-098: Inbox projesi kullanıcıya 'Projesiz' olarak görünür.
+    const parts = [task.project.kind === 'inbox' ? t('table.noProject') : task.project.name];
     if (task.due) {
       parts.push(
         task.due.date === context.today ? t('row.today') : shortDate(task.due.date, locale),

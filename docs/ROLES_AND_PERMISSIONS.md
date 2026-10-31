@@ -58,6 +58,7 @@
 | `project.read` / `project.create` / `project.update` / `project.archive` / `project.delete` / `project.restore` / `project.purge` | Proje işlemleri |
 | `task.read` / `task.create` / `task.update` / `task.complete` / `task.archive` / `task.delete` / `task.restore` / `task.purge` | Görev işlemleri |
 | `tag.manage` | Etiket oluşturma/yeniden adlandırma/silme |
+| `contact.manage` | Kişi ekleme/düzenleme/silme (D-097); kişileri okumak `task.read` ile |
 | `note.*`, `goal.*` | Görevle aynı alt izinler |
 | `view.manage_own` | Kendi kayıtlı görünümleri |
 | `trash.empty` | Çöpü boşaltma |

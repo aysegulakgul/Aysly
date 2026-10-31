@@ -64,6 +64,13 @@
       "when": 1793375128412,
       "tag": "0008_search_vectors",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793452260159,
+      "tag": "0009_contacts_points_comments",
+      "breakpoints": true
     }
   ]
 }

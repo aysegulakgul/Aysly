@@ -15,7 +15,7 @@ import { Popover, PopoverClose } from '@/ui/components/popover';
 import { Progress } from '@/ui/components/progress';
 import { ProjectDot } from '../project-color';
 import { ProjectFormDialog } from '../project-form';
-import { percentOf } from '../projects-list';
+import { percentOf } from '../projects-board';
 import { updatedWhen } from '../when';
 
 type Preview = { tasks: number; topLevel: number; subtasks: number };

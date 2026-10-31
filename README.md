@@ -18,11 +18,11 @@ Ayrıntılı durum: [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 
 ## Özellikler
 
-Şu an çalışanlar (Faz 1–8):
+Şu an çalışanlar (Faz 1–9):
 - **Hesap:** E-posta doğrulamalı kayıt, giriş, şifre sıfırlama, oturum ve cihaz yönetimi, profil.
 - **İlk kullanım:** Kullanım amacı ve tercihlere göre kurulum rehberi; "İlk adımlar" listesi.
 - **Tercihler:** Dil, saat dilimi, hafta başlangıcı, saat biçimi, tema.
-- **Görevler:** Inbox ve hızlı ekleme; tarih/saat (saat dilimi ve yaz saati geçişleri dahil), öncelik, açıklama, etiketler, alt görevler; projeye taşıma; tamamlama ve 5 saniyelik "Geri al".
+- **Görevler:** Görevlerim (tarihe ya da projeye göre bölümler, renkli rozetler) ve hızlı ekleme; tarih/saat (saat dilimi ve yaz saati geçişleri dahil), öncelik, açıklama, etiketler, alt görevler; projeye taşıma; tamamlama ve 5 saniyelik "Geri al".
 - **Görünümler:** Bugün (Bugün, Geciken, Yaklaşan, Öncelikli bölümleri; düzenlenebilir), Görevlerim (tarihe göre gruplu), Yaklaşanlar (7 gün), görev detay paneli.
 - **Projeler:** Oluşturma, düzenleme (ad, açıklama, renk), durum (Aktif / Beklemede / Tamamlandı), ilerleme, manuel sıra, arşivleme; silindiğinde görevleriyle birlikte çöpe gider ve birlikte geri yüklenir.
 - **Liste ve pano:** Proje sayfasında Liste (gruplama) ve Pano (masaüstünde sürükle-bırak, her cihazda kart menüsü); ortak filtreler, sıralama, kayıtlı görünümler; çoklu seçim ve toplu işlemler.
@@ -34,6 +34,8 @@ Ayrıntılı durum: [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 - **Notlar:** Başlık, liste, yapılacak listesi, bağlantı ve kod destekleyen editör; otomatik kayıt, çevrimdışı yerel taslak, çatışma kopyası; sabitleme; görev ve projelere bağlama.
 - **Hedefler:** Bağlı görevlerden otomatik ya da elle girilen ilerleme; "Ulaşıldı" önerisi; Aktif / Ulaşılan / Vazgeçilen sekmeleri; panoda Hedefler ve Projeler widget'ları.
 - **Arama:** `Ctrl/⌘+K` ile görev, proje, not ve hedeflerde Türkçe harflerden bağımsız arama.
+- **Ekip ve iş birliği (yerel):** Kişiler listesi, görevlere kişi atama, story point ve bölüm toplamları, görev yorumları, sağ üstte Paylaş (bağlantı kopyalama, e-posta taslağıyla davet).
+- **Projeler panosu:** Projeler durum sütunlarında renkli kartlarla; görevler statüleri ve alt görev sayılarıyla.
 - **Veri ve gizlilik:** Tüm verileri JSON olarak indirme; 14 gün içinde iptal edilebilen hesap silme.
 - **Klavye kısayolları:** `Q`, `G D/I/M/U`, `J/K`, `T/M/L`, `Ctrl/⌘+Z`, `Ctrl/⌘+K`, `?` rehberi.
 
@@ -95,6 +97,7 @@ Uygulama yalnızca bu bilgisayarda (yerel) çalışır; hosting veya ücretli se
 | `pnpm test` / `pnpm test:integration` / `pnpm test:e2e` | Birim / gerçek veritabanlı entegrasyon / tarayıcı testleri |
 | `pnpm db:backup` | Yerel veritabanını `backups/` klasörüne yedekler (son 7 yedek saklanır) |
 | `pnpm db:restore backups/<dosya>.dump` | Önce güncel yedeği alır, sonra seçilen yedeği geri yükler |
+| `pnpm db:seed-demo` | Demo hesabı oluşturur ve tüm ekranları örnek veriyle doldurur (`demo@aysly.local` / `aysly demo 2026`); varsa önce demo hesabını siler, diğer hesaplara dokunmaz |
 | `pnpm db:restore-drill` | Geri yükleme denemesi: yedeği geçici bir veritabanına yükleyip karşılaştırır; asıl veritabanına dokunmaz |
 | `pnpm arch` | Mimari katman kurallarını denetler |
 

@@ -1,27 +1,29 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
-import { findMyTasks, findTaskDetail } from '@/modules/tasks';
-import { Icon } from '@/ui/components/icon';
+import { findMyTasks, findTaskDetail, type TaskView } from '@/modules/tasks';
+import { cn } from '@/ui/cn';
 import { getPersonalScope, getViewer } from '../../viewer';
 import { PageFrame } from '../page-frame';
+import { QuickCapture } from '../tasks/quick-capture';
 import { buildTaskContext } from '../tasks/task-context.server';
 import { TaskDetailPanel } from '../tasks/task-detail';
-import { MyTaskGroups } from './my-task-groups';
+import { MyTaskTable, type TaskSection } from './my-task-table';
+import { sectionDueDate } from './sections';
 
 /**
- * Görevlerim (Figma 4:66732): son tarihe göre gruplu açık görevler (BR-INBOX-004, BR-DATE-003/004).
- * Pano ve Takvim sekmeleri, filtre ve gruplama seçimi ilgili fazlarda gelir (Faz 5–6).
+ * Görevlerim (D-098, D-100): Inbox ile birleşik tek görev ekranı. Hızlı ekleme (BR-INBOX-001: projesiz görev),
+ * tarihe ya da projeye göre bölümler (`?group=project`), satır başına atanan, tarih, proje, öncelik, statü ve
+ * story point; bölüm başına ekleme ve puan toplamı. `?task=` yan panelde görev detayını açar.
  */
 export default async function MyTasksPage({
   searchParams,
 }: {
-  searchParams: Promise<{ task?: string }>;
+  searchParams: Promise<{ task?: string; add?: string; group?: string }>;
 }) {
-  const [viewer, scope, t, tShell, query] = await Promise.all([
+  const [viewer, scope, t, query] = await Promise.all([
     getViewer(),
     getPersonalScope(),
-    getTranslations('tasks.myTasks'),
-    getTranslations('shell'),
+    getTranslations('tasks'),
     searchParams,
   ]);
   if (!viewer || !scope) return null;
@@ -30,24 +32,54 @@ export default async function MyTasksPage({
     buildTaskContext(viewer, scope),
     query.task ? findTaskDetail(scope, query.task) : null,
   ]);
-  const count = groups.reduce((n, g) => n + g.tasks.length, 0);
+  const byProject = query.group === 'project';
+  const all = groups.flatMap((g) => g.tasks);
+  const sections: TaskSection[] = byProject
+    ? context.projects.map((p) => ({
+        key: p.id,
+        title: p.kind === 'inbox' ? t('table.noProject') : p.name,
+        add: { projectId: p.id },
+        tasks: all.filter((task: TaskView) => task.projectId === p.id),
+      }))
+    : groups.map((g) => ({
+        key: g.group,
+        title: t(`groups.${g.group}`),
+        add: { dueDate: sectionDueDate(g.group, context.today) },
+        tasks: g.tasks,
+      }));
+  const tab = (active: boolean) =>
+    cn(
+      'flex min-h-9 items-center rounded-sm px-3 text-sm',
+      active ? 'bg-support-1 font-medium text-primary' : 'text-text-secondary',
+    );
   return (
-    <PageFrame title={t('title')}>
-      <div className="flex w-full items-start gap-4">
-        <div className="flex flex-1 flex-col gap-2">
-          <h1 className="text-xl font-semibold text-text">{t('title')}</h1>
-          <p className="text-sm text-text-secondary">{t('subtitle', { count })}</p>
+    <PageFrame title={t('myTasks.title')} wide>
+      <div className="flex w-full flex-wrap items-end gap-4">
+        <div className="flex flex-1 flex-col gap-1">
+          <h1 className="text-xl font-semibold text-text">{t('myTasks.title')}</h1>
+          <p className="text-sm text-text-secondary">
+            {t('myTasks.subtitle', { count: all.length })}
+          </p>
         </div>
-        {/* BR-INBOX-001: bağlamsız ekleme Inbox'a gider. */}
-        <Link
-          href="/inbox?add=1"
-          className="inline-flex min-h-11 items-center gap-2 rounded-md bg-primary px-4 py-2.5 text-base font-medium text-on-primary"
-        >
-          <Icon name="plus" />
-          {tShell('addTask')}
-        </Link>
+        <nav aria-label={t('table.groupBy')} className="flex gap-1">
+          <Link
+            href="/my-tasks"
+            aria-current={byProject ? undefined : 'page'}
+            className={tab(!byProject)}
+          >
+            {t('table.byDate')}
+          </Link>
+          <Link
+            href="/my-tasks?group=project"
+            aria-current={byProject ? 'page' : undefined}
+            className={tab(byProject)}
+          >
+            {t('table.byProject')}
+          </Link>
+        </nav>
       </div>
-      <MyTaskGroups groups={groups} context={context} />
+      <QuickCapture context={context} autoFocus={query.add === '1'} />
+      <MyTaskTable sections={sections} context={context} />
       {query.task ? <TaskDetailPanel detail={detail} context={context} /> : null}
     </PageFrame>
   );
