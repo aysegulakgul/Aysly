@@ -78,11 +78,13 @@ export function GoalsWorkspace({
           )}
         >
           {goals.length === 0 ? (
-            <EmptyState
-              icon={<Icon name="inbox" />}
-              title={t('emptyTitle')}
-              description={t('emptyDescription')}
-            />
+            <li>
+              <EmptyState
+                icon={<Icon name="inbox" />}
+                title={t('emptyTitle')}
+                description={t('emptyDescription')}
+              />
+            </li>
           ) : (
             goals.map((g) => (
               <li key={g.id}>

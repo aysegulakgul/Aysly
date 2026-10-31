@@ -21,6 +21,28 @@ Bu dosya, **ürün sahibinin kararını bekleyen** konuların tek kaynağıdır.
 |---|---|---|---|---|
 | OQ-032 | Yayına alma (hosting, alan adı, e-posta sağlayıcı, hata izleme, yedekleme) | Yayın kararı (MVP sonrası) | Şimdi karar gerekmiyor | AÇIK (ertelendi) |
 
+### OQ-043 — Silme talebinden sonraki 14 günde giriş — KAPANDI (D-092: seçenek A)
+
+**Bağlam.** BR-ACC-005: talepten sonra oturumlar kapanır, bildirimler durur; iptal "14 gün içinde giriş yapılınca sunulan seçenekle" yapılır (USER_FLOWS §3.10). Kullanıcının iptal etmeden uygulamayı kullanmaya devam edip edemeyeceği yazılı değil.
+
+| Seçenek | Sonuç |
+|---|---|
+| A. Girişte yalnızca "Hesabın silinmek üzere (tarih)" ekranı: [Silmeyi iptal et] [Çıkış yap]. İptal etmeden uygulamaya girilemez. | Silinmek üzere olan hesapta veri değişmez; davranış net. **Önerilen.** |
+| B. Uygulama normal açılır, üstte kalıcı uyarı bandı ve iptal düğmesi. | Kullanıcı 14 gün boyunca çalışmaya devam edebilir; silinecek veriye yeni kayıt eklenir. |
+
+**Engellediği:** Faz 8 hesap silme akışı.
+
+### OQ-044 — Ekran okuyucu manuel testi (AC-11, NFR-04) — KAPANDI (D-093: seçenek A)
+
+**Bağlam.** Faz 8 kapsamı "ekran okuyucu manuel testleri" içerir. Claude ekran okuyucu çalıştırıp sesli çıktıyı dinleyemez; otomatik taramaları (axe) ve yalnızca klavyeyle E2E testlerini yapabilir.
+
+| Seçenek | Sonuç |
+|---|---|
+| A. Claude otomatik denetimi tüm sayfalara genişletir ve kısa bir kontrol listesi hazırlar; ürün sahibi ücretsiz NVDA ile listeyi (~20 dk) uygular, bulguları Claude düzeltir. | AC-11 tam karşılanır. **Önerilen.** |
+| B. Yalnızca otomatik denetim; manuel ekran okuyucu testi yayına alma öncesine ertelenir. | Faz 8 daha hızlı kapanır; ekran okuyucu deneyimi doğrulanmamış kalır. |
+
+**Engellediği:** Faz 8 kapanışı (geliştirmeyi engellemez).
+
 ### OQ-042 — Not editörü paketi — KAPANDI (D-090: seçenek A)
 
 **Bağlam.** D-042 sade, Markdown tabanlı bir editör ister: başlık, liste, yapılacak listesi, bağlantı, kod. İçerik Markdown olarak saklanır. Paket seçimi plan gereği Faz 7 başında sunulur. Figma Notlar ekranı (`4:67588`) notu biçimlenmiş hâliyle gösterir: başlıklar, madde işaretleri. Ekranda ham Markdown işaretleri görünmez.
@@ -165,5 +187,7 @@ D-045 gereği şimdilik yalnızca yerel ortam kullanılıyor. Yayına alma karar
 | OQ-040 | Toplu işlem kapsamı | Tamamla, taşı, durum, öncelik, tarih, etiket, arşivle, çöpe taşı. | D-084 |
 | OQ-041 | Etiket yönetimi | Faz 5'te Ayarlar · Etiketler. | D-085 |
 | OQ-042 | Not editörü paketi | Tiptap; içerik Markdown olarak saklanır. | D-090 |
+| OQ-043 | Silme talebinden sonraki 14 günde giriş | Girişte yalnızca "Silmeyi iptal et / Çıkış yap" ekranı; iptal etmeden uygulamaya girilemez. | D-092 |
+| OQ-044 | Ekran okuyucu manuel testi | Claude otomatik denetim + kontrol listesi; ürün sahibi NVDA ile uygular. | D-093 |
 
 Kapanan soruların değerlendirilen seçenekleri DECISIONS.md'deki ilgili kaydın "Alternatifler" alanında özetlenmiştir.

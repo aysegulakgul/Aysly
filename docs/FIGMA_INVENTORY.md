@@ -42,7 +42,7 @@
 |---|---|---|
 | Giriş, kayıt, şifremi unuttum, şifre sıfırlama, e-posta doğrulama | FR-AUTH-01..05, D-055 | 3 |
 | Onboarding adımları ve başlangıç projeleri | ONBOARDING §2–3, D-063 | 3 |
-| Ayarlar: Profil, Tarih ve saat, Bildirimler, Güvenlik (şifre, oturumlar), Veri ve gizlilik (dışa aktarma, hesap silme) | FR-SET, D-036, D-046 | 3, 8 |
+| Ayarlar: Profil, Tarih ve saat, Bildirimler, Güvenlik (şifre, oturumlar), Veri ve gizlilik (dışa aktarma, hesap silme) | FR-SET, D-036, D-046 | 3, 8 (Veri ve gizlilik ile "Hesabın silinmek üzere" ekranı kuruldu, onaya sunuldu) |
 | Bildirim merkezi, Ayarlar · Bildirimler, hatırlatıcı ve tekrar düzenleyicileri, takvim Ay görünümü | FR-NOTIF-01, FR-NOTIF-04, BR-REM, BR-REC, FR-CAL-01 | 6 (kuruldu, onaya sunuldu) |
 | Arşiv ve Çöp kutusu sayfaları | FR-SET-06/07, BR-DEL-* | 5 (kuruldu, onaya sunuldu) |
 | Hedef detayı (bağlı görev/projeler) | FR-GOAL-02 | 7 |

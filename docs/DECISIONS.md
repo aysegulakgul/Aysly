@@ -475,6 +475,35 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - **Arayüz:** `/notes` ve `/goals` liste + detay (detay URL parametresiyle: `?note=`, `?goal=`); `Ctrl/⌘+K` komut paleti; görev detayında ve proje sayfasında "Bağlı kayıtlar"; panoda Projeler ve Hedefler widget'ları; arşiv sayfasında Notlar ve Hedefler sekmeleri.
 - **Süreç notu:** 0007 ve not alanı kodu paralel bir oturumda başladı; çakışan şema dışa aktarımları birleştirildi, uygulanmış 0007 korundu.
 
+
+### D-092 — Silme talebi sürerken giriş (OQ-043)
+- Durum: ONAYLI · Tarih: 2026-10-30 · Karar veren: Ürün sahibi ("İkisi de A")
+- Karar: Silme talebinden sonraki 14 gün içinde giriş yapan kullanıcı yalnızca "Hesabın şu tarihte silinecek" ekranını görür: [Silmeyi iptal et] [Çıkış yap]. İptal etmeden uygulamaya ve API'ye erişilemez; silinecek hesaba yeni veri eklenmez.
+- Sonuçlar: BR-ACC-005, USER_FLOWS §3.10.
+
+### D-093 — Ekran okuyucu testi (OQ-044)
+- Durum: ONAYLI · Tarih: 2026-10-30 · Karar veren: Ürün sahibi ("İkisi de A")
+- Karar: Claude otomatik erişilebilirlik taramasını tüm sayfalara genişletir, yalnızca klavyeyle E2E testlerini yazar ve kısa bir ekran okuyucu kontrol listesi hazırlar. Ürün sahibi listeyi NVDA ile uygular; bulguları Claude düzeltir. Faz 8 kapanışı bu kontrolün sonucunu içerir.
+- Sonuçlar: AC-11, NFR-04, TESTING_STRATEGY §6.
+
+
+### D-094 — Dışa aktarma, hesap silme, güvenlik ve performansın uygulama ayrıntıları (Faz 8)
+- Durum: ONAYLI · Tarih: 2026-10-31 · Karar veren: Claude (uygulama ayrıntısı; ürün davranışı D-036, D-046, D-055, D-059, D-092'ye uygun)
+- **`data-portability` modülü:** `POST /me/export` ham SQL okuma modeliyle (search modülündeki gibi) tek, salt okunur, `repeatable read` işlemde anlık görüntü alır. Biçim `{ format: "aysly-export", version: 1, exportedAt, profile, preferences, workspace, content }`; `content` alan adları veritabanı kolon adlarıdır (snake_case). Arama kolonu ve tekrarlanan `workspace_id` çıkarılır; bildirimler yalnızca aktörünkiler. Yanıt bellekte üretilir (akış yok): 15.000 kayıt ≈ 8 MB, ≈ 0,5 sn. Denetim olayı `account.export`.
+- **Hesap silme:** `users.deletion_requested_at` (migration 0001'den beri var) Better Auth `additionalFields` ile oturumla birlikte okunur. Talep sürerken `apiRoute` her uç noktayı `403 ACCOUNT_DELETION_PENDING` ile reddeder; yalnızca `DELETE /me/deletion` açıktır. Sayfalar `/account-deletion`'a yönlenir. Silme işi (`accounts.purge`, saatlik ve açılışta) kullanıcı satırını siler; içerik yabancı anahtar zinciriyle gider. Denetim kayıtları, sıfırlama kayıtları ve hız sınırı sayaçları açıkça temizlenir; geriye yalnızca kimliksiz `account.deleted` olayı kalır. Kimlik modülü `composition.ts`'e bağımlı olduğu için iş `instrumentation.ts`'te kaydedilir.
+- **CSP:** `src/proxy.ts` (Next.js 16) her sayfa isteğinde nonce üretir: `script-src 'self' 'nonce-…' 'strict-dynamic'`, `object-src 'none'`, `base-uri 'none'`, `frame-ancestors 'none'`, `form-action 'self'`. `style-src` için `'unsafe-inline'` gerekir (React `style` öznitelikleri, Radix konumlandırması, editör); script çalıştırmaz.
+- **Gizli anahtar taraması:** `scripts/secret-scan.mjs` (gitleaks eşdeğeri, ek paket yok) `pnpm verify`'ın bir adımıdır. Bilerek yazılmış test değeri satırında `secret-scan: izinli — <gerekçe>` işareti gerekir.
+- **Performans (NFR-01/03):** 10.000 görevle "Görevlerim" ve "Bugün" 300 ms'yi aşıyordu. Düzeltmeler: görev ve proje sorguları `search_vector` kolonunu okumaz; büyük kimlik listeleri tek dizi parametresiyle gider (`anyUuid`); pano yalnızca gösterilecek görevleri özetler; gruplamadaki karesel dizi kopyalama kaldırıldı. Sayfalama gerekmedi.
+- **Geri yükleme denemesi:** `pnpm db:restore-drill` asıl veritabanına dokunmadan yedeği geçici veritabanına yükler, tablo satır sayılarını karşılaştırır ve geçici veritabanını siler.
+- **Erişilebilirlik:** Tüm uygulama sayfaları masaüstünde ve mobilde axe ile taranır; yalnızca klavyeyle görev ekleme, tamamlama, taşıma ve silme testi var. Taramanın bulduğu iki sorun düzeltildi: boş Hedefler listesinde `<li>`'siz öğe; Inbox açıkken `Q`'nun hızlı ekleme alanına odaklanmaması.
+
+
+### D-095 — Not içeriğinin sunucuda temizlenmesi ve ayrı migration kullanıcısı (Faz 8 güvenlik denetimi)
+- Durum: ONAYLI · Tarih: 2026-10-31 · Karar veren: Ürün sahibi ("Önerileri onayla")
+- Karar 1: SECURITY §5'teki "sunucu, kaydederken de tehlikeli HTML'i temizler" maddesi kaldırıldı. Not gövdesi Markdown olarak değiştirilmeden saklanır; güvenlik, gösterimin her yerde `SafeMarkdown` (rehype-sanitize) ile yapılmasına dayanır (XSS yük testleri). Gerekçe: kaydederken temizlemek kod örneklerini bozar.
+- Karar 2: SECURITY §2'deki "ayrı migration kullanıcısı" [MVP] → [YAYIN]. Tek kullanıcılı yerel ortamda pratik faydası yok; mevcut veritabanında elle değişiklik gerektirir (D-061 ilkesi).
+- Sonuçlar: SECURITY §2, §5; API_CONTRACTS §9.
+
 ---
 
 ## 5. Faz kapanış kayıtları

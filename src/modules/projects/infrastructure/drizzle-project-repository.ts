@@ -1,4 +1,15 @@
-import { and, asc, desc, eq, inArray, isNotNull, isNull, lt, sql } from 'drizzle-orm';
+import {
+  getTableColumns,
+  and,
+  asc,
+  desc,
+  eq,
+  inArray,
+  isNotNull,
+  isNull,
+  lt,
+  sql,
+} from 'drizzle-orm';
 import type { WorkspaceScope } from '@/modules/workspaces';
 import type { DbExecutor } from '@/shared/db/client';
 import { isUuid } from '@/shared/kernel/id';
@@ -6,7 +17,11 @@ import type { ProjectRepository } from '../application/projects';
 import type { Project, ProjectColor, ProjectStatus } from '../domain/project';
 import { projects } from './schema';
 
-type Row = typeof projects.$inferSelect;
+/** Satır kolonları; arama kolonu (`search_vector`, D-091) yalnızca arama sorgularında okunur. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- kolon bilerek dışarıda bırakılır
+const { searchVector: _searchVector, ...projectRow } = getTableColumns(projects);
+
+type Row = Omit<typeof projects.$inferSelect, 'searchVector'>;
 
 // Değerler veritabanı CHECK kısıtlarıyla sınırlıdır (schema.ts).
 export function toProject(row: Row): Project {
@@ -56,7 +71,7 @@ export function createDrizzleProjectRepository(db: DbExecutor): ProjectRepositor
     async findById(scope, id) {
       if (!isUuid(id)) return null;
       const [row] = await db
-        .select()
+        .select(projectRow)
         .from(projects)
         .where(and(inScope(scope), eq(projects.id, id)))
         .limit(1);
@@ -74,7 +89,7 @@ export function createDrizzleProjectRepository(db: DbExecutor): ProjectRepositor
 
     async list(scope, filter) {
       const rows = await db
-        .select()
+        .select(projectRow)
         .from(projects)
         .where(
           and(
@@ -108,7 +123,7 @@ export async function findAnyProject(
 ): Promise<Project | null> {
   if (!isUuid(id)) return null;
   const [row] = await db
-    .select()
+    .select(projectRow)
     .from(projects)
     .where(and(eq(projects.workspaceId, scope.workspaceId), eq(projects.id, id)))
     .limit(1);
@@ -171,7 +186,7 @@ export async function listTrashedProjects(
 ): Promise<Project[]> {
   if (batchId !== undefined && !isUuid(batchId)) return [];
   const rows = await db
-    .select()
+    .select(projectRow)
     .from(projects)
     .where(
       and(

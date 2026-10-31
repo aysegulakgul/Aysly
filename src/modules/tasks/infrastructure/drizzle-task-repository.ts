@@ -1,4 +1,5 @@
 import {
+  getTableColumns,
   and,
   asc,
   count,
@@ -13,6 +14,7 @@ import {
   sql,
 } from 'drizzle-orm';
 import type { WorkspaceScope } from '@/modules/workspaces';
+import { anyUuid } from '@/shared/db/any-uuid';
 import type { DbExecutor } from '@/shared/db/client';
 import { isUuid } from '@/shared/kernel/id';
 import type { TaskChanges, TaskRepository } from '../application/ports';
@@ -20,7 +22,11 @@ import type { Recurrence, RecurrenceMode } from '../domain/recurrence';
 import type { Priority, Task, TaskStatus } from '../domain/task';
 import { tasks } from './schema';
 
-type Row = typeof tasks.$inferSelect;
+/** Satır kolonları; arama kolonu (`search_vector`, D-091) yalnızca arama sorgularında okunur. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- kolon bilerek dışarıda bırakılır
+const { searchVector: _searchVector, ...taskRow } = getTableColumns(tasks);
+
+type Row = Omit<typeof tasks.$inferSelect, 'searchVector'>;
 
 // Değerler veritabanı CHECK kısıtlarıyla sınırlıdır (schema.ts).
 function toTask(row: Row): Task {
@@ -125,7 +131,7 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
     async findById(scope, id) {
       if (!isUuid(id)) return null;
       const [row] = await db
-        .select()
+        .select(taskRow)
         .from(tasks)
         .where(and(inScope(scope), eq(tasks.id, id)))
         .limit(1);
@@ -159,7 +165,7 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
 
     async list(scope, filter) {
       const rows = await db
-        .select()
+        .select(taskRow)
         .from(tasks)
         .where(
           and(
@@ -177,7 +183,7 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
     async query(scope, q) {
       if (q.projectIds.length === 0 || q.statuses.length === 0) return [];
       const rows = await db
-        .select()
+        .select(taskRow)
         .from(tasks)
         .where(
           and(
@@ -208,7 +214,7 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
             inScope(scope),
             isNull(tasks.archivedAt),
             isNull(tasks.parentTaskId),
-            inArray(tasks.projectId, [...projectIds]),
+            anyUuid(tasks.projectId, projectIds),
           ),
         )
         .groupBy(tasks.projectId);
@@ -261,7 +267,7 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
 
     async listArchived(scope) {
       const rows = await db
-        .select()
+        .select(taskRow)
         .from(tasks)
         .where(and(inScope(scope), isNotNull(tasks.archivedAt)))
         .orderBy(desc(tasks.archivedAt));
@@ -287,7 +293,7 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
     async listOpenInProjects(scope, projectIds) {
       if (projectIds.length === 0) return [];
       const rows = await db
-        .select()
+        .select(taskRow)
         .from(tasks)
         .where(
           and(
@@ -304,7 +310,7 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
 
     async listSubtasks(scope, parentId) {
       const rows = await db
-        .select()
+        .select(taskRow)
         .from(tasks)
         .where(and(inScope(scope), eq(tasks.parentTaskId, parentId)))
         .orderBy(asc(tasks.position), asc(tasks.id));
@@ -322,11 +328,7 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
         })
         .from(tasks)
         .where(
-          and(
-            inScope(scope),
-            isNull(tasks.archivedAt),
-            inArray(tasks.parentTaskId, [...parentIds]),
-          ),
+          and(inScope(scope), isNull(tasks.archivedAt), anyUuid(tasks.parentTaskId, parentIds)),
         )
         .groupBy(tasks.parentTaskId);
       for (const row of rows) {
@@ -383,7 +385,7 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
     async findAny(scope, id) {
       if (!isUuid(id)) return null;
       const [row] = await db
-        .select()
+        .select(taskRow)
         .from(tasks)
         .where(and(eq(tasks.workspaceId, scope.workspaceId), eq(tasks.id, id)))
         .limit(1);
@@ -449,7 +451,7 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
     async batchMembers(scope, batchId) {
       if (!isUuid(batchId)) return [];
       const rows = await db
-        .select()
+        .select(taskRow)
         .from(tasks)
         .where(
           and(
@@ -463,7 +465,7 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
 
     async listTrash(scope) {
       const rows = await db
-        .select()
+        .select(taskRow)
         .from(tasks)
         .where(and(eq(tasks.workspaceId, scope.workspaceId), isNotNull(tasks.deletedAt)))
         .orderBy(desc(tasks.deletedAt));
@@ -472,7 +474,7 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
 
     async findGeneratedFrom(scope, id) {
       const [row] = await db
-        .select()
+        .select(taskRow)
         .from(tasks)
         .where(and(inScope(scope), eq(tasks.recurrenceGeneratedFrom, id)))
         .limit(1);

@@ -37,7 +37,8 @@ export function getEmailSender(): EmailSender {
 let scheduler: Scheduler | undefined;
 /**
  * Bakım işleri (D-053). Kayıtlı: idempotency temizliği (D-019), 30 günlük çöp temizliği (BR-DEL-003).
- * 90 günlük bildirim temizliği (BR-NOTIF-003). Hesap silme Faz 8'de buraya kaydedilir.
+ * 90 günlük bildirim temizliği (BR-NOTIF-003). Hesap silme işi (BR-ACC-005) kimlik modülü bu dosyaya bağımlı olduğu
+ * için `instrumentation.ts`'te kaydedilir.
  */
 export function getScheduler(): Scheduler {
   if (!scheduler) {

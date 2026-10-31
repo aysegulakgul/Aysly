@@ -7,5 +7,8 @@ export async function register() {
   const { env } = await import('@/shared/config/env');
   if (!env().SCHEDULER_ENABLED) return;
   const { getScheduler } = await import('@/shared/composition');
-  getScheduler().start();
+  const { accountDeletionJob } = await import('@/modules/identity');
+  const scheduler = getScheduler();
+  scheduler.register(accountDeletionJob()); // BR-ACC-005
+  scheduler.start();
 }

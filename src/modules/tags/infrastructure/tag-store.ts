@@ -1,5 +1,6 @@
 import { and, asc, count, eq, inArray, ne, notInArray, sql } from 'drizzle-orm';
 import type { WorkspaceScope } from '@/modules/workspaces';
+import { anyUuid } from '@/shared/db/any-uuid';
 import type { DbExecutor } from '@/shared/db/client';
 import { uuidv7 } from '@/shared/kernel/id';
 import { normalizeTagName } from '../domain/tag';
@@ -170,7 +171,7 @@ export async function findTagsForTasks(
     .select({ taskId: taskTags.taskId, id: tags.id, name: tags.name, color: tags.color })
     .from(taskTags)
     .innerJoin(tags, eq(tags.id, taskTags.tagId))
-    .where(and(eq(taskTags.workspaceId, scope.workspaceId), inArray(taskTags.taskId, [...taskIds])))
+    .where(and(eq(taskTags.workspaceId, scope.workspaceId), anyUuid(taskTags.taskId, taskIds)))
     .orderBy(asc(tags.name));
   for (const { taskId, ...tag } of rows) {
     result.set(taskId, [...(result.get(taskId) ?? []), tag]);

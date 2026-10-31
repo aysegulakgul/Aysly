@@ -39,6 +39,27 @@
     },
     {
       "method": "POST",
+      "path": "/api/v1/me/export",
+      "access": "self",
+      "body": {
+        "currentPassword": "yanlis sifre 123"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/me/deletion",
+      "access": "self",
+      "body": {
+        "currentPassword": "yanlis sifre 123"
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/me/deletion",
+      "access": "self"
+    },
+    {
+      "method": "POST",
       "path": "/api/v1/me/email",
       "access": "self",
       "body": {

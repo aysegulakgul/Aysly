@@ -123,6 +123,7 @@ export function QuickCapture({
           onKeyDown={onKeyDown}
           placeholder={t('quickAdd.placeholder')}
           autoFocus={autoFocus}
+          data-quick-add
           maxLength={500}
           aria-invalid={fieldError ? true : undefined}
           aria-describedby={fieldError ? `${inputId}-error` : undefined}

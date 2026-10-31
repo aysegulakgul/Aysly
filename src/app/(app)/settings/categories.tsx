@@ -8,8 +8,8 @@ import { cn } from '@/ui/cn';
 import { NavItem } from '@/ui/components/nav';
 
 /**
- * Figma "Settings categories" (Figma sırasıyla). Varsayılanlar, Bildirimler ve Veri ve gizlilik ait oldukları
- * fazlarda gelir.
+ * Figma "Settings categories" (Figma sırasıyla). Varsayılanlar kategorisi henüz eklenmedi; etiketler Figma dışı
+ * (D-085) ve en sonda.
  */
 const CATEGORIES = [
   { href: '/settings/profile', glyph: '○', key: 'profile' },
@@ -18,6 +18,8 @@ const CATEGORIES = [
   // FR-NOTIF-04 (Figma'da yok, D-065).
   { href: '/settings/notifications', glyph: '◔', key: 'notifications' },
   { href: '/settings/security', glyph: '▣', key: 'security' },
+  // D-036, D-046: Figma'da kategori var (4:67746); sayfa içeriği Figma'da yok (D-065).
+  { href: '/settings/data-privacy', glyph: '◇', key: 'dataPrivacy' },
   // D-085: etiket yönetimi (Figma'da yok, D-065).
   { href: '/settings/tags', glyph: '#', key: 'tags' },
 ] as const satisfies readonly { href: Route; glyph: string; key: string }[];

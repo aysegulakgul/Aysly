@@ -16,6 +16,7 @@ import { SearchPaletteProvider } from './search/command-palette';
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const [viewer, scope] = await Promise.all([getViewer(), getPersonalScope()]);
   if (!viewer || !scope) redirect('/sign-in');
+  if (viewer.user.deletionRequestedAt) redirect('/account-deletion'); // D-092
   const [inboxCount, myTasksCount, dashboard, projects, views] = await Promise.all([
     findInboxCount(scope),
     findMyTasksCount(scope),

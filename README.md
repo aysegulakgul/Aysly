@@ -8,7 +8,7 @@ Aysly; görevleri, projeleri, günlük planı, notları ve hedefleri tek, sakin 
 
 | | |
 |---|---|
-| Mevcut faz | **Faz 8 — Test, güvenlik, kalite; dışa aktarma, hesap silme** (başlamadı; Faz 1–7 kapandı) |
+| Mevcut faz | **Faz 8 — Test, güvenlik, kalite; dışa aktarma, hesap silme** (devam ediyor; Faz 1–7 kapandı) |
 | Uygulama kodu | Hesap, görevler, projeler, takvim, notlar, hedefler ve arama çalışıyor (aşağıdaki "Özellikler") |
 | Çalışma ortamı | Yalnızca yerel bilgisayar; hosting ve ücretli servis yok |
 | Teknoloji | Next.js, TypeScript, PostgreSQL, Drizzle, Better Auth |
@@ -18,7 +18,7 @@ Ayrıntılı durum: [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 
 ## Özellikler
 
-Şu an çalışanlar (Faz 1–7):
+Şu an çalışanlar (Faz 1–8):
 - **Hesap:** E-posta doğrulamalı kayıt, giriş, şifre sıfırlama, oturum ve cihaz yönetimi, profil.
 - **İlk kullanım:** Kullanım amacı ve tercihlere göre kurulum rehberi; "İlk adımlar" listesi.
 - **Tercihler:** Dil, saat dilimi, hafta başlangıcı, saat biçimi, tema.
@@ -34,6 +34,7 @@ Ayrıntılı durum: [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 - **Notlar:** Başlık, liste, yapılacak listesi, bağlantı ve kod destekleyen editör; otomatik kayıt, çevrimdışı yerel taslak, çatışma kopyası; sabitleme; görev ve projelere bağlama.
 - **Hedefler:** Bağlı görevlerden otomatik ya da elle girilen ilerleme; "Ulaşıldı" önerisi; Aktif / Ulaşılan / Vazgeçilen sekmeleri; panoda Hedefler ve Projeler widget'ları.
 - **Arama:** `Ctrl/⌘+K` ile görev, proje, not ve hedeflerde Türkçe harflerden bağımsız arama.
+- **Veri ve gizlilik:** Tüm verileri JSON olarak indirme; 14 gün içinde iptal edilebilen hesap silme.
 - **Klavye kısayolları:** `Q`, `G D/I/M/U`, `J/K`, `T/M/L`, `Ctrl/⌘+Z`, `Ctrl/⌘+K`, `?` rehberi.
 
 Plan gereği sonraki fazlarda: dışa aktarma, hesap silme, güvenlik ve erişilebilirlik denetimi (Faz 8).
@@ -90,14 +91,18 @@ Uygulama yalnızca bu bilgisayarda (yerel) çalışır; hosting veya ücretli se
 **Komutlar:**
 | Komut | Ne yapar |
 |---|---|
-| `pnpm verify` | Tüm kontroller: biçim, lint, tip, mimari, testler (birim, entegrasyon, tarayıcı), derleme, bağımlılık güvenliği |
+| `pnpm verify` | Tüm kontroller: biçim, lint, gizli anahtar taraması, tip, mimari, testler (birim, entegrasyon, tarayıcı), derleme, bağımlılık güvenliği |
 | `pnpm test` / `pnpm test:integration` / `pnpm test:e2e` | Birim / gerçek veritabanlı entegrasyon / tarayıcı testleri |
 | `pnpm db:backup` | Yerel veritabanını `backups/` klasörüne yedekler (son 7 yedek saklanır) |
 | `pnpm db:restore backups/<dosya>.dump` | Önce güncel yedeği alır, sonra seçilen yedeği geri yükler |
+| `pnpm db:restore-drill` | Geri yükleme denemesi: yedeği geçici bir veritabanına yükleyip karşılaştırır; asıl veritabanına dokunmaz |
 | `pnpm arch` | Mimari katman kurallarını denetler |
 
 > Gerçek verini içeren veritabanına migration uygulamadan önce mutlaka `pnpm db:backup` çalıştır.
 > Entegrasyon testleri kendi geçici veritabanlarını açar; senin verine dokunmaz.
+
+### Oturum anahtarını yenileme (SECURITY §7)
+Anahtarın sızdığından şüphelenirsen: uygulamayı durdur, `.env` dosyasındaki `AUTH_SECRET=` satırının değerini sil, `pnpm setup:env` ile yenisini üret ve uygulamayı yeniden başlat. Tüm cihazlarda oturumlar kapanır (beklenen sonuç); verin etkilenmez.
 
 ## Geliştirme süreci
 Her geliştirme [CLAUDE.md §7](CLAUDE.md) sürecini izler: belgeleri oku → etkiyi değerlendir → gerekirse onay al → geliştir → test et → belgeleri güncelle → raporla. Fazlar arası geçiş [faz kapısı](docs/IMPLEMENTATION_PLAN.md) kontrolüne tabidir.

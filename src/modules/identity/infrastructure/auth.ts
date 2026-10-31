@@ -75,6 +75,10 @@ function createAuth() {
       // BR-ACC-004: yeni adrese doğrulama bağlantısı gider, doğrulanınca e-posta değişir; o zamana kadar eski adres
       // geçerlidir. Eski adrese onay e-postası MVP'de yok (D-055, D-062).
       changeEmail: { enabled: true, updateEmailWithoutVerification: false },
+      // BR-ACC-005 / D-092: oturumla birlikte okunur; silme talebi sürerken uygulama kapısı için.
+      additionalFields: {
+        deletionRequestedAt: { type: 'date', required: false, input: false },
+      },
     },
     emailVerification: {
       sendOnSignUp: false, // kayıt kendi use case'imizde; e-posta oradan istenir

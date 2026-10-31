@@ -7,7 +7,9 @@ import { getViewer } from '../viewer';
  * UI/Button, UI/Input ile. Oturum yoksa giriş sayfası.
  */
 export default async function OnboardingLayout({ children }: { children: ReactNode }) {
-  if (!(await getViewer())) redirect('/sign-in');
+  const viewer = await getViewer();
+  if (!viewer) redirect('/sign-in');
+  if (viewer.user.deletionRequestedAt) redirect('/account-deletion'); // D-092
   return (
     <main className="flex min-h-dvh items-center justify-center px-4 py-10">
       <div className="flex w-full max-w-[560px] flex-col gap-6">

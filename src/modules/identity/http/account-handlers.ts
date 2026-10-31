@@ -2,8 +2,11 @@ import { z } from 'zod';
 import { env } from '@/shared/config/env';
 import { db } from '@/shared/db/client';
 import type { ApiContext } from '@/shared/http/api-route';
+import type { JobDefinition } from '@/shared/jobs/scheduler';
+import { logger } from '@/shared/observability/logger';
 import { systemClock } from '@/shared/kernel/clock';
-import { isUuid } from '@/shared/kernel/id';
+import { isUuid, uuidv7 } from '@/shared/kernel/id';
+import { recordAuditEvent } from '@/modules/audit';
 import {
   changePassword,
   listSessions,
@@ -12,7 +15,13 @@ import {
   revokeSession,
   updateProfile,
 } from '../application/account';
+import {
+  cancelAccountDeletion,
+  purgeDueAccounts,
+  requestAccountDeletion,
+} from '../application/account-deletion';
 import { createBetterAuthCredentials } from '../infrastructure/better-auth-credentials';
+import { createDrizzleDeletionStore } from '../infrastructure/drizzle-deletion-store';
 import { createDrizzleAccountStore } from '../infrastructure/drizzle-account-store';
 import { consumeRateLimit } from '../infrastructure/rate-limiter';
 
@@ -27,14 +36,21 @@ const ChangeEmailBody = z.strictObject({
   currentPassword: z.string().max(1000),
 });
 
+const DeletionBody = z.strictObject({ currentPassword: z.string().max(1000) });
+
 const deps = () => ({ store: createDrizzleAccountStore(db()), clock: systemClock });
 
-/** SECURITY §4.4: kullanıcı başına saatlik sınır; aşılırsa 429. */
-async function rateLimited(ctx: ApiContext, action: string, max: number) {
+/** SECURITY §4.4: kullanıcı başına sınır (varsayılan saatlik); aşılırsa 429 yanıtı, değilse null. */
+export async function rateLimited(
+  ctx: ApiContext,
+  action: string,
+  max: number,
+  windowSeconds = 3600,
+) {
   if (!env().AUTH_RATE_LIMIT_ENABLED) return null;
   const limit = await consumeRateLimit(db(), {
     key: `${action}:${ctx.actor.userId}`,
-    windowSeconds: 3600,
+    windowSeconds,
     max,
     nowMs: Date.now(),
   });
@@ -113,4 +129,64 @@ export async function deleteSession(ctx: ApiContext): Promise<Response> {
 /** Ayarlar · Güvenlik sayfası (sunucu bileşeni) için oturum listesi; uç noktayla aynı use case. */
 export function findActiveSessions(actor: { userId: string; sessionId: string }) {
   return listSessions(deps(), actor);
+}
+
+/** D-055: dışa aktarma ve hesap silme gibi işlemler için isteğin oturumuyla şifreyle yeniden doğrulama. */
+export function verifyCurrentPassword(headers: Headers, password: string): Promise<boolean> {
+  return createBetterAuthCredentials(headers).verifyPassword(password);
+}
+
+const deletionDeps = (headers: Headers) => ({
+  store: createDrizzleDeletionStore(db()),
+  clock: systemClock,
+  verifyPassword: (password: string) =>
+    createBetterAuthCredentials(headers).verifyPassword(password),
+});
+
+/** POST /me/deletion (API_CONTRACTS §3): BR-ACC-005, şifreyle yeniden doğrulama (D-055), günde 3 istek. */
+export async function postDeletion(ctx: ApiContext): Promise<Response> {
+  const limited = await rateLimited(ctx, 'account-deletion', 3, 24 * 3600);
+  if (limited) return limited;
+  const body = await ctx.parse(DeletionBody);
+  if (!body.ok) return body.response;
+  const result = await requestAccountDeletion(
+    deletionDeps(ctx.request.headers),
+    ctx.actor,
+    body.data,
+  );
+  if (!result.ok) return ctx.fail(result.error);
+  await recordAuditEvent(db(), {
+    id: uuidv7(),
+    action: 'account.deletion_requested',
+    actorUserId: ctx.actor.userId,
+    now: systemClock.now(),
+  });
+  return ctx.json(202, { data: { scheduledFor: result.value.scheduledFor.toISOString() } });
+}
+
+/** DELETE /me/deletion: BR-ACC-005 / D-092 — 14 gün içinde talep iptal edilir. */
+export async function deleteDeletion(ctx: ApiContext): Promise<Response> {
+  await cancelAccountDeletion(deletionDeps(ctx.request.headers), ctx.actor);
+  await recordAuditEvent(db(), {
+    id: uuidv7(),
+    action: 'account.deletion_cancelled',
+    actorUserId: ctx.actor.userId,
+    now: systemClock.now(),
+  });
+  return new Response(null, { status: 204 });
+}
+
+/** BR-ACC-005 / D-053: 14 günü dolan silme talepleri saatlik uygulanır; açılışta da çalışır. */
+export function accountDeletionJob(): JobDefinition {
+  return {
+    name: 'accounts.purge',
+    intervalMs: 60 * 60 * 1000,
+    run: async () => {
+      const purged = await purgeDueAccounts({
+        store: createDrizzleDeletionStore(db()),
+        clock: systemClock,
+      });
+      if (purged > 0) logger().info({ purged }, 'süresi dolan hesaplar silindi');
+    },
+  };
 }

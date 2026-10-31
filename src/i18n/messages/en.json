@@ -12,7 +12,8 @@
     "rateLimited": "Too many attempts. Please try again in a moment.",
     "unauthenticated": "Your session has ended. Please sign in again.",
     "idempotencyReused": "This request key was already used for a different request.",
-    "bulkRejected": "Some of the selected tasks could not be changed; nothing was changed."
+    "bulkRejected": "Some of the selected tasks could not be changed; nothing was changed.",
+    "deletionPending": "Your account is scheduled for deletion. Cancel the deletion request to continue."
   },
   "rules": {
     "BR-ACC-001": "A new account can't be created with this email. If you have an account, sign in or reset your password.",
@@ -281,6 +282,27 @@
       "title": "In-app notifications",
       "reminders": "Reminder notifications",
       "hint": "Notifications are created only while the app is open. If you turn them off, due reminders won’t create notifications."
+    },
+    "dataPrivacy": "Data & privacy",
+    "export": {
+      "title": "Export your data",
+      "description": "Your tasks, projects, notes, goals, profile and preferences are downloaded as a single JSON file. Items in the trash are included; your password and session details are not.",
+      "password": "Your password",
+      "submit": "Download as JSON",
+      "pending": "Preparing…",
+      "done": "The file was downloaded."
+    },
+    "deleteAccount": {
+      "title": "Delete your account",
+      "whatIsDeleted": "Your account and all your data (tasks, projects, notes, goals, preferences) are permanently deleted.",
+      "grace": "Deletion happens after 14 days. You can cancel it by signing in during that time.",
+      "exportFirst": "We recommend exporting your data before deleting.",
+      "open": "Delete my account",
+      "confirmTitle": "Are you sure you want to delete your account?",
+      "confirmBody": "Your account will be permanently deleted on {date}. If you confirm, you will be signed out on all devices.",
+      "password": "Your password",
+      "confirm": "Confirm deletion request",
+      "cancel": "Cancel"
     }
   },
   "onboarding": {
@@ -1019,5 +1041,12 @@
     "addTask": "Add task",
     "settings": "Settings",
     "footer": "↑ ↓ navigate · Enter open · Esc close · Trash isn’t searched"
+  },
+  "accountDeletion": {
+    "pendingTitle": "Your account is scheduled for deletion",
+    "pendingBody": "Your account and all your data will be permanently deleted on {date}. Cancel the deletion to keep using the app.",
+    "cancel": "Cancel deletion",
+    "signOut": "Sign out",
+    "cancelFailed": "The deletion could not be cancelled. Try again."
   }
 }

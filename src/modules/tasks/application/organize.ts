@@ -178,7 +178,9 @@ export async function myTasks(
   const groups = new Map<DueGroup, TaskSummary[]>();
   for (const item of summaries) {
     const group = dueGroup(item.task.due, { ...context, now });
-    groups.set(group, [...(groups.get(group) ?? []), item]);
+    const list = groups.get(group);
+    if (list) list.push(item);
+    else groups.set(group, [item]);
   }
   return ok(
     DUE_GROUPS.filter((g) => groups.has(g)).map((group) => ({ group, items: groups.get(group)! })),
@@ -234,18 +236,24 @@ export async function dashboard(
   const projects = await deps.projects.listActive(scope);
   const byId = new Map(projects.map((p) => [p.id, p]));
   const tasks = await deps.tasks.listOpenInProjects(scope, [...byId.keys()]);
-  const items = await summarize(deps, scope, tasks, byId);
   const now = deps.clock.now();
-  const group = (item: TaskSummary) => dueGroup(item.task.due, { ...context, now });
-  const timeOf = (item: TaskSummary) => item.task.due?.at?.getTime() ?? Number.POSITIVE_INFINITY;
+  const group = (task: Task) => dueGroup(task.due, { ...context, now });
+  const timeOf = (task: Task) => task.due?.at?.getTime() ?? Number.POSITIVE_INFINITY;
+  const byDate = (a: Task, b: Task) => (a.due!.date < b.due!.date ? -1 : 1);
+  const sections = {
+    today: tasks.filter((t) => group(t) === 'today').sort((a, b) => timeOf(a) - timeOf(b)),
+    overdue: tasks.filter((t) => group(t) === 'overdue').sort(byDate),
+    upcoming: tasks.filter((t) => t.due && isUpcoming(t.due.date, context.today)).sort(byDate),
+    priority: tasks.filter((t) => t.priority === 3).slice(0, PRIORITY_LIMIT),
+  };
+  // NFR-01/03: yalnızca bölümlerde görünen görevler özetlenir (etiket ve alt görev sorguları).
+  const shown = [...new Set(Object.values(sections).flat())];
+  const summaries = new Map((await summarize(deps, scope, shown, byId)).map((s) => [s.task.id, s]));
+  const pick = (list: Task[]) => list.map((t) => summaries.get(t.id)!);
   return ok({
-    today: items.filter((i) => group(i) === 'today').sort((a, b) => timeOf(a) - timeOf(b)),
-    overdue: items
-      .filter((i) => group(i) === 'overdue')
-      .sort((a, b) => (a.task.due!.date < b.task.due!.date ? -1 : 1)),
-    upcoming: items
-      .filter((i) => i.task.due && isUpcoming(i.task.due.date, context.today))
-      .sort((a, b) => (a.task.due!.date < b.task.due!.date ? -1 : 1)),
-    priority: items.filter((i) => i.task.priority === 3).slice(0, PRIORITY_LIMIT),
+    today: pick(sections.today),
+    overdue: pick(sections.overdue),
+    upcoming: pick(sections.upcoming),
+    priority: pick(sections.priority),
   });
 }

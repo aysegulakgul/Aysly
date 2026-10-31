@@ -64,6 +64,7 @@
 | 422 | `BULK_OPERATION_REJECTED` | Toplu işlemde en az bir kayıt reddedildi (`failures[]`) |
 | 422 | `IDEMPOTENCY_KEY_REUSED` | Aynı anahtar farklı gövdeyle |
 | 429 | `RATE_LIMITED` | Hız sınırı; `Retry-After` başlığı |
+| 403 | `ACCOUNT_DELETION_PENDING` | Hesap silme talebi sürüyor; yalnızca iptal uç noktası çalışır (D-092) |
 | 500 | `INTERNAL_ERROR` | Beklenmeyen hata |
 | 503 | `SERVICE_UNAVAILABLE` | Bakım/bağımlılık hatası |
 
@@ -104,6 +105,8 @@ Kimlik doğrulama kütüphanesi kendi uç noktalarını `/api/auth/*` altında s
 | DELETE | `/me/sessions?others=true` | Diğer tüm oturumları kapat | — | `204` | — | — |
 | POST | `/me/deletion` | Hesap silme talebi | `{ currentPassword }` | `202 { scheduledFor }` | BR-ACC-005 (D-036) | 3/gün |
 | DELETE | `/me/deletion` | Silme talebini iptal | — | `204` | BR-ACC-005 | — |
+
+**Uygulandı (Faz 8, D-092, D-094):** Silme talebi tüm oturumları kapatır. Talep sürerken `DELETE /me/deletion` dışındaki tüm `/api/v1` uç noktaları `403 ACCOUNT_DELETION_PENDING` döner. Yanlış şifre `400 VALIDATION_FAILED` (`field: currentPassword, reason: incorrect`).
 
 **Uygulanan yollar (Faz 3, D-067):** Kayıt `POST /api/v1/auth/sign-up` (gövde: `{ name, email, password, timezone? }`; dil, çerezden veya tarayıcı dilinden). Giriş, çıkış, sıfırlama ve doğrulama Better Auth uç noktalarıdır: `POST /api/auth/sign-in/email`, `POST /api/auth/sign-out`, `GET /api/auth/get-session`, `POST /api/auth/request-password-reset`, `GET /api/auth/reset-password/:token`, `POST /api/auth/reset-password`, `GET /api/auth/verify-email`, `POST /api/auth/send-verification-email`. Profil, şifre, e-posta ve oturum işlemleri yukarıdaki tablodaki kendi `/api/v1/me*` uç noktalarımızdır (uygulandı: `PATCH /me`, `POST /me/password`, `POST /me/email`, `GET /me/sessions`, `DELETE /me/sessions?others=true`, `DELETE /me/sessions/{id}`; D-073). Better Auth'un kayıt, kullanıcı güncelleme, şifre değiştirme, şifre doğrulama, e-posta değiştirme, oturum listeleme/kapatma ve kullanıcı silme yolları dışarıya kapalıdır (404). Yanlış mevcut şifre `400 VALIDATION_FAILED` (`field: currentPassword, reason: incorrect`); doğrulanmamış hesapta e-posta değiştirme `422` (`rule: BR-ACC-004`). Hata gövdeleri Better Auth biçimindedir (`{ code, message }`); kendi uç noktalarımız §2.4 biçimini kullanır.
 
@@ -308,7 +311,7 @@ Hatırlatıcılar görev detayında döner; ayrı listeleme yoktur.
 | POST | `/workspaces/{ws}/notes/{id}/archive` / `unarchive` | BR-DEL-002 |
 | DELETE | `/workspaces/{ws}/notes/{id}` | BR-DEL-* |
 
-Gövde Markdown olarak döner; istemci sanitize edilmiş HTML'e çevirir (SECURITY §5). Sunucu kaydederken tehlikeli HTML'i temizler (savunma derinliği).
+Gövde Markdown olarak döner; istemci sanitize edilmiş HTML'e çevirir (SECURITY §5). Sunucu gövdeyi değiştirmeden saklar (D-095).
 
 **Uygulandı (Faz 7, D-091):** Eski `version` ile gelen PATCH 409 yerine 200 + `meta.outcome = "conflict_copy"` döner ve `data` yeni çatışma kopyasıdır; boşaltılan not silinir (`meta.outcome = "deleted"`, `data: null`). Listede `q` (tam metin) filtresi de var. Markdown gövde saklanırken değiştirilmez; gösterim her yerde `SafeMarkdown` (rehype-sanitize) ile yapılır.
 
@@ -386,6 +389,8 @@ MVP'de yalnızca uygulama içi bildirim vardır (D-037). D-053 gereği `unread-c
 |---|---|---|
 | POST | `/me/export` | Çalışma alanını JSON olarak **doğrudan indirme** yanıtı üretir (D-046; `Content-Disposition: attachment`, büyük veride akış). Gövde: `{ currentPassword }` — şifreyle yeniden doğrulama (D-055). Kapsam: çalışma alanı içeriği (çöp kutusu dahil) + profil + tercihler; şifre hash'i, oturumlar, token'lar, idempotency ve denetim kayıtları, IP/user-agent hariç (D-059). Hız sınırı: 5/saat. |
 | GET | `/api/health`, `/api/health/ready` | Kimlik doğrulamasız; iç ayrıntı içermez |
+
+**Uygulandı (Faz 8, D-094):** Yanıt `aysly-export-YYYY-MM-DD.json` adlı JSON dosyasıdır; biçim D-094'te. Akış yerine bellekte üretilir (15.000 kayıt ≈ 8 MB). Yanlış şifre `400 VALIDATION_FAILED` (`field: currentPassword`).
 
 ## 15. Sürümleme ve uyumluluk
 - Geriye uyumlu değişiklikler (yeni isteğe bağlı alan, yeni uç nokta) `v1` içinde yapılır.

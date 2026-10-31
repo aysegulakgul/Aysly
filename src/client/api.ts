@@ -58,3 +58,36 @@ export const apiDelete = <T = void>(path: ApiPath, body?: unknown) =>
   apiRequest<T>('DELETE', path, body);
 export const apiGet = <T>(path: ApiPath) => apiRequest<T>('GET', path);
 export const apiPut = <T>(path: ApiPath, body: unknown) => apiRequest<T>('PUT', path, body);
+
+/**
+ * Dosya indiren POST (D-046: dışa aktarma doğrudan indirme yanıtıdır). Başarıda dosya içeriği ve sunucunun verdiği
+ * dosya adı döner; hata gövdesi diğer uç noktalarla aynı biçimdedir.
+ */
+export async function apiDownload(
+  path: ApiPath,
+  body: unknown,
+): Promise<ApiResult<{ blob: Blob; filename: string }>> {
+  let response: Response;
+  try {
+    response = await fetch(path, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    return { ok: false, status: 0, error: { code: 'NETWORK', message: '' } };
+  }
+  if (!response.ok) {
+    const json = (await response.json().catch(() => null)) as { error?: ApiError } | null;
+    return {
+      ok: false,
+      status: response.status,
+      error: json?.error ?? { code: 'INTERNAL_ERROR', message: '' },
+    };
+  }
+  const filename =
+    /filename="([^"]+)"/.exec(response.headers.get('content-disposition') ?? '')?.[1] ??
+    'aysly-export.json';
+  return { ok: true, data: { blob: await response.blob(), filename } };
+}

@@ -9,7 +9,7 @@ export const MAILPIT_API = 'http://127.0.0.1:8025/api/v1';
 export const E2E_SERVER_ENV = {
   DATABASE_URL: E2E_DATABASE_URL,
   APP_BASE_URL: E2E_BASE_URL,
-  AUTH_SECRET: 'e2e-only-secret-not-used-anywhere-else-000',
+  AUTH_SECRET: 'e2e-only-secret-not-used-anywhere-else-000', // secret-scan: izinli — yalnızca test veritabanı
   EMAIL_TRANSPORT: 'smtp',
   SMTP_HOST: '127.0.0.1',
   SMTP_PORT: '1025',

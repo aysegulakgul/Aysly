@@ -97,7 +97,10 @@ export function KeyboardShortcuts({ workspaceId }: { workspaceId: string }) {
       }
       if (key === 'q') {
         event.preventDefault();
-        router.push('/inbox?add=1');
+        // AC-11: Inbox'ta zaten açıkken sayfa yeniden yüklenmez; odak doğrudan hızlı ekleme alanına geçer.
+        const quickAdd = document.querySelector<HTMLInputElement>('[data-quick-add]');
+        if (pathname === '/inbox' && quickAdd) quickAdd.focus();
+        else router.push('/inbox?add=1');
         return;
       }
       if (['j', 'k', 'arrowdown', 'arrowup'].includes(key)) {

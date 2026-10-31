@@ -14,7 +14,7 @@
 | 5 | Projeler ve görev görünümleri | **Kapandı** | — | 2026-10-29 | 2026-10-29 |
 | 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | **Kapandı** | — | 2026-10-29 | 2026-10-30 |
 | 7 | Notlar, hedefler, arama | **Kapandı** | — | 2026-10-30 | 2026-10-30 |
-| 8 | Test, güvenlik, kalite; dışa aktarma, hesap silme | Başlamadı | — | — | — |
+| 8 | Test, güvenlik, kalite; dışa aktarma, hesap silme | Devam ediyor | — (OQ-043 → D-092, OQ-044 → D-093) | 2026-10-30 | — |
 | 9 | Kullanım geri bildirimine göre iyileştirmeler | Başlamadı | — | — | — |
 | 10 | (Doğrulanırsa) Ekip ve paylaşılan çalışma alanları | Başlamadı | Ayrı karar seti; yayına alma (OQ-032); abonelik yönü D-048 | — | — |
 
@@ -158,6 +158,16 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
 - **Bağımlılık:** Faz 6, 7.
 - **Kapsam:** Hesap silme (14 gün, D-036), JSON dışa aktarma (D-046, kapsam D-059, şifreyle yeniden doğrulama D-055), SECURITY.md `[MVP]` maddelerinin denetimi, CSP sıkılaştırma, erişilebilirlik denetimi (AC-11, ekran okuyucu manuel testleri), performans testi (10.000 görev), yerel yedekten geri yükleme denemesi, LEGAL gereksinimlerinden yerel MVP'de anlamlı olanlar (dışa aktarma, silme, saklama süreleri). Koşul kabul kaydı ve yasal sayfalar yayına alma öncesine ertelendi (D-061).
 - **Kapsam dışı:** Yayına alma, analitik (D-052), hata izleme servisi.
+- **İlerleme (2026-10-31):**
+  - Kararlar D-092 (silme talebi sürerken giriş), D-093 (ekran okuyucu testi), D-094 (uygulama ayrıntıları).
+  - JSON dışa aktarma ve hesap silme (talep, iptal ekranı, 14 gün sonra kalıcı silme); Ayarlar · Veri ve gizlilik.
+  - Nonce tabanlı CSP, gizli anahtar taraması, `AUTH_SECRET` yenileme prosedürü (README).
+  - Ölçek testi (10.000 görev, 500 proje, 5.000 not): okuma p95 en çok ≈ 217 ms, görev oluşturma ≈ 12 ms; dışa aktarma ≈ 0,5 sn.
+  - Geri yükleme denemesi (2026-10-31): yedek geçici veritabanına yüklendi; 24 tablonun hepsinde satır sayıları eşleşti (geliştirme veritabanında 26 satır vardı).
+  - Erişilebilirlik: tüm sayfalarda axe taraması, klavye testi; ekran okuyucu kontrol listesi `docs/SCREEN_READER_CHECKLIST.md` ürün sahibinin uygulamasını bekliyor (D-093).
+  - Doğrulama (2026-10-31): `pnpm verify` 14/14 yeşil (yeni adım: gizli anahtar taraması) — birim 202, entegrasyon 72, tarayıcı 337 (3 atlandı: yalnızca masaüstü testleri).
+  - SECURITY §5 "sunucu kaydederken HTML'i temizler" maddesi kaldırıldı, §2 "ayrı migration kullanıcısı" yayına alma öncesine ertelendi (D-095).
+  - Kapanış için kalan: ürün sahibinin NVDA kontrol listesini uygulaması (D-093).
 - **Kabul:** SECURITY §13 MVP sütunu tamamen ✔; NFR-01..06 yerelde ölçüldü ve karşılandı; geri yükleme denemesi raporu; açık kritik/ciddi bulgu yok.
 
 ### Faz 9 — Kullanım geri bildirimine göre iyileştirmeler

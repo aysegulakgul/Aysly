@@ -7,6 +7,7 @@ const steps = [
   ['Kilit dosyası', 'pnpm', ['install', '--frozen-lockfile', '--prefer-offline']],
   ['Biçim', 'pnpm', ['format:check']],
   ['Lint', 'pnpm', ['lint']],
+  ['Gizli anahtar taraması', 'node', ['scripts/secret-scan.mjs']],
   ['Tip kontrolü', 'pnpm', ['typecheck']],
   ['Mimari kurallar', 'pnpm', ['arch']],
   ['İş kuralı izlenebilirliği', 'node', ['scripts/br-coverage.mjs']],

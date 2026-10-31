@@ -4,7 +4,7 @@ Bu dosya, Aysly üzerinde çalışan Claude için **bağlayıcı** talimatlardı
 
 ## 0. Bir bakışta
 - **Ürün:** Aysly — görevleri, projeleri, günlük planı, notları ve hedefleri tek, sakin bir çalışma alanında birleştiren web uygulaması. MVP bireysel kullanım; mimari ekip kullanımına hazır.
-- **Mevcut faz:** Bkz. [docs/IMPLEMENTATION_PLAN.md §1](docs/IMPLEMENTATION_PLAN.md). Faz 1–6 kapandı; Faz 7 (notlar, hedefler, arama) sürüyor. Güncel durumu her zaman plandan oku.
+- **Mevcut faz:** Bkz. [docs/IMPLEMENTATION_PLAN.md §1](docs/IMPLEMENTATION_PLAN.md). Faz 1–7 kapandı; Faz 8 (test, güvenlik, dışa aktarma, hesap silme) sürüyor. Güncel durumu her zaman plandan oku.
 - **Çalışma ortamı:** Yalnızca ürün sahibinin bilgisayarı (yerel). Hosting, alan adı, ücretli servis yok; mimari ileride yayına alınabilir olmalı (D-045).
 - **Teknoloji:** Next.js, TypeScript, PostgreSQL (Docker Desktop, D-056), Drizzle, Better Auth. Uygun yerlerde Zod, Tailwind CSS, Radix UI, Vitest, Playwright. TanStack Query yalnızca gerekirse ve onayla eklenir. pg-boss ve ayrı worker yok (D-044, D-053). Onaylı yardımcı paketler yalnızca gerçekten gerektiğinde eklenir (D-058). Kalite kontrolü: yerel Git + `pnpm verify` (D-057).
 - **Ürün kararlarının sahibi ürün sahibidir.** Sen öneri sunarsın; önemli kararları sessizce vermezsin (§5).

@@ -10,7 +10,12 @@ import { isSameOrigin } from './origin';
 import { REQUEST_ID_HEADER, resolveRequestId } from './request-id';
 
 /** Oturumdaki aktör (ARCHITECTURE §7). Kimlik modülü tarafından çözülür ve rotada enjekte edilir. */
-export type Actor = { userId: string; sessionId: string };
+export type Actor = {
+  userId: string;
+  sessionId: string;
+  /** BR-ACC-005 / D-092: silme talebi sürüyor; yalnızca iptal uç noktası çalışır. */
+  deletionPending?: true;
+};
 
 /** İsteğin dili: kullanıcının seçtiği dil çerezi, yoksa tarayıcı dili. Hata metinleri bu dilde döner. */
 export function requestLocale(headers: Headers): Locale {
@@ -46,6 +51,8 @@ const MUTATING = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
  */
 export function apiRoute(options: {
   resolveActor: () => Promise<Actor | null>;
+  /** Silme talebi süren hesabın da çağırabileceği uç noktalar (yalnızca iptal; D-092). */
+  allowDeletionPending?: boolean;
   handler: (ctx: ApiContext) => Promise<Response>;
 }): (request: Request, context?: { params: Promise<Record<string, string>> }) => Promise<Response> {
   return async (request, context) => {
@@ -62,6 +69,9 @@ export function apiRoute(options: {
       }
       const actor = await options.resolveActor();
       if (!actor) return json(401, errorBody('UNAUTHENTICATED', t('errors.unauthenticated')));
+      if (actor.deletionPending && !options.allowDeletionPending) {
+        return json(403, errorBody('ACCOUNT_DELETION_PENDING', t('errors.deletionPending')));
+      }
 
       const fail = (error: DomainError) => {
         const mapped = mapDomainError(error, requestId, t);

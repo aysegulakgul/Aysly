@@ -20,7 +20,7 @@ Her madde **[MVP]** (lansman öncesi zorunlu) veya **[SONRA]** olarak işaretlid
 ## 2. Genel ilkeler
 - **Varsayılan reddet:** Açıkça izin verilmeyen her şey yasak.
 - **Savunma derinliği:** Kritik kurallar uygulama + veritabanı düzeyinde.
-- **En az yetki:** Veritabanı kullanıcısı yalnızca gerekli şemaya erişir; migration kullanıcısı ayrı [MVP].
+- **En az yetki:** Veritabanı kullanıcısı yalnızca gerekli şemaya erişir; migration kullanıcısı ayrı [YAYIN] (D-095: tek kullanıcılı yerel ortamda yayına alma öncesine ertelendi).
 - **Güvenli varsayılanlar:** Yeni uç nokta oturum gerektirir; açıkça `public` işaretlenmedikçe.
 
 ## 3. Yetkilendirme [MVP]
@@ -81,8 +81,8 @@ MVP'de yalnızca kimlik doğrulama ve şifre doğrulamalı uç noktalarda sını
 - **XSS:**
   - React varsayılan kaçışı; `dangerouslySetInnerHTML` yalnızca sanitize edilmiş Markdown çıktısı için tek bir bileşende (`<SafeMarkdown>`), başka yerde lint ile yasak.
   - Markdown → HTML: `rehype-sanitize` izinli liste (script, iframe, style, `on*` öznitelikleri, `javascript:` URL'leri yasak). Bağlantılar `rel="noopener noreferrer nofollow"`, `target="_blank"`.
-  - Sunucu, kaydederken de tehlikeli HTML'i temizler.
-- **Content Security Policy:** nonce tabanlı `script-src`, `object-src 'none'`, `base-uri 'none'`, `frame-ancestors 'none'`. Üçüncü taraf script yok.
+  - Sunucu Markdown gövdeyi değiştirmeden saklar; güvenlik, gösterimin her yerde `<SafeMarkdown>` ile yapılmasına dayanır (D-095). Kaydederken temizlemek kod örneklerini bozacağı için uygulanmaz.
+- **Content Security Policy:** nonce tabanlı `script-src`, `object-src 'none'`, `base-uri 'none'`, `frame-ancestors 'none'`. Üçüncü taraf script yok. **Uygulandı (Faz 8, D-094):** `src/proxy.ts`; `style-src 'unsafe-inline'` gerekçesi D-094'te.
 - **Diğer başlıklar:** `Strict-Transport-Security` [YAYIN], `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (kamera/mikrofon/konum kapalı).
 - **Yönlendirmeler:** Giriş sonrası `redirect` parametresi yalnızca uygulama içi göreli yollar (açık yönlendirme önlemi).
 
@@ -116,7 +116,7 @@ MVP'de yalnızca kimlik doğrulama ve şifre doğrulamalı uç noktalarda sını
 - `pnpm db:restore <dosya>`: Yedeği geri yükler; önce mevcut veritabanının yedeğini alır.
 - Migration'lardan önce yedek alınması README'de ve CLAUDE.md'de zorunlu adımdır.
 - Yedek klasörü `.gitignore`'dadır (gerçek veri depoya girmez).
-- Faz 8'de bir kez geri yükleme denemesi yapılır ve sonuç kaydedilir.
+- Faz 8'de bir kez geri yükleme denemesi yapılır ve sonuç kaydedilir. **Uygulandı (2026-10-31):** `pnpm db:restore-drill` ile geçici veritabanına yüklendi; tüm tablolarda satır sayıları eşleşti (IMPLEMENTATION_PLAN Faz 8).
 
 **Yayında (ertelendi, OQ-032):** Yönetilen PostgreSQL ile günlük yedek + PITR, yedek saklama 35 gün, şifreli yedekler, düzenli geri yükleme tatbikatı, RPO/RTO hedefleri.
 

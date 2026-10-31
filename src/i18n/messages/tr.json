@@ -12,7 +12,8 @@
     "rateLimited": "Çok fazla deneme yaptın. Lütfen biraz sonra tekrar dene.",
     "unauthenticated": "Oturumun sona erdi. Lütfen yeniden giriş yap.",
     "idempotencyReused": "Bu istek anahtarı farklı bir istekle zaten kullanıldı.",
-    "bulkRejected": "Seçili görevlerden bazıları değiştirilemedi; hiçbir değişiklik yapılmadı."
+    "bulkRejected": "Seçili görevlerden bazıları değiştirilemedi; hiçbir değişiklik yapılmadı.",
+    "deletionPending": "Hesabın silinmek üzere. Devam etmek için önce silme talebini iptal et."
   },
   "rules": {
     "BR-ACC-001": "Bu e-posta adresiyle yeni hesap açılamıyor. Hesabın varsa giriş yap ya da şifreni sıfırla.",
@@ -281,6 +282,27 @@
       "title": "Uygulama içi bildirimler",
       "reminders": "Hatırlatıcı bildirimleri",
       "hint": "Bildirimler yalnızca uygulama açıkken oluşturulur. Kapatırsan zamanı gelen hatırlatıcılar bildirim üretmez."
+    },
+    "dataPrivacy": "Veri ve gizlilik",
+    "export": {
+      "title": "Verilerini dışa aktar",
+      "description": "Görevlerin, projelerin, notların, hedeflerin, profilin ve tercihlerin tek bir JSON dosyası olarak indirilir. Çöp kutusundakiler de dahildir; şifren ve oturum bilgilerin dahil değildir.",
+      "password": "Şifren",
+      "submit": "JSON olarak indir",
+      "pending": "Hazırlanıyor…",
+      "done": "Dosya indirildi."
+    },
+    "deleteAccount": {
+      "title": "Hesabını sil",
+      "whatIsDeleted": "Hesabın ve tüm verilerin (görevler, projeler, notlar, hedefler, tercihler) kalıcı olarak silinir.",
+      "grace": "Silme 14 gün sonra yapılır. Bu süre içinde giriş yaparak silmeyi iptal edebilirsin.",
+      "exportFirst": "Silmeden önce verilerini dışa aktarmanı öneririz.",
+      "open": "Hesabımı sil",
+      "confirmTitle": "Hesabını silmek istediğine emin misin?",
+      "confirmBody": "Hesabın {date} tarihinde kalıcı olarak silinecek. Onaylarsan tüm cihazlarda oturumun kapanır.",
+      "password": "Şifren",
+      "confirm": "Silme talebini onayla",
+      "cancel": "Vazgeç"
     }
   },
   "onboarding": {
@@ -1019,5 +1041,12 @@
     "addTask": "Görev ekle",
     "settings": "Ayarlar",
     "footer": "↑ ↓ gezin · Enter aç · Esc kapat · Çöpteki kayıtlar aranmaz"
+  },
+  "accountDeletion": {
+    "pendingTitle": "Hesabın silinmek üzere",
+    "pendingBody": "Hesabın ve tüm verilerin {date} tarihinde kalıcı olarak silinecek. Uygulamayı kullanmaya devam etmek için silmeyi iptal et.",
+    "cancel": "Silmeyi iptal et",
+    "signOut": "Çıkış yap",
+    "cancelFailed": "Silme iptal edilemedi. Tekrar dene."
   }
 }

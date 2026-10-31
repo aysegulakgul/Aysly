@@ -303,6 +303,8 @@ Uygulama (Faz 7, D-091): Yeniden deneme sabit aralıkla değil, tarayıcı yenid
 ### 3.10. Hesap silme (D-036)
 Ayarlar → Veri ve gizlilik → "Hesabımı sil" → açıklama (ne silinir, bekleme süresi, önce dışa aktarma önerisi) → şifre girişi → onay → oturum kapanır (bilgilendirme e-postası MVP'de yok, D-062). 14 gün içinde giriş → "Hesabın silinmek üzere. Silmeyi iptal et?" 14 gün dolunca, uygulama bir sonraki çalıştığında hesap ve veriler kalıcı silinir (D-053).
 
+Uygulama (Faz 8, D-092): 14 gün içinde girişte yalnızca "Hesabın silinmek üzere" ekranı açılır: [Silmeyi iptal et] [Çıkış yap]. İptal etmeden uygulamanın hiçbir sayfası açılmaz. Veri ve gizlilik ekranı Figma'da yok (kategori var, 4:67746); Güvenlik ekranının düzeni ve Figma bileşenleriyle kuruldu (D-065).
+
 ### 3.11. Arama
 `Ctrl+K` → yaz (≥ 2 karakter, 200 ms gecikmeli istek) → gruplu sonuçlar → `Enter` ile aç. Sonuç yoksa: "‘xyz’ için sonuç yok · Arşivi de ara · ‘xyz’ başlıklı görev oluştur".
 
