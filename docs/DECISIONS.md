@@ -535,6 +535,28 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Durum: ONAYLI · Tarih: 2026-10-31 · Karar veren: Ürün sahibi
 - Karar: `pnpm db:seed-demo` ayrı bir demo hesabı (`demo@aysly.local`) oluşturur ve tüm ekranları dolduracak örnek veriyle doldurur; varsa önce o hesabı siler. Diğer hesaplara dokunmaz. Şifre README'de; yalnızca yerel geliştirme içindir.
 
+
+### D-102 — Dört proje statüsü (OQ-050, Faz 9)
+- Durum: ONAYLI · Tarih: 2026-10-31 · Karar veren: Ürün sahibi
+- Karar: Proje statüleri Başlamadı (`not_started`), Devam ediyor (`active`), Beklemede (`on_hold`), Tamamlandı (`completed`). Yeni proje Başlamadı ile başlar. Mevcut `active` değeri korunur, etiketi "Devam ediyor" olur (veri dönüşümü yok). Başlamadı projeler açık projeler gibi listelenir.
+- Sonuçlar: BR-PROJ-002, DATA_MODEL (`projects_status` CHECK), API_CONTRACTS §5.
+
+### D-103 — Alt görev sınırı 1.000 (OQ-051, BR-SUB-005'i değiştirir)
+- Durum: ONAYLI · Tarih: 2026-10-31 · Karar veren: Ürün sahibi
+- Karar: Görev başına en çok 1.000 alt görev (önceki 100). Alt görevler tek seviyedir (BR-SUB-001 değişmez). Görevlerim'de alt görevler satır içinde açılır ve satır içinde eklenir; her ekleme ve değişiklik anında kaydedilir.
+
+### D-104 — Kayıtlı görünümler kalır (OQ-052)
+- Durum: ONAYLI · Tarih: 2026-10-31 · Karar veren: Ürün sahibi ("kayıtlı görünümleri kısmı kalsın silinmesin")
+- Karar: 31 Ekim 2026 isteğinin 8. maddesi (kayıtlı görünümleri silme) uygulanmaz.
+
+### D-105 — Örnek ürün geliştirme verisi kullanıcının hesabına (OQ-053)
+- Durum: ONAYLI · Tarih: 2026-10-31 · Karar veren: Ürün sahibi ("Kendi hesabım")
+- Karar: `pnpm db:seed-sample --email <adres>` belirtilen hesaba 3 projelik bir ürün geliştirme senaryosu ekler: görevler, alt görevler, kişiler ve atamalar, yorumlar, notlar, hedefler, takvim, arşiv ve çöp kutusu. Kayıtlar kullanım senaryolarıyla yazılır (sabit kodlanmış ekran verisi değildir) ve tek tek silinebilir. `--remove` eklediklerini toplu kaldırır (kimlikler yerel `backups/` klasöründe tutulur). Ekleme öncesi veritabanı yedeği alınır.
+
+### D-106 — Satır içi düzenleme, tamamlananların görünür kalması, sütun filtreleri (Faz 9)
+- Durum: ONAYLI · Tarih: 2026-10-31 · Karar veren: Ürün sahibi (31 Ekim isteği 2, 4, 7, 9, 11)
+- Karar: Görevlerim, Bugün ve Projeler'de alanlar detay açmadan düzenlenir ve anında kaydedilir. Görevlerim'de tamamlanan görevler listede kalır (Tamamlandı statüsü, üstü çizili); statü seçiminden "Tamamlandı" tamamlama işlemini çağırır (BR-TASK-003 tek yol kuralı korunur). Görevlerim ve Projeler'de sütun filtreleri (atanan, proje, öncelik, statü, tarih; projelerde statü ve renk). BR-INBOX-004: Görevlerim kapsamına tamamlanan görevler eklenir.
+
 ---
 
 ## 5. Faz kapanış kayıtları

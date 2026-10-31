@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { findProjectBoardTasks, findProjectOverview } from '@/modules/tasks';
 import { getPersonalScope, getViewer } from '../../viewer';
 import { PageFrame } from '../page-frame';
+import { buildTaskContext } from '../tasks/task-context.server';
 import { ProjectsBoard } from './projects-board';
 
 /**
@@ -21,7 +22,10 @@ export default async function ProjectsPage({
     searchParams,
   ]);
   if (!viewer || !scope) return null;
-  const projects = await findProjectOverview(scope);
+  const [projects, context] = await Promise.all([
+    findProjectOverview(scope),
+    buildTaskContext(viewer, scope),
+  ]);
   const tasks = await findProjectBoardTasks(
     scope,
     projects.map((p) => p.id),
@@ -32,6 +36,7 @@ export default async function ProjectsPage({
         projects={projects}
         tasks={tasks}
         workspaceId={scope.workspaceId}
+        context={context}
         deletedBatch={query.deleted}
       />
     </PageFrame>

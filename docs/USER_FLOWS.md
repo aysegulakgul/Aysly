@@ -159,6 +159,14 @@ Ayrıntı: [ONBOARDING_AND_PERSONALIZATION.md](ONBOARDING_AND_PERSONALIZATION.md
 | Paylaş | Sayfa bağlantısını kopyalar; kişiye e-posta uygulamasında davet taslağı açar. Yerel ortamda bağlantının başka bilgisayarda açılmadığı pencerede yazar. |
 | Ayarlar · Kişiler | Kişi ekle (ad, e-posta), düzenle, renk, sil. |
 
+### 2.8b. Faz 9 — 31 Ekim değişiklikleri (D-102..D-106)
+| | |
+|---|---|
+| Menü | Bugün, Görevlerim, Projeler, Takvim, Hedefler, Notlar. |
+| Görevlerim | Her alan satırda tıklanarak düzenlenir ve anında kaydedilir: ad, atanan, son tarih, proje, öncelik, statü, puan. Statüde "Tamamlandı" seçilebilir; tamamlanan görev listede kalır (üstü çizili, son 30 gün). Satırdaki ▸ alt görevleri açar; alt görev eklenir, adı düzenlenir, tamamlanır, silinir (en çok 1.000). Bölüm sonundaki "+ Görev ekle" ile alt alta sınırsız görev eklenir; Enter'da alan açık kalır, odaktan çıkınca yazılan kaydedilir. Sütun filtreleri: atanan, proje, öncelik, statü, tarih. Bölümler renkli. |
+| Bugün | Görev satırlarında statü, öncelik, tarih, atanan ve puan detay açmadan düzenlenir. Renkli karşılama alanı ve bölüm renkleri. |
+| Projeler | Dört statü sütunu (Başlamadı, Devam ediyor, Beklemede, Tamamlandı). Kartta proje adı ve rengi, görevlerin statüsü satır içinde değişir. Filtreler: ad araması, statü, renk. |
+
 ### 2.9. Hedefler (`/goals`, `/goals/:id`)
 | | |
 |---|---|

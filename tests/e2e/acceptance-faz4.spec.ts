@@ -56,7 +56,7 @@ test.describe('Faz 4 kabul', () => {
     for (const title of ['A görevi', 'B görevi']) {
       const row = page.locator('[data-task-row]').filter({ hasText: title });
       await row
-        .getByRole('button', { name: /Projeye taşı/ })
+        .getByRole('button', { name: /^Proje: / })
         .first()
         .click();
       await page.getByRole('button', { name: 'Ev', exact: true }).click();

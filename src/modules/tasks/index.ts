@@ -32,7 +32,7 @@ export {
   findInboxCount,
   findInboxTasks,
   findMyTasks,
-  findMyTasksCount,
+  findSidebarCounts,
   findProjectDetail,
   findProjectOverview,
   findTaskList,

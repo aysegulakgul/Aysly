@@ -55,7 +55,8 @@ export default async function TodayPage() {
 
   return (
     <PageFrame title={tShell('today')}>
-      <div className="flex w-full flex-col gap-2">
+      {/* D-100: renkli karşılama alanı */}
+      <div className="flex w-full flex-col gap-2 rounded-lg border border-border bg-[linear-gradient(120deg,#4a8ae833,#9a6ee62e_45%,#e05f9e26)] p-6 shadow-sm">
         <div className="flex items-center gap-3">
           <h1 className="flex-1 text-2xl font-semibold text-text">
             {t(`greeting.${dayPart(now, timezone)}`, { name: firstName(viewer.user.name) })}

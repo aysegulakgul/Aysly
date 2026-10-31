@@ -7,7 +7,7 @@ import {
   getTaskDetail,
   listSummaries,
   myTasks,
-  myTasksCount,
+  sidebarCounts,
 } from '../application/organize';
 import { listTrash } from '../application/lifecycle';
 import {
@@ -74,9 +74,13 @@ export async function findTaskDetail(
   };
 }
 
-export async function findMyTasksCount(scope: WorkspaceScope): Promise<number> {
-  const result = await myTasksCount(taskDeps(db()), scope);
-  return result.ok ? result.value : 0;
+/** Kenar çubuğu sayıları (Görevlerim, Bugün) tek sorguda. */
+export async function findSidebarCounts(
+  scope: WorkspaceScope,
+  prefs: { timezone: string },
+): Promise<{ myTasks: number; today: number }> {
+  const result = await sidebarCounts(taskDeps(db()), scope, todayIn(prefs.timezone, new Date()));
+  return result.ok ? result.value : { myTasks: 0, today: 0 };
 }
 
 /** Bugün ekranının bölümleri (FR-DASH-01..04). */

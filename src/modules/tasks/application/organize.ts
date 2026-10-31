@@ -172,39 +172,59 @@ export async function myTasks(
   deps: TaskDeps,
   scope: WorkspaceScope,
   context: { today: string; weekStart: number },
-): Promise<Result<{ group: DueGroup; items: TaskSummary[] }[], DomainError>> {
+): Promise<Result<{ group: MyTaskGroup; items: TaskSummary[] }[], DomainError>> {
   const allowed = authorize(scope, 'task.read');
   if (!allowed.ok) return allowed;
   const projects = await deps.projects.listActive(scope);
   const byId = new Map(projects.map((p) => [p.id, p]));
-  const tasks = await deps.tasks.listOpenInProjects(scope, [...byId.keys()]);
-  const summaries = await summarize(deps, scope, tasks, byId);
   const now = deps.clock.now();
-  const groups = new Map<DueGroup, TaskSummary[]>();
+  const ids = [...byId.keys()];
+  // D-106: son 30 günde tamamlananlar da listede kalır (üstü çizili); daha eskiler Arşiv/projelerde görülür.
+  const [open, done] = await Promise.all([
+    deps.tasks.listOpenInProjects(scope, ids),
+    deps.tasks.listDoneInProjects(scope, ids, new Date(now.getTime() - DONE_WINDOW_MS)),
+  ]);
+  const summaries = await summarize(deps, scope, [...open, ...done], byId);
+  const groups = new Map<MyTaskGroup, TaskSummary[]>();
   for (const item of summaries) {
-    const group = dueGroup(item.task.due, { ...context, now });
+    const due = dueGroup(item.task.due, { ...context, now });
+    // Tamamlanmış görev "Geciken"de görünmez; tarihi geçmişse Tamamlananlar bölümünde.
+    const group: MyTaskGroup = item.task.status === 'done' && due === 'overdue' ? 'done' : due;
     const list = groups.get(group);
     if (list) list.push(item);
     else groups.set(group, [item]);
   }
   return ok(
-    DUE_GROUPS.filter((g) => groups.has(g)).map((group) => ({ group, items: groups.get(group)! })),
+    MY_TASK_GROUPS.filter((g) => groups.has(g)).map((group) => ({
+      group,
+      items: groups.get(group)!,
+    })),
   );
 }
 
-/** Kenar çubuğundaki Görevlerim sayısı: Görevlerim kapsamındaki açık üst düzey görevler (BR-INBOX-004). */
-export async function myTasksCount(
+/** D-106: Görevlerim bölümleri — tarih grupları ve tarihi geçmiş tamamlananlar. */
+export type MyTaskGroup = DueGroup | 'done';
+const MY_TASK_GROUPS: readonly MyTaskGroup[] = [...DUE_GROUPS, 'done'];
+const DONE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+
+/**
+ * Kenar çubuğu sayıları (BR-INBOX-004, FR-DASH-01): Görevlerim'deki açık üst düzey görevler ve bugün tarihli
+ * olanlar. Her sayfada çalıştığı için görevleri yüklemeden tek sayım sorgusuyla hesaplanır (NFR-01).
+ */
+export async function sidebarCounts(
   deps: TaskDeps,
   scope: WorkspaceScope,
-): Promise<Result<number, DomainError>> {
+  today: string,
+): Promise<Result<{ myTasks: number; today: number }, DomainError>> {
   const allowed = authorize(scope, 'task.read');
   if (!allowed.ok) return allowed;
   const projects = await deps.projects.listActive(scope);
-  const tasks = await deps.tasks.listOpenInProjects(
+  const counts = await deps.tasks.countOpenInProjects(
     scope,
     projects.map((p) => p.id),
+    today,
   );
-  return ok(tasks.length);
+  return ok({ myTasks: counts.open, today: counts.today });
 }
 
 /** Liste + özet bilgiler (proje adı, etiketler, alt görev sayıları). */

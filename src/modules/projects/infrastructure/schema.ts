@@ -48,7 +48,7 @@ export const projects = pgTable(
   },
   (t) => [
     check('projects_kind', sql`${t.kind} in ('inbox','standard')`),
-    check('projects_status', sql`${t.status} in ('active','on_hold','completed')`),
+    check('projects_status', sql`${t.status} in ('not_started','active','on_hold','completed')`),
     // UI_UX §2.4, D-082: sabit 12 renklik palet.
     check(
       'projects_color',

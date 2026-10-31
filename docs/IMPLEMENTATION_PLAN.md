@@ -179,6 +179,12 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
   - Bildirim ve Paylaş sağ üst başlıkta; Yaklaşanlar Bugün'ün altında; takvimde alt görevler; kenar çubuğundan "Görev ekle" kalktı.
   - Görevlerim tablosu, görev detayında atanan/puan/yorumlar, Ayarlar · Kişiler, Projeler panosu, `pnpm db:seed-demo`.
   - Görevlerim'de çoklu seçim, toplu işlemler ve satırdan "Projeye taşı" korundu (BR-TASK-008, AC-02).
+- **İlerleme (2026-10-31) — ikinci geri bildirim (12 madde):**
+  - Kararlar D-102 (dört proje statüsü), D-103 (1.000 alt görev), D-104 (kayıtlı görünümler kalır), D-105 (örnek veri kullanıcının hesabına), D-106 (satır içi düzenleme, tamamlananlar listede, sütun filtreleri). Migration 0010.
+  - Görevlerim, Bugün ve Projeler'de satır içi düzenleme; Görevlerim'de alt görevler, filtreler ve tamamlananlar; menü sırası; renkli tasarım (bölüm renkleri, degrade başlıklar, proje renkli satır çizgisi, renkli özet kartları).
+  - `pnpm db:seed-sample` (3 proje, 37 görev, 5 kişi, 5 not, 6 hedef; arşiv ve çöp dahil) ürün sahibinin hesabına eklendi; `--remove` ile kaldırma doğrulandı.
+  - Performans: kenar çubuğu sayıları her sayfada tüm görevleri yüklemek yerine tek sayım sorgusuyla (pano yalnızca Bugün'de hesaplanır). Ölçümler: 10.000 görevle Görevlerim p95 ≈ 193 ms, Bugün ≈ 203 ms; tarayıcıda ana sayfalar 90–265 ms'de hazır.
+  - Doğrulama (2026-10-31): `pnpm verify` 14/14 yeşil — birim 203, entegrasyon 76, tarayıcı 354 (4 atlandı). Tamamlananların listede kalması nedeniyle eski testler güncellendi; satır içi düzenleme, alt görev ve filtre için yeni tarayıcı testi.
   - Doğrulama (2026-10-31): `pnpm verify` 14/14 yeşil — birim 203, entegrasyon 76, tarayıcı 351 (3 atlandı). Eski Inbox/Yaklaşanlar testleri yeni ekranlara göre güncellendi.
 
 ### Faz 10 — Ekip ve paylaşılan çalışma alanları (koşullu)

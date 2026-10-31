@@ -10,8 +10,10 @@ import { cn } from '../cn';
  */
 const navItemClass = (active: boolean) =>
   cn(
-    'flex h-row w-full items-center gap-2 rounded-sm px-3 text-sm font-medium',
-    active ? 'bg-support-1 text-primary' : 'text-text-secondary',
+    'flex h-row w-full items-center gap-2 rounded-md px-3 text-sm font-medium transition-colors',
+    active
+      ? 'bg-gradient-to-r from-support-1 to-transparent text-primary shadow-[inset_3px_0_0_var(--primary)]'
+      : 'text-text-secondary hover:bg-surface hover:text-text',
   );
 
 function NavLabel({ glyph, children }: { glyph?: string | undefined; children: ReactNode }) {

@@ -71,6 +71,13 @@
       "when": 1793452260159,
       "tag": "0009_contacts_points_comments",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793461131909,
+      "tag": "0010_project_not_started",
+      "breakpoints": true
     }
   ]
 }

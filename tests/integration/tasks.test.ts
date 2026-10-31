@@ -267,7 +267,11 @@ describe('alt görev, etiket ve taşıma (veritabanı)', () => {
     await createTask(deps(), scope, { title: 'Ev görevi', projectId: ev!.id });
     await client`update projects set archived_at = now() where id = ${ev!.id}`;
     const groups = await myTasks(deps(), scope, { today: '2026-10-28', weekStart: 1 });
-    expect(groups).toEqual({ ok: true, value: [] });
+    if (!groups.ok) throw new Error('Görevlerim okunamadı');
+    const titles = groups.value.flatMap((g) => g.items.map((i) => i.task.title));
+    // D-106: tamamlanan görev üstü çizili olarak kalır; arşivli projenin görevi görünmez.
+    expect(titles).toEqual(['Ana']);
+    expect(groups.value.flatMap((g) => g.items)[0]?.task.status).toBe('done');
   });
 });
 

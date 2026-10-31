@@ -194,5 +194,9 @@ D-045 gereği şimdilik yalnızca yerel ortam kullanılıyor. Yayına alma karar
 | OQ-047 | Yeni görev alanları | Story point (bölüm toplamıyla), yorumlar; statü üç değerde kalır. | D-099 |
 | OQ-048 | Tasarım kaynağı | Figma + ürün sahibinin ekran görüntüleri; renkli rozet paleti. | D-100 |
 | OQ-049 | Örnek veri | Ayrı demo hesabı, tek komut; mevcut veriye dokunulmaz. | D-101 |
+| OQ-050 | Yeni projenin statüsü (4 statü) | Başlamadı; mevcut "Aktif" = Devam ediyor. | D-102 |
+| OQ-051 | Alt görev sınırı | 1.000 (pratikte sınırsız); tek seviye kalır. | D-103 |
+| OQ-052 | Kayıtlı görünümlerin kaldırılması | Ürün sahibi vazgeçti: kayıtlı görünümler kalır. | D-104 |
+| OQ-053 | Örnek verinin hesabı | Ürün sahibinin kendi hesabı; tek komutla eklenir ve kaldırılır. | D-105 |
 
 Kapanan soruların değerlendirilen seçenekleri DECISIONS.md'deki ilgili kaydın "Alternatifler" alanında özetlenmiştir.

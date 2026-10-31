@@ -282,6 +282,11 @@ Yanıt: `{ data: { task, nextOccurrence: Task | null, completedSubtaskIds: [] } 
 - `GET / POST /workspaces/{ws}/tasks/{id}/comments` — `{ body }`; yanıt `{ id, body, authorName, mine, createdAt }` (BR-COMMENT-001).
 - `DELETE /workspaces/{ws}/tasks/{id}/comments/{commentId}` — yalnızca yazan; başkasınınki 404.
 
+### 6.7a. Faz 9 ekleri — 31 Ekim (D-102, D-106)
+- Proje `status`: `not_started | active | on_hold | completed`; yeni proje `not_started` ile oluşur.
+- `GET /my-tasks` ve Görevlerim ekranı son 30 günde tamamlanan üst düzey görevleri de döndürür; tarihi geçmiş tamamlananlar `done` grubundadır.
+- Satır içi düzenleme mevcut uç noktaları kullanır: `PATCH /tasks/{id}` (başlık, atanan, tarih, öncelik, statü, puan), `POST /tasks/{id}/move`, `/complete`, `/reopen`; alt görevler `POST /tasks` (`parentTaskId`). Yeni uç nokta yok.
+
 ### 6.8. Kişiler (D-097)
 | Metot | Yol | Açıklama |
 |---|---|---|

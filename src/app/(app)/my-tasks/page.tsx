@@ -15,6 +15,17 @@ import { sectionDueDate } from './sections';
  * tarihe ya da projeye göre bölümler (`?group=project`), satır başına atanan, tarih, proje, öncelik, statü ve
  * story point; bölüm başına ekleme ve puan toplamı. `?task=` yan panelde görev detayını açar.
  */
+/** D-100: tarih bölümlerinin renk vurgusu. */
+const GROUP_COLOR: Record<string, string> = {
+  overdue: 'red',
+  today: 'blue',
+  tomorrow: 'violet',
+  thisWeek: 'teal',
+  later: 'indigo',
+  none: 'slate',
+  done: 'green',
+};
+
 export default async function MyTasksPage({
   searchParams,
 }: {
@@ -38,12 +49,14 @@ export default async function MyTasksPage({
     ? context.projects.map((p) => ({
         key: p.id,
         title: p.kind === 'inbox' ? t('table.noProject') : p.name,
+        color: p.color,
         add: { projectId: p.id },
         tasks: all.filter((task: TaskView) => task.projectId === p.id),
       }))
     : groups.map((g) => ({
         key: g.group,
         title: t(`groups.${g.group}`),
+        color: GROUP_COLOR[g.group] ?? 'slate',
         add: { dueDate: sectionDueDate(g.group, context.today) },
         tasks: g.tasks,
       }));

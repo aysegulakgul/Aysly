@@ -105,8 +105,9 @@ test.describe('Görevlerim ve görev detayı', () => {
     const dialog = page.getByRole('dialog', { name: 'Alt görevler de tamamlansın mı?' });
     await expect(dialog).toContainText('2 alt görevin 0 tanesi tamamlandı');
     await dialog.getByRole('button', { name: 'Alt görevleri de tamamla' }).click();
-    await expect(row(page, 'Ana görev')).toHaveCount(0);
     await expect(page.getByText('Görev tamamlandı.')).toBeVisible(); // sunucu yanıtı geldi
+    // D-106: tamamlanan görev listede kalır.
+    await expect(page.getByRole('button', { name: 'Yeniden aç: Ana görev' })).toBeVisible();
 
     await page.goto(`/my-tasks?task=${parent.id}`);
     const panel = page.getByRole('complementary', { name: 'Görev detayı' });
@@ -123,16 +124,61 @@ test.describe('Görevlerim ve görev detayı', () => {
     await page.waitForLoadState('networkidle');
     const target = row(page, 'Garanti belgesini bul');
     await target
-      .getByRole('button', { name: /Projeye taşı/ })
+      .getByRole('button', { name: /^Proje: / })
       .first()
       .click();
     await page.getByRole('button', { name: 'Ev', exact: true }).click();
-    await expect(page.getByText('“Garanti belgesini bul” Ev projesine taşındı.')).toBeVisible();
     await expect(target).not.toContainText('Projesiz');
     await page.reload();
     await expect(target).toContainText('Ev');
     await expect(target).toContainText('1 Ara');
     await expect(target).toContainText('Orta');
+  });
+
+  test('D-106 / D-103: satır içi düzenleme, alt görev ekleme ve sütun filtresi anında kaydedilir', async ({
+    page,
+  }) => {
+    const { create } = await setupUser(page);
+    await create({ title: 'Raporu hazırla' });
+    await create({ title: 'Toplantı ayarla', priority: 1 });
+    await page.goto('/my-tasks');
+    await page.waitForLoadState('networkidle');
+    const target = row(page, 'Raporu hazırla');
+
+    // Öncelik ve statü detay açmadan değişir.
+    await target.getByRole('button', { name: 'Öncelik: Raporu hazırla' }).click();
+    await page.getByRole('button', { name: 'Yüksek' }).click();
+    await expect(target).toContainText('Yüksek');
+    await target.getByRole('button', { name: 'Statü: Raporu hazırla' }).click();
+    await page.getByRole('button', { name: 'Devam ediyor' }).click();
+    await expect(target).toContainText('Devam ediyor');
+
+    // Ad satır içinde düzenlenir.
+    await target.getByRole('button', { name: 'Adı düzenle: Raporu hazırla' }).click();
+    await page.getByLabel('Görev adı').fill('Raporu hazırla v2');
+    await page.getByLabel('Görev adı').press('Enter');
+    const renamed = row(page, 'Raporu hazırla v2');
+    await expect(renamed).toBeVisible();
+
+    // Alt görevler satır içinde eklenir.
+    await renamed.getByRole('button', { name: 'Alt görevler: Raporu hazırla v2' }).click();
+    const subInput = page.getByLabel('Raporu hazırla v2 için alt görev ekle');
+    for (const title of ['Veri topla', 'Grafikleri çiz']) {
+      await subInput.fill(title);
+      await subInput.press('Enter');
+      await expect(page.getByLabel(`Alt görev adı: ${title}`)).toBeVisible();
+    }
+
+    // Kalıcı: yeniden yüklemede de var.
+    await page.reload();
+    await expect(row(page, 'Raporu hazırla v2')).toContainText('Yüksek');
+    await expect(row(page, 'Raporu hazırla v2')).toContainText('Devam ediyor');
+    await expect(row(page, 'Raporu hazırla v2')).toContainText('0/2 ⑂');
+
+    // Statü filtresi yalnızca eşleşenleri gösterir.
+    await page.getByLabel('Statüye göre filtrele').selectOption('in_progress');
+    await expect(row(page, 'Raporu hazırla v2')).toBeVisible();
+    await expect(row(page, 'Toplantı ayarla')).toHaveCount(0);
   });
 
   test('/my-tasks ve açık detay paneli erişilebilirlik taraması (AC-11)', async ({ page }) => {

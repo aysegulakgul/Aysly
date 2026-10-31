@@ -51,24 +51,25 @@ test.describe('Görevlerim ve hızlı ekleme (D-098: Inbox sayfası kaldırıld�
     await expect(page.getByLabel('Hızlı ekle')).toHaveValue('');
   });
 
-  test('BR-TASK-004: tamamlanan görev listeden çıkar, "Geri al" geri getirir', async ({ page }) => {
+  test('BR-TASK-004 / D-106: tamamlanan görev listede üstü çizili kalır; "Geri al" yeniden açar', async ({
+    page,
+  }) => {
     await signUp(page);
     await page.goto('/my-tasks');
     await page.waitForLoadState('networkidle');
     await addTask(page, 'Garanti belgesini bul');
 
     await page.getByRole('button', { name: 'Tamamla: Garanti belgesini bul' }).click();
-    await expect(
-      page.getByRole('listitem').filter({ hasText: 'Garanti belgesini bul' }),
-    ).toHaveCount(0);
     await expect(page.getByText('Görev tamamlandı.')).toBeVisible();
+    const reopen = page.getByRole('button', { name: 'Yeniden aç: Garanti belgesini bul' });
+    await expect(reopen).toHaveAttribute('aria-pressed', 'true');
     await page.getByRole('button', { name: 'Geri al' }).click();
     await expect(
-      page.getByRole('listitem').filter({ hasText: 'Garanti belgesini bul' }),
+      page.getByRole('button', { name: 'Tamamla: Garanti belgesini bul' }),
     ).toBeVisible();
     await page.reload();
     await expect(
-      page.getByRole('listitem').filter({ hasText: 'Garanti belgesini bul' }),
+      page.getByRole('button', { name: 'Tamamla: Garanti belgesini bul' }),
     ).toBeVisible();
   });
 

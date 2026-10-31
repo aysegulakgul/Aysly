@@ -142,7 +142,7 @@ export function ProjectHeader({
                   {t('edit')}
                 </Button>
               </PopoverClose>
-              {(['active', 'on_hold'] as const)
+              {(['not_started', 'active', 'on_hold'] as const)
                 .filter((s) => s !== project.status)
                 .map((s) => (
                   <PopoverClose asChild key={s}>

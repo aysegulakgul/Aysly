@@ -98,6 +98,7 @@ Uygulama yalnızca bu bilgisayarda (yerel) çalışır; hosting veya ücretli se
 | `pnpm db:backup` | Yerel veritabanını `backups/` klasörüne yedekler (son 7 yedek saklanır) |
 | `pnpm db:restore backups/<dosya>.dump` | Önce güncel yedeği alır, sonra seçilen yedeği geri yükler |
 | `pnpm db:seed-demo` | Demo hesabı oluşturur ve tüm ekranları örnek veriyle doldurur (`demo@aysly.local` / `aysly demo 2026`); varsa önce demo hesabını siler, diğer hesaplara dokunmaz |
+| `pnpm db:seed-sample --email <adres>` | Hesaba 3 projelik ürün geliştirme örneği ekler (görevler, alt görevler, kişiler, yorumlar, notlar, hedefler, takvim, arşiv, çöp); önce yedek alır. `--remove` eklenenleri kaldırır |
 | `pnpm db:restore-drill` | Geri yükleme denemesi: yedeği geçici bir veritabanına yükleyip karşılaştırır; asıl veritabanına dokunmaz |
 | `pnpm arch` | Mimari katman kurallarını denetler |
 

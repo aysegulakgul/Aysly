@@ -58,7 +58,7 @@ export function createDrizzleProjectRepository(db: DbExecutor): ProjectRepositor
           name: p.name,
           description: p.description,
           color: p.color,
-          status: 'active',
+          status: 'not_started', // D-102: yeni proje Başlamadı ile başlar
           position: p.position,
           createdBy: scope.userId,
           createdAt: p.now,

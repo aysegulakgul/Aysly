@@ -2,7 +2,8 @@ import type { FieldIssue } from '@/shared/kernel/errors';
 import { err, ok, type Result } from '@/shared/kernel/result';
 
 /** BR-PROJ-002: proje durumu arşivden ayrıdır. */
-export const PROJECT_STATUSES = ['active', 'on_hold', 'completed'] as const;
+/** BR-PROJ-002 / D-102: Başlamadı, Devam ediyor (`active`), Beklemede, Tamamlandı. */
+export const PROJECT_STATUSES = ['not_started', 'active', 'on_hold', 'completed'] as const;
 export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
 
 /** UI_UX §2.4, D-082: sabit 12 renklik palet; serbest HEX yok. Simge MVP'de seçilmez. */

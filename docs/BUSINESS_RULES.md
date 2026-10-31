@@ -254,7 +254,7 @@ Ayrıntılı matris: [ROLES_AND_PERMISSIONS.md](ROLES_AND_PERMISSIONS.md).
 
 ### BR-SUB-005 — Alt görev sayısı sınırı
 - **Durum:** ONAYLI (D-060)
-- **Davranış:** Görev başına en fazla 100 alt görev (performans ve kullanılabilirlik koruması).
+- **Davranış:** Görev başına en fazla 1.000 alt görev (D-103; önceki sınır 100). Performans koruması olarak teknik üst sınır kalır.
 
 ---
 
@@ -367,7 +367,7 @@ Ayrıntılı matris: [ROLES_AND_PERMISSIONS.md](ROLES_AND_PERMISSIONS.md).
 
 ### BR-PROJ-002 — Proje durumu arşivden ayrıdır
 - **Durum:** ONAYLI (D-060)
-- **Davranış:** `active` (Aktif), `on_hold` (Beklemede), `completed` (Tamamlandı). Projeyi "Tamamlandı" yapmak görevlerini **değiştirmez**; açık görev varsa arayüz "12 açık görev var: hepsini tamamla / olduğu gibi bırak / vazgeç" sorar. Durum, projenin görünürlüğünü değiştirmez; arşiv değiştirir.
+- **Davranış:** `not_started` (Başlamadı, yeni projenin varsayılanı), `active` (Devam ediyor), `on_hold` (Beklemede), `completed` (Tamamlandı) (D-102). Projeyi "Tamamlandı" yapmak görevlerini **değiştirmez**; açık görev varsa arayüz "12 açık görev var: hepsini tamamla / olduğu gibi bırak / vazgeç" sorar. Durum, projenin görünürlüğünü değiştirmez; arşiv değiştirir.
 
 ### BR-PROJ-003 — Proje ilerlemesi
 - **Durum:** ONAYLI (D-060)
@@ -416,7 +416,7 @@ Ayrıntılı matris: [ROLES_AND_PERMISSIONS.md](ROLES_AND_PERMISSIONS.md).
 
 ### BR-INBOX-004 — My Tasks kapsamı
 - **Durum:** ONAYLI (D-060)
-- **Davranış:** MVP'de: kullanıcının kişisel çalışma alanındaki, arşivlenmemiş projelerdeki açık görevler (alt görevler ebeveynin altında gösterilir). Faz 10'da: kişisel alandaki görevler + paylaşılan alanlarda kullanıcıya atanmış görevler.
+- **Davranış:** MVP'de: kullanıcının kişisel çalışma alanındaki, arşivlenmemiş projelerdeki görevler; tamamlananlar üstü çizili olarak listede kalır (D-106; önceden yalnızca açık görevler) (alt görevler ebeveynin altında gösterilir). Faz 10'da: kişisel alandaki görevler + paylaşılan alanlarda kullanıcıya atanmış görevler.
 
 ---
 

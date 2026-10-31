@@ -59,13 +59,24 @@ export function Sidebar({
   const t = useTranslations('shell');
   const section = useSection();
   return (
-    <aside className="sticky top-0 hidden h-dvh w-[232px] shrink-0 flex-col gap-3 overflow-y-auto bg-surface-muted p-4 lg:flex">
+    <aside className="sticky top-0 hidden h-dvh w-[232px] shrink-0 flex-col gap-3 overflow-y-auto border-r border-border bg-[linear-gradient(180deg,var(--surface-muted),var(--bg-page))] p-4 lg:flex">
       <div className="flex h-11 w-full items-center gap-2.5">
         <Icon name="moon" tone="primary" />
-        <p className="flex-1 text-xl font-semibold text-text">aysly</p>
+        <p className="flex-1 bg-gradient-to-r from-[#7a7ff0] via-[#9a6ee6] to-[#e05f9e] bg-clip-text text-xl font-bold text-transparent">
+          aysly
+        </p>
       </div>
       <SearchButton />
       <nav aria-label={t('mainNav')} className="flex w-full flex-col gap-3">
+        <NavItem
+          href="/"
+          glyph="☼"
+          active={section.today}
+          count={badge(counts.today)}
+          countLabel={t('todayCount', { count: counts.today })}
+        >
+          {t('today')}
+        </NavItem>
         <NavItem
           href="/my-tasks"
           glyph="✓"
@@ -76,18 +87,6 @@ export function Sidebar({
           {t('myTasks')}
         </NavItem>
         <NavItem
-          href="/"
-          glyph="☼"
-          active={section.today}
-          count={badge(counts.today)}
-          countLabel={t('todayCount', { count: counts.today })}
-        >
-          {t('today')}
-        </NavItem>
-        <NavItem href="/calendar" glyph="▦" active={section.calendar}>
-          {t('calendar')}
-        </NavItem>
-        <NavItem
           href="/projects"
           glyph="▭"
           active={section.projects}
@@ -95,6 +94,9 @@ export function Sidebar({
           countLabel={t('projectsCount', { count: projects.length })}
         >
           {t('projects')}
+        </NavItem>
+        <NavItem href="/calendar" glyph="▦" active={section.calendar}>
+          {t('calendar')}
         </NavItem>
         <NavItem href="/goals" glyph="◎" active={section.goals}>
           {t('goals')}

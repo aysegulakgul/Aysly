@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { findMyTasksCount, findProjectOverview } from '@/modules/tasks';
+import { findProjectOverview, findSidebarCounts } from '@/modules/tasks';
 import { findViews } from '@/modules/views';
-import { getDashboard, getPersonalScope, getViewer } from '../viewer';
+import { getPersonalScope, getViewer } from '../viewer';
 import { KeyboardShortcuts } from './shortcuts';
 import { MobileNavigation, Sidebar } from './navigation';
 import { NotificationProvider } from './notifications/notification-center';
@@ -17,13 +17,12 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const [viewer, scope] = await Promise.all([getViewer(), getPersonalScope()]);
   if (!viewer || !scope) redirect('/sign-in');
   if (viewer.user.deletionRequestedAt) redirect('/account-deletion'); // D-092
-  const [myTasksCount, dashboard, projects, views] = await Promise.all([
-    findMyTasksCount(scope),
-    getDashboard(),
+  // NFR-01: kenar çubuğu sayıları tek sayım sorgusundan; pano yalnızca Bugün sayfasında hesaplanır.
+  const [counts, projects, views] = await Promise.all([
+    findSidebarCounts(scope, viewer.preferences),
     findProjectOverview(scope),
     findViews(scope),
   ]);
-  const counts = { myTasks: myTasksCount, today: dashboard?.today.length ?? 0 };
   return (
     <NotificationProvider>
       <SearchPaletteProvider workspaceId={scope.workspaceId}>

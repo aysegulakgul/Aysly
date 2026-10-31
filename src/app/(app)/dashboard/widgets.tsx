@@ -14,10 +14,22 @@ import { addDays } from '../tasks/dates';
 import { useTaskCompletion } from '../tasks/task-actions';
 import type { TaskUiContext } from '../tasks/task-context';
 import { TaskRow, isOverdue, useTaskMeta } from '../tasks/task-row';
+import { TaskQuickFields } from '../tasks/inline-edit';
 import type { GoalView } from '@/modules/goals';
 import type { ProjectView } from '@/modules/tasks';
 import { Progress } from '@/ui/components/progress';
 import { TASK_WIDGETS, type WidgetId } from './widget-ids';
+import { PROJECT_COLOR_VALUES } from '../projects/project-color';
+
+/** D-100: bölüm renkleri (proje paletinden). */
+const WIDGET_ACCENT: Record<string, string> = {
+  today: PROJECT_COLOR_VALUES.blue,
+  overdue: PROJECT_COLOR_VALUES.red,
+  upcoming: PROJECT_COLOR_VALUES.violet,
+  priority: PROJECT_COLOR_VALUES.amber,
+  projects: PROJECT_COLOR_VALUES.teal,
+  goals: PROJECT_COLOR_VALUES.pink,
+};
 
 /**
  * Bugün ekranı bölümleri (Figma 4:66545 "Dashboard widgets"): masaüstünde iki sütun (sıradaki bölümler sırayla
@@ -64,7 +76,18 @@ export function DashboardWidgets({
           overdue={isOverdue(task, context.today)}
           onComplete={() => completion.complete(task)}
           stacked
-          {...(actions ? { actions: actions(task) } : {})}
+          actions={
+            <>
+              {/* D-106: detay açmadan düzenleme */}
+              <TaskQuickFields
+                key={`${task.id}-${task.version}`}
+                task={task}
+                context={context}
+                overdue={isOverdue(task, context.today)}
+              />
+              {actions?.(task)}
+            </>
+          }
         />
       ))}
     </ul>
@@ -72,9 +95,10 @@ export function DashboardWidgets({
 
   const widget = (id: WidgetId) => {
     if (id === 'projects') {
-      const shown = projects.filter((p) => p.status === 'active');
+      // D-102: Başlamadı ve Devam eden projeler açık projelerdir.
+      const shown = projects.filter((p) => p.status === 'active' || p.status === 'not_started');
       return (
-        <Panel>
+        <Panel accent={WIDGET_ACCENT.projects}>
           <div className="flex items-center gap-3">
             <div className="flex-1">
               <SectionHeading>{t('widgets.projects')}</SectionHeading>
@@ -119,7 +143,7 @@ export function DashboardWidgets({
     }
     if (id === 'goals') {
       return (
-        <Panel>
+        <Panel accent={WIDGET_ACCENT.goals}>
           <div className="flex items-center gap-3">
             <div className="flex-1">
               <SectionHeading>{t('widgets.goals')}</SectionHeading>
@@ -159,7 +183,7 @@ export function DashboardWidgets({
     const items = visible(data[id]);
     const shown = items;
     return (
-      <Panel>
+      <Panel accent={WIDGET_ACCENT[id]}>
         <div className="flex items-center gap-3">
           <div className="flex-1">
             <SectionHeading>{t(`widgets.${id}`)}</SectionHeading>

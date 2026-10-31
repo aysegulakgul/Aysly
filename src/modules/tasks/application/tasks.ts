@@ -52,7 +52,7 @@ export type CreateTaskCommand = {
   reminders?: readonly ReminderInput[] | undefined;
 };
 
-export const SUBTASKS_PER_TASK = 100; // BR-SUB-005
+export const SUBTASKS_PER_TASK = 1000; // BR-SUB-005 / D-103
 
 /** D-097: atanan kişi aynı çalışma alanında olmalı (BR-WS-002); yoksa alan hatası. */
 async function checkAssignee(

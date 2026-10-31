@@ -8,7 +8,12 @@ import { noteDeps } from '@/modules/notes';
 import { listNotes } from '@/modules/notes/application/notes';
 import { createSqlSearchIndex } from '@/modules/search';
 import { searchEverything } from '@/modules/search/application/search';
-import { dashboard, listSummaries, myTasks } from '@/modules/tasks/application/organize';
+import {
+  dashboard,
+  listSummaries,
+  myTasks,
+  sidebarCounts,
+} from '@/modules/tasks/application/organize';
 import { projectOverview } from '@/modules/tasks/application/projects';
 import { createTask, listTasks } from '@/modules/tasks/application/tasks';
 import { taskDeps } from '@/modules/tasks/http/task-handlers';
@@ -132,7 +137,12 @@ describe('ölçek (NFR-03: 10.000 görev, 500 proje, 5.000 not)', () => {
     const today = await measure('Bugün bölümleri', () =>
       dashboard(tasks(), scope, { today: '2026-10-30', weekStart: 1 }),
     );
+    // Her sayfada çalışan kenar çubuğu sayıları ayrıca çok hızlı olmalı (görev yüklemeden sayım).
+    const counts = await measure('Kenar çubuğu sayıları', () =>
+      sidebarCounts(tasks(), scope, '2026-10-30'),
+    );
     for (const time of [inbox, project, mine, today]) expect(time).toBeLessThan(READ_MS);
+    expect(counts).toBeLessThan(READ_MS);
   });
 
   it('NFR-01: projeler, notlar ve arama p95 < 300 ms', async () => {

@@ -391,7 +391,8 @@
       "tomorrow": "Yarın",
       "thisWeek": "Bu hafta",
       "later": "Daha sonra",
-      "none": "Tarihsiz"
+      "none": "Tarihsiz",
+      "done": "Tamamlananlar"
     },
     "myTasks": {
       "title": "Görevlerim",
@@ -581,7 +582,8 @@
       "addFailed": "Görev eklenemedi. Tekrar dene.",
       "groupBy": "Gruplama",
       "byDate": "Tarihe göre",
-      "byProject": "Projeye göre"
+      "byProject": "Projeye göre",
+      "doneCount": "{count} tamamlandı"
     },
     "comments": {
       "title": "Yorumlar",
@@ -592,6 +594,44 @@
       "delete": "Sil",
       "unknown": "Silinmiş kullanıcı",
       "failed": "Yorum eklenemedi. Tekrar dene."
+    },
+    "inline": {
+      "title": "Görev adı",
+      "editTitle": "Adı düzenle: {title}",
+      "assignee": "Atanan: {title}",
+      "unassigned": "Atanmamış",
+      "noContacts": "Kişi eklemek için Ayarlar · Kişiler.",
+      "due": "Son tarih: {title}",
+      "project": "Proje: {title}",
+      "priority": "Öncelik: {title}",
+      "status": "Statü: {title}",
+      "points": "Puan: {title}",
+      "clearPoints": "Puanı kaldır",
+      "reopen": "Yeniden aç: {title}",
+      "subtasks": "Alt görevler: {title}",
+      "subtasksOf": "{title} alt görevleri",
+      "subtaskTitle": "Alt görev adı: {title}",
+      "toggleSubtask": "Tamamla ya da yeniden aç: {title}",
+      "deleteSubtask": "Alt görevi sil: {title}",
+      "addSubtask": "{title} için alt görev ekle",
+      "addSubtaskPlaceholder": "+ Alt görev ekle (Enter)",
+      "loading": "Yükleniyor…",
+      "failed": "Kaydedilemedi. Tekrar dene."
+    },
+    "filters": {
+      "label": "Sütun filtreleri",
+      "byAssignee": "Atanana göre filtrele",
+      "byProject": "Projeye göre filtrele",
+      "byPriority": "Önceliğe göre filtrele",
+      "byStatus": "Statüye göre filtrele",
+      "byDue": "Tarihe göre filtrele",
+      "allAssignees": "Tüm atananlar",
+      "allProjects": "Tüm projeler",
+      "allPriorities": "Tüm öncelikler",
+      "allStatuses": "Tüm statüler",
+      "allDates": "Tüm tarihler",
+      "clear": "Filtreleri temizle",
+      "showing": "{count} görev gösteriliyor"
     }
   },
   "firstSteps": {
@@ -655,7 +695,8 @@
     "moveUp": "{name} projesini yukarı taşı",
     "moveDown": "{name} projesini aşağı taşı",
     "status": {
-      "active": "Aktif",
+      "not_started": "Başlamadı",
+      "active": "Devam ediyor",
       "on_hold": "Beklemede",
       "completed": "Tamamlandı"
     },
@@ -745,10 +786,21 @@
       "next": "Sıradaki: {date}",
       "stats": {
         "projects": "Proje",
-        "active": "Aktif proje",
+        "active": "Devam eden",
         "open": "Açık görev",
         "done": "Tamamlanan"
-      }
+      },
+      "open": "{name} projesini aç",
+      "name": "Proje adı",
+      "rename": "Adı düzenle: {name}",
+      "colorOf": "{name} rengi",
+      "filters": "Pano filtreleri",
+      "search": "Projelerde ara",
+      "byStatus": "Statüye göre filtrele",
+      "byColor": "Renge göre filtrele",
+      "allStatuses": "Tüm statüler",
+      "allColors": "Tüm renkler",
+      "clear": "Filtreleri temizle"
     }
   },
   "views": {

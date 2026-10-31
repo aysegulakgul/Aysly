@@ -102,6 +102,18 @@ export type TaskRepository = {
   countOpen(scope: WorkspaceScope, projectId: string): Promise<number>;
   /** Görevlerim (BR-INBOX-004): verilen projelerdeki açık, arşivlenmemiş üst düzey görevler. */
   listOpenInProjects(scope: WorkspaceScope, projectIds: readonly string[]): Promise<Task[]>;
+  /** Kenar çubuğu sayıları tek sorguda: açık üst düzey görevler ve bugün tarihli olanlar (NFR-01). */
+  countOpenInProjects(
+    scope: WorkspaceScope,
+    projectIds: readonly string[],
+    today: string,
+  ): Promise<{ open: number; today: number }>;
+  /** D-106: verilen andan sonra tamamlanmış üst düzey görevler (Görevlerim'de üstü çizili kalır). */
+  listDoneInProjects(
+    scope: WorkspaceScope,
+    projectIds: readonly string[],
+    completedSince: Date,
+  ): Promise<Task[]>;
   /** Çöpte olmayan alt görevler (arşivliler dahil), sıralı. */
   listSubtasks(scope: WorkspaceScope, parentId: string): Promise<Task[]>;
   subtaskCounts(

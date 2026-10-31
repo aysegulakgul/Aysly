@@ -1,5 +1,6 @@
 import {
   getTableColumns,
+  gte,
   and,
   asc,
   count,
@@ -306,10 +307,49 @@ export function createDrizzleTaskRepository(db: DbExecutor): TaskRepository {
             isNull(tasks.archivedAt),
             isNull(tasks.parentTaskId),
             ne(tasks.status, 'done'),
-            inArray(tasks.projectId, [...projectIds]),
+            anyUuid(tasks.projectId, projectIds),
           ),
         )
         .orderBy(asc(tasks.dueDate), asc(tasks.dueAt), desc(tasks.priority), asc(tasks.position));
+      return rows.map(toTask);
+    },
+
+    async countOpenInProjects(scope, projectIds, today) {
+      if (projectIds.length === 0) return { open: 0, today: 0 };
+      const [row] = await db
+        .select({
+          open: count(),
+          today: sql<number>`count(*) filter (where ${tasks.dueDate} = ${today})`.mapWith(Number),
+        })
+        .from(tasks)
+        .where(
+          and(
+            inScope(scope),
+            isNull(tasks.archivedAt),
+            isNull(tasks.parentTaskId),
+            ne(tasks.status, 'done'),
+            anyUuid(tasks.projectId, projectIds),
+          ),
+        );
+      return { open: row?.open ?? 0, today: row?.today ?? 0 };
+    },
+
+    async listDoneInProjects(scope, projectIds, completedSince) {
+      if (projectIds.length === 0) return [];
+      const rows = await db
+        .select(taskRow)
+        .from(tasks)
+        .where(
+          and(
+            inScope(scope),
+            isNull(tasks.archivedAt),
+            isNull(tasks.parentTaskId),
+            eq(tasks.status, 'done'),
+            gte(tasks.completedAt, completedSince),
+            anyUuid(tasks.projectId, projectIds),
+          ),
+        )
+        .orderBy(desc(tasks.completedAt));
       return rows.map(toTask);
     },
 

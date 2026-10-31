@@ -32,6 +32,7 @@ import {
   reopenTask,
   updateTask,
   type TaskDeps,
+  SUBTASKS_PER_TASK,
 } from './tasks';
 
 const scope = { userId: 'u1', workspaceId: 'w1', role: 'owner' } as WorkspaceScope;
@@ -137,6 +138,29 @@ function setup(projects: ProjectRef[] = [], tagCount = 0) {
           t.workspaceId === s.workspaceId &&
           ids.includes(t.projectId) &&
           t.status !== 'done' &&
+          !t.archivedAt &&
+          !t.deletedAt &&
+          !t.parentTaskId,
+      ),
+    countOpenInProjects: async (s, ids, today) => {
+      const open = [...rows.values()].filter(
+        (t) =>
+          t.workspaceId === s.workspaceId &&
+          ids.includes(t.projectId) &&
+          t.status !== 'done' &&
+          !t.archivedAt &&
+          !t.deletedAt &&
+          !t.parentTaskId,
+      );
+      return { open: open.length, today: open.filter((t) => t.due?.date === today).length };
+    },
+    listDoneInProjects: async (s, ids, since) =>
+      [...rows.values()].filter(
+        (t) =>
+          t.workspaceId === s.workspaceId &&
+          ids.includes(t.projectId) &&
+          t.status === 'done' &&
+          (t.completedAt ?? new Date(0)) >= since &&
           !t.archivedAt &&
           !t.deletedAt &&
           !t.parentTaskId,
@@ -589,10 +613,10 @@ describe('alt görevler', () => {
     });
   });
 
-  it('BR-SUB-005: en fazla 100 alt görev', async () => {
+  it('BR-SUB-005 / D-103: en fazla 1.000 alt görev', async () => {
     const { deps } = setup();
     const parent = value(await createTask(deps, scope, { title: 'Ana' }));
-    for (let i = 0; i < 100; i++)
+    for (let i = 0; i < SUBTASKS_PER_TASK; i++)
       await createTask(deps, scope, { title: `A${i}`, parentTaskId: parent.id });
     expect(await createTask(deps, scope, { title: 'Fazla', parentTaskId: parent.id })).toEqual({
       ok: false,

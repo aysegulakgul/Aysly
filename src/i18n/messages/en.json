@@ -391,7 +391,8 @@
       "tomorrow": "Tomorrow",
       "thisWeek": "This week",
       "later": "Later",
-      "none": "No date"
+      "none": "No date",
+      "done": "Completed"
     },
     "myTasks": {
       "title": "My tasks",
@@ -581,7 +582,8 @@
       "addFailed": "The task couldn't be added. Try again.",
       "groupBy": "Grouping",
       "byDate": "By date",
-      "byProject": "By project"
+      "byProject": "By project",
+      "doneCount": "{count} done"
     },
     "comments": {
       "title": "Comments",
@@ -592,6 +594,44 @@
       "delete": "Delete",
       "unknown": "Deleted user",
       "failed": "The comment couldn't be added. Try again."
+    },
+    "inline": {
+      "title": "Task name",
+      "editTitle": "Edit name: {title}",
+      "assignee": "Assignee: {title}",
+      "unassigned": "Unassigned",
+      "noContacts": "Add people in Settings · People.",
+      "due": "Due date: {title}",
+      "project": "Project: {title}",
+      "priority": "Priority: {title}",
+      "status": "Status: {title}",
+      "points": "Points: {title}",
+      "clearPoints": "Clear points",
+      "reopen": "Reopen: {title}",
+      "subtasks": "Subtasks: {title}",
+      "subtasksOf": "Subtasks of {title}",
+      "subtaskTitle": "Subtask name: {title}",
+      "toggleSubtask": "Complete or reopen: {title}",
+      "deleteSubtask": "Delete subtask: {title}",
+      "addSubtask": "Add a subtask to {title}",
+      "addSubtaskPlaceholder": "+ Add subtask (Enter)",
+      "loading": "Loading…",
+      "failed": "Couldn't save. Try again."
+    },
+    "filters": {
+      "label": "Column filters",
+      "byAssignee": "Filter by assignee",
+      "byProject": "Filter by project",
+      "byPriority": "Filter by priority",
+      "byStatus": "Filter by status",
+      "byDue": "Filter by date",
+      "allAssignees": "All assignees",
+      "allProjects": "All projects",
+      "allPriorities": "All priorities",
+      "allStatuses": "All statuses",
+      "allDates": "All dates",
+      "clear": "Clear filters",
+      "showing": "Showing {count} tasks"
     }
   },
   "firstSteps": {
@@ -655,7 +695,8 @@
     "moveUp": "Move {name} up",
     "moveDown": "Move {name} down",
     "status": {
-      "active": "Active",
+      "not_started": "Not started",
+      "active": "In progress",
       "on_hold": "On hold",
       "completed": "Completed"
     },
@@ -745,10 +786,21 @@
       "next": "Next: {date}",
       "stats": {
         "projects": "Projects",
-        "active": "Active projects",
+        "active": "In progress",
         "open": "Open tasks",
         "done": "Completed"
-      }
+      },
+      "open": "Open {name}",
+      "name": "Project name",
+      "rename": "Rename: {name}",
+      "colorOf": "Color of {name}",
+      "filters": "Board filters",
+      "search": "Search projects",
+      "byStatus": "Filter by status",
+      "byColor": "Filter by color",
+      "allStatuses": "All statuses",
+      "allColors": "All colors",
+      "clear": "Clear filters"
     }
   },
   "views": {

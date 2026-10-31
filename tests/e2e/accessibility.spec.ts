@@ -102,13 +102,15 @@ test.describe('Erişilebilirlik (AC-11)', () => {
       await expect(rows.first().locator('[data-task-link]')).toBeFocused();
     };
 
-    // Tamamla: J ile ilk satıra odaklan, Ctrl/⌘ + Enter.
+    // Tamamla: J ile ilk satıra odaklan, Ctrl/⌘ + Enter. D-106: görev listede tamamlanmış olarak kalır.
     await focusRow();
     await page.keyboard.press('ControlOrMeta+Enter');
-    await expect(rows).toHaveCount(2);
+    await expect(rows.locator('[data-complete][aria-pressed="true"]')).toHaveCount(1);
 
-    // Taşı: M görev detayında proje alanını odaklar; ok tuşuyla proje seçilir.
+    // Taşı: J ile ikinci satıra geç; M görev detayında proje alanını odaklar; ok tuşuyla proje seçilir.
     await focusRow();
+    await page.keyboard.press('j');
+    await expect(rows.nth(1).locator('[data-task-link]')).toBeFocused();
     await page.keyboard.press('m');
     const projectField = page.locator('#detail-project');
     await expect(projectField).toBeFocused();
@@ -116,14 +118,14 @@ test.describe('Erişilebilirlik (AC-11)', () => {
     await expect(projectField.locator('option:checked')).toHaveText('Ev');
     // D-098: taşınan görev Görevlerim'de kalır; proje rozeti değişir.
     await page.goto('/my-tasks');
-    await expect(rows).toHaveCount(2);
+    await expect(rows).toHaveCount(3);
     await expect(rows.filter({ hasText: 'Ev' })).toHaveCount(1);
 
     // Sil: J ile odaklan, Delete.
     await focusRow();
     const last = (await rows.first().getAttribute('data-task-id'))!;
     await page.keyboard.press('Delete');
-    await expect(rows).toHaveCount(1);
+    await expect(rows).toHaveCount(2);
     const trashed = await page.request.get(`/api/v1/workspaces/${ws}/trash`);
     expect(JSON.stringify(await trashed.json())).toContain(last);
   });

@@ -12,13 +12,17 @@ import { Banner, EmptyState, Toast } from '@/ui/components/feedback';
 import { Icon } from '@/ui/components/icon';
 import { cn } from '@/ui/cn';
 import { shortDate } from '../tasks/dates';
-import { Avatar, Pill, STATUS_COLOR } from '../tasks/pills';
-import { PROJECT_COLOR_VALUES, type ProjectColorName } from './project-color';
+import { Avatar } from '../tasks/pills';
+import { StatusCell, useTaskEditor } from '../tasks/inline-edit';
+import type { TaskUiContext } from '../tasks/task-context';
+import { Popover, PopoverClose } from '@/ui/components/popover';
+import { PROJECT_COLOR_NAMES, PROJECT_COLOR_VALUES, type ProjectColorName } from './project-color';
 import { ProjectFormDialog } from './project-form';
 
-const COLUMNS = ['active', 'on_hold', 'completed'] as const;
+const COLUMNS = ['not_started', 'active', 'on_hold', 'completed'] as const;
 type Column = (typeof COLUMNS)[number];
 const COLUMN_COLOR: Record<Column, string> = {
+  not_started: 'slate',
   active: 'blue',
   on_hold: 'amber',
   completed: 'green',
@@ -37,15 +41,18 @@ export function ProjectsBoard({
   projects,
   tasks,
   workspaceId,
+  context,
   deletedBatch,
 }: {
   projects: ProjectView[];
   tasks: Record<string, TaskView[]>;
   workspaceId: string;
+  context: TaskUiContext;
   deletedBatch?: string | undefined;
 }) {
   const t = useTranslations('projects');
-  const tTasks = useTranslations('tasks');
+  const tColors = useTranslations('projects.color');
+  const [filters, setFilters] = useState({ status: '', color: '', q: '' });
   const tUi = useTranslations('ui');
   const locale = useLocale();
   const router = useRouter();
@@ -114,16 +121,78 @@ export function ProjectsBoard({
       </div>
       {/* Özet şeridi (D-100: önerilen iyileştirme) */}
       <dl className="grid w-full grid-cols-2 gap-3 lg:grid-cols-4">
-        {stats.map((s) => (
-          <div
-            key={s.label}
-            className="flex flex-col gap-1 rounded-md border border-border bg-surface p-4"
-          >
-            <dt className="text-xs text-text-secondary">{s.label}</dt>
-            <dd className="text-2xl font-semibold text-text">{s.value}</dd>
-          </div>
-        ))}
+        {stats.map((s, i) => {
+          const accent = [
+            PROJECT_COLOR_VALUES.indigo,
+            PROJECT_COLOR_VALUES.blue,
+            PROJECT_COLOR_VALUES.amber,
+            PROJECT_COLOR_VALUES.green,
+          ][i]!;
+          return (
+            <div
+              key={s.label}
+              className="flex flex-col gap-1 rounded-lg border border-border p-4 shadow-sm"
+              style={{
+                backgroundImage: `linear-gradient(135deg, ${accent}30, ${accent}08)`,
+                borderLeft: `4px solid ${accent}`,
+              }}
+            >
+              <dt className="text-xs font-medium text-text-secondary">{s.label}</dt>
+              <dd className="text-3xl font-bold text-text">{s.value}</dd>
+            </div>
+          );
+        })}
       </dl>
+      {/* D-106: pano filtreleri — statü sütunu, renk, ad */}
+      <div
+        role="group"
+        aria-label={t('overview.filters')}
+        className="flex flex-wrap items-center gap-2"
+      >
+        <input
+          type="search"
+          value={filters.q}
+          onChange={(e) => setFilters({ ...filters, q: e.target.value })}
+          placeholder={t('overview.search')}
+          aria-label={t('overview.search')}
+          className="min-h-9 min-w-[200px] flex-1 rounded-full border border-border bg-surface px-4 text-sm text-text placeholder:text-text-secondary sm:flex-none"
+        />
+        <select
+          value={filters.status}
+          onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+          aria-label={t('overview.byStatus')}
+          className="min-h-9 rounded-full border border-border bg-surface px-3 text-sm text-text"
+        >
+          <option value="">{t('overview.allStatuses')}</option>
+          {COLUMNS.map((c) => (
+            <option key={c} value={c}>
+              {t(`status.${c}`)}
+            </option>
+          ))}
+        </select>
+        <select
+          value={filters.color}
+          onChange={(e) => setFilters({ ...filters, color: e.target.value })}
+          aria-label={t('overview.byColor')}
+          className="min-h-9 rounded-full border border-border bg-surface px-3 text-sm text-text"
+        >
+          <option value="">{t('overview.allColors')}</option>
+          {PROJECT_COLOR_NAMES.map((c) => (
+            <option key={c} value={c}>
+              {tColors(c)}
+            </option>
+          ))}
+        </select>
+        {filters.status || filters.color || filters.q ? (
+          <button
+            type="button"
+            onClick={() => setFilters({ status: '', color: '', q: '' })}
+            className="min-h-9 rounded-full px-3 text-sm text-primary hover:underline"
+          >
+            {t('overview.clear')}
+          </button>
+        ) : null}
+      </div>
       {failed ? <Banner>{t('actionFailed')}</Banner> : null}
       {projects.length === 0 ? (
         <EmptyState
@@ -133,8 +202,14 @@ export function ProjectsBoard({
         />
       ) : (
         <div className="flex w-full gap-4 overflow-x-auto pb-2">
-          {COLUMNS.map((column) => {
-            const cards = projects.filter((p) => p.status === column);
+          {COLUMNS.filter((c) => !filters.status || c === filters.status).map((column) => {
+            const query = filters.q.trim().toLocaleLowerCase(locale);
+            const cards = projects.filter(
+              (p) =>
+                p.status === column &&
+                (!filters.color || p.color === filters.color) &&
+                (!query || p.name.toLocaleLowerCase(locale).includes(query)),
+            );
             return (
               <section
                 key={column}
@@ -146,8 +221,11 @@ export function ProjectsBoard({
                 }}
                 onDragLeave={() => setOver(null)}
                 onDrop={(e) => onDrop(e, column)}
+                style={{
+                  backgroundColor: `${PROJECT_COLOR_VALUES[COLUMN_COLOR[column] as ProjectColorName]}12`,
+                }}
                 className={cn(
-                  'flex min-w-[300px] flex-1 flex-col gap-3 rounded-md bg-surface-muted p-3',
+                  'flex min-w-[280px] flex-1 flex-col gap-3 rounded-lg border border-border p-3',
                   over === column && 'ring-2 ring-primary',
                 )}
               >
@@ -190,20 +268,23 @@ export function ProjectsBoard({
                       data-project-card
                       draggable
                       onDragStart={(e) => e.dataTransfer.setData('text/plain', project.id)}
-                      className="flex flex-col gap-3 overflow-hidden rounded-md border border-border bg-surface"
+                      className="flex flex-col gap-3 overflow-hidden rounded-lg border border-border bg-surface shadow-sm transition-shadow hover:shadow-md"
                     >
                       <div
                         aria-hidden="true"
-                        className="h-1.5 w-full"
-                        style={{ backgroundColor: color }}
+                        className="h-2 w-full"
+                        style={{ backgroundImage: `linear-gradient(90deg, ${color}, ${color}66)` }}
                       />
                       <div className="flex flex-col gap-3 px-4 pb-4">
                         <div className="flex items-start gap-2">
+                          <ColorDot project={project} workspaceId={workspaceId} />
+                          <ProjectName project={project} workspaceId={workspaceId} />
                           <Link
                             href={`/projects/${project.id}` as Route}
-                            className="min-w-0 flex-1 text-base font-semibold text-text hover:underline"
+                            aria-label={t('overview.open', { name: project.name })}
+                            className="flex size-7 shrink-0 items-center justify-center rounded-sm text-text-secondary hover:bg-surface-muted hover:text-text"
                           >
-                            {project.name}
+                            ↗
                           </Link>
                           <select
                             value={project.status}
@@ -251,9 +332,11 @@ export function ProjectsBoard({
                           <ul className="flex flex-col gap-1.5">
                             {list.slice(0, TASKS_PER_CARD).map((task) => (
                               <li key={task.id} className="flex items-center gap-2 text-sm">
-                                <Pill color={STATUS_COLOR[task.status]!} className="shrink-0">
-                                  {tTasks(`status.${task.status}`)}
-                                </Pill>
+                                <BoardTaskStatus
+                                  key={`${task.id}-${task.version}`}
+                                  task={task}
+                                  context={context}
+                                />
                                 <Link
                                   href={`/projects/${project.id}?task=${task.id}` as Route}
                                   className={cn(
@@ -335,9 +418,114 @@ export function ProjectsBoard({
           open={creating}
           onOpenChange={setCreating}
           workspaceId={workspaceId}
-          existingNames={projects.filter((p) => p.status === 'active').map((p) => p.name)}
+          existingNames={projects.filter((p) => p.status !== 'completed').map((p) => p.name)}
         />
       ) : null}
     </>
+  );
+}
+
+/** D-106: proje adı satır içinde düzenlenir (Enter veya odaktan çıkınca kaydedilir). */
+function ProjectName({ project, workspaceId }: { project: ProjectView; workspaceId: string }) {
+  const t = useTranslations('projects');
+  const router = useRouter();
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(project.name);
+  async function commit() {
+    setEditing(false);
+    const name = value.trim();
+    if (!name || name === project.name) return setValue(project.name);
+    const result = await apiPatch(`/api/v1/workspaces/${workspaceId}/projects/${project.id}`, {
+      version: project.version,
+      name,
+    });
+    if (!result.ok) setValue(project.name);
+    router.refresh();
+  }
+  if (editing) {
+    return (
+      <input
+        autoFocus
+        value={value}
+        maxLength={100}
+        aria-label={t('overview.name')}
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={() => void commit()}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') void commit();
+          if (e.key === 'Escape') {
+            setValue(project.name);
+            setEditing(false);
+          }
+        }}
+        className="min-h-8 min-w-0 flex-1 rounded-sm border border-primary bg-surface px-1 text-base font-semibold text-text"
+      />
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={() => setEditing(true)}
+      aria-label={t('overview.rename', { name: project.name })}
+      className="min-h-8 min-w-0 flex-1 truncate rounded-sm px-1 text-left text-base font-semibold text-text hover:bg-surface-muted"
+    >
+      {project.name}
+    </button>
+  );
+}
+
+/** D-106: proje rengi kart üzerinden değişir. */
+function ColorDot({ project, workspaceId }: { project: ProjectView; workspaceId: string }) {
+  const t = useTranslations('projects');
+  const tColors = useTranslations('projects.color');
+  const router = useRouter();
+  async function choose(color: string) {
+    await apiPatch(`/api/v1/workspaces/${workspaceId}/projects/${project.id}`, {
+      version: project.version,
+      color,
+    });
+    router.refresh();
+  }
+  return (
+    <Popover
+      label={t('overview.colorOf', { name: project.name })}
+      className="w-52 p-3"
+      trigger={
+        <button
+          type="button"
+          aria-label={t('overview.colorOf', { name: project.name })}
+          className="mt-1 size-5 shrink-0 rounded-full ring-2 ring-surface ring-offset-1 ring-offset-border"
+          style={{
+            backgroundColor:
+              PROJECT_COLOR_VALUES[project.color as ProjectColorName] ?? PROJECT_COLOR_VALUES.slate,
+          }}
+        />
+      }
+    >
+      <div className="grid grid-cols-6 gap-2">
+        {PROJECT_COLOR_NAMES.map((c) => (
+          <PopoverClose asChild key={c}>
+            <button
+              type="button"
+              onClick={() => void choose(c)}
+              aria-label={tColors(c)}
+              aria-pressed={project.color === c}
+              className={cn('size-6 rounded-full', project.color === c && 'ring-2 ring-text')}
+              style={{ backgroundColor: PROJECT_COLOR_VALUES[c] }}
+            />
+          </PopoverClose>
+        ))}
+      </div>
+    </Popover>
+  );
+}
+
+/** D-106: karttaki görevin statüsü satır içinde değişir. */
+function BoardTaskStatus({ task, context }: { task: TaskView; context: TaskUiContext }) {
+  const editor = useTaskEditor(task, context);
+  return (
+    <span className="shrink-0">
+      <StatusCell task={task} editor={editor} />
+    </span>
   );
 }

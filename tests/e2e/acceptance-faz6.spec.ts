@@ -47,8 +47,9 @@ test.describe('Faz 6 kabul', () => {
     await row.locator('[data-complete]').click();
     await expect(page.getByText('Görev tamamlandı', { exact: false })).toBeVisible();
     await page.reload();
+    // D-106: tamamlanan örnek de listede kalır; yeni açık örnek eklenir.
     await expect(page.locator('[data-task-row]').filter({ hasText: 'Haftalık plan' })).toHaveCount(
-      1,
+      2,
     );
     const tasks = (
       await (
