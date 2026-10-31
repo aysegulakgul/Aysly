@@ -482,7 +482,7 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Sonuçlar: BR-ACC-005, USER_FLOWS §3.10.
 
 ### D-093 — Ekran okuyucu testi (OQ-044)
-- Durum: ONAYLI · Tarih: 2026-10-30 · Karar veren: Ürün sahibi ("İkisi de A")
+- Durum: YERİNE GEÇİLDİ (D-096) · Tarih: 2026-10-30 · Karar veren: Ürün sahibi ("İkisi de A")
 - Karar: Claude otomatik erişilebilirlik taramasını tüm sayfalara genişletir, yalnızca klavyeyle E2E testlerini yazar ve kısa bir ekran okuyucu kontrol listesi hazırlar. Ürün sahibi listeyi NVDA ile uygular; bulguları Claude düzeltir. Faz 8 kapanışı bu kontrolün sonucunu içerir.
 - Sonuçlar: AC-11, NFR-04, TESTING_STRATEGY §6.
 
@@ -504,6 +504,12 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Karar 2: SECURITY §2'deki "ayrı migration kullanıcısı" [MVP] → [YAYIN]. Tek kullanıcılı yerel ortamda pratik faydası yok; mevcut veritabanında elle değişiklik gerektirir (D-061 ilkesi).
 - Sonuçlar: SECURITY §2, §5; API_CONTRACTS §9.
 
+
+### D-096 — Ekran okuyucu manuel testi yayına alma öncesine ertelendi (D-093'ün yerine)
+- Durum: ONAYLI · Tarih: 2026-10-31 · Karar veren: Ürün sahibi ("bu gerekli değil … faz 8'i kapatalım")
+- Karar: Uygulamayı şimdilik yalnızca ürün sahibi kullandığı için NVDA ile manuel dinleme testi yapılmaz; yayına alma öncesine (OQ-032) ertelenir. Otomatik erişilebilirlik taraması (tüm sayfalar) ve yalnızca klavye testi `pnpm verify` içinde çalışmaya devam eder. Kontrol listesi `docs/SCREEN_READER_CHECKLIST.md` o zaman kullanılmak üzere saklanır.
+- Sonuçlar: AC-11 otomatik kısmıyla karşılandı; NFR-04'ün manuel doğrulaması yayın öncesi kontrol listesinde.
+
 ---
 
 ## 5. Faz kapanış kayıtları
@@ -517,3 +523,4 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 | Faz 5 — Projeler ve görev görünümleri | 2026-10-29 | Ürün sahibi ("evet kapat ve faz 6 ya geç") | `pnpm verify` 13/13 yeşil (birim 155, entegrasyon 55, tarayıcı 252). D-082..D-086. Figma'da olmayan ekranlar ve proje renk tonları kabul edildi. FR-VIEW-08 kısmi (D-086). `main` üzerinde `3f7069d`. |
 | Faz 6 — Takvim, hatırlatıcılar, tekrar, bildirimler | 2026-10-30 | Ürün sahibi ("Kapat, Faz 7'ye geç") | `pnpm verify` 13/13 yeşil (birim 173, entegrasyon 60, tarayıcı 281). D-087..D-089 (ürün sahibinin Faz 6 ön onayıyla). FR-CAL-05 (P2) kapsam dışı. `main` üzerinde `1eed030`. |
 | Faz 7 — Notlar, hedefler, arama | 2026-10-30 | Ürün sahibi ("Faz 7'yi kapat ve commit et") | `pnpm verify` 13/13 yeşil (birim 199, entegrasyon 64, tarayıcı 322). D-090 (Tiptap, OQ-042), D-091. `main` üzerinde `4cd525e`, `ca81401`. |
+| Faz 8 — Test, güvenlik, kalite; dışa aktarma, hesap silme | 2026-10-31 | Ürün sahibi ("faz 8'i kapatalım") | `pnpm verify` 14/14 yeşil (birim 202, entegrasyon 72, tarayıcı 337). D-092..D-096. Ekran okuyucu manuel testi yayına alma öncesine ertelendi (D-096). `main` üzerinde `18e5c02`. |

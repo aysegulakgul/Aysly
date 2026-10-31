@@ -1,13 +1,15 @@
 # Ekran okuyucu kontrol listesi (NVDA)
 
-> Durum: v1.0 · Son güncelleme: 2026-10-31 · Karar: D-093 · Kapsam: AC-11, NFR-04
+> Durum: v1.0 · Son güncelleme: 2026-10-31 · Karar: D-096 (yayına alma öncesinde uygulanacak) · Kapsam: AC-11, NFR-04
 >
 > Otomatik taramalar (axe) ve klavye testleri `pnpm verify` içinde çalışır. Bu liste, makinenin ölçemediği şeyi,
 > yani ekran okuyucunun **ne söylediğini** kontrol eder. Süre: yaklaşık 20 dakika.
 
 ## Hazırlık (bir kez)
 1. NVDA'yı ücretsiz indir ve kur: <https://www.nvaccess.org/download/>.
-2. Uygulamayı başlat (`pnpm dev`) ve Chrome ya da Edge'de `http://localhost:3000` adresini aç.
+2. Docker Desktop'ı aç (veritabanı onunla çalışır). Proje klasöründe bir PowerShell penceresinde `pnpm.cmd dev`
+   yaz (PowerShell betik çalıştırmayı engellediği için `pnpm` yerine `pnpm.cmd`). "Ready" yazınca Chrome ya da
+   Edge'de `http://localhost:3000` adresini aç. Pencere açık kaldığı sürece uygulama çalışır.
 3. NVDA'yı başlat (`Ctrl + Alt + N`). NVDA tuşu varsayılan olarak `Insert`'tür.
 4. Konuşmayı susturmak için `Ctrl`; NVDA'yı kapatmak için `Insert + Q`.
 
@@ -49,5 +51,5 @@ Her satırda NVDA'nın söylemesi gerekeni dinle. Sorun varsa "Not" sütununa k�
 | 20 | Klavye kısayolları | `?` | Kısayol rehberi pencere olarak açılır ve okunur | |
 
 ## Bitince
-Tabloyu doldurup bana gönder (ya da yalnızca sorunlu satırları yaz). Bulguları düzeltip testlerini eklerim; Faz 8
-kapanışında bu kontrolün sonucu kaydedilir (D-093).
+Tabloyu doldurup bana gönder (ya da yalnızca sorunlu satırları yaz). Bulguları düzeltip testlerini eklerim; Sonuç yayına
+alma öncesi kontrolde kaydedilir (D-096).

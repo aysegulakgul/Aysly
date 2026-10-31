@@ -14,7 +14,7 @@
 | 5 | Projeler ve görev görünümleri | **Kapandı** | — | 2026-10-29 | 2026-10-29 |
 | 6 | Takvim, hatırlatıcılar, tekrarlayan görevler, bildirimler | **Kapandı** | — | 2026-10-29 | 2026-10-30 |
 | 7 | Notlar, hedefler, arama | **Kapandı** | — | 2026-10-30 | 2026-10-30 |
-| 8 | Test, güvenlik, kalite; dışa aktarma, hesap silme | Devam ediyor | — (OQ-043 → D-092, OQ-044 → D-093) | 2026-10-30 | — |
+| 8 | Test, güvenlik, kalite; dışa aktarma, hesap silme | **Kapandı** | — | 2026-10-30 | 2026-10-31 |
 | 9 | Kullanım geri bildirimine göre iyileştirmeler | Başlamadı | — | — | — |
 | 10 | (Doğrulanırsa) Ekip ve paylaşılan çalışma alanları | Başlamadı | Ayrı karar seti; yayına alma (OQ-032); abonelik yönü D-048 | — | — |
 
@@ -164,10 +164,10 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
   - Nonce tabanlı CSP, gizli anahtar taraması, `AUTH_SECRET` yenileme prosedürü (README).
   - Ölçek testi (10.000 görev, 500 proje, 5.000 not): okuma p95 en çok ≈ 217 ms, görev oluşturma ≈ 12 ms; dışa aktarma ≈ 0,5 sn.
   - Geri yükleme denemesi (2026-10-31): yedek geçici veritabanına yüklendi; 24 tablonun hepsinde satır sayıları eşleşti (geliştirme veritabanında 26 satır vardı).
-  - Erişilebilirlik: tüm sayfalarda axe taraması, klavye testi; ekran okuyucu kontrol listesi `docs/SCREEN_READER_CHECKLIST.md` ürün sahibinin uygulamasını bekliyor (D-093).
+  - Erişilebilirlik: tüm sayfalarda axe taraması, klavye testi; ekran okuyucu manuel testi yayına alma öncesine ertelendi (D-096; kontrol listesi `docs/SCREEN_READER_CHECKLIST.md`).
   - Doğrulama (2026-10-31): `pnpm verify` 14/14 yeşil (yeni adım: gizli anahtar taraması) — birim 202, entegrasyon 72, tarayıcı 337 (3 atlandı: yalnızca masaüstü testleri).
   - SECURITY §5 "sunucu kaydederken HTML'i temizler" maddesi kaldırıldı, §2 "ayrı migration kullanıcısı" yayına alma öncesine ertelendi (D-095).
-  - Kapanış için kalan: ürün sahibinin NVDA kontrol listesini uygulaması (D-093).
+  - Ürün sahibi kapanışı onayladı (2026-10-31).
 - **Kabul:** SECURITY §13 MVP sütunu tamamen ✔; NFR-01..06 yerelde ölçüldü ve karşılandı; geri yükleme denemesi raporu; açık kritik/ciddi bulgu yok.
 
 ### Faz 9 — Kullanım geri bildirimine göre iyileştirmeler
