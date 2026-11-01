@@ -13,6 +13,11 @@ import { addDays, monthGrid, offsetLabel, shortTime, todayIn, weekday } from '..
 import { GiveDate } from '../tasks/row-actions';
 import type { TaskUiContext } from '../tasks/task-context';
 import { isOverdue } from '../tasks/task-row';
+import { PROJECT_COLOR_VALUES, type ProjectColorName } from '../projects/project-color';
+
+/** D-100: proje rengi (takvim çipleri ve dolu günler). */
+const hex = (color: string) =>
+  PROJECT_COLOR_VALUES[color as ProjectColorName] ?? PROJECT_COLOR_VALUES.slate;
 
 export type CalendarMode = 'month' | 'week' | 'day';
 const HOURS = Array.from({ length: 24 }, (_, h) => h);
@@ -163,11 +168,15 @@ export function Calendar({
       data-calendar-task={task.id}
       onDragStart={(e) => e.dataTransfer.setData('text/plain', task.id)}
       className={cn(
-        'block rounded-sm px-1.5 py-1 text-xs leading-4',
-        minutes === null ? 'text-text' : 'bg-support-1 text-primary',
+        'block rounded-sm px-1.5 py-1 text-xs leading-4 text-text',
         isOverdue(task, today) && 'text-danger',
+        task.status === 'done' && 'text-text-secondary line-through',
         compact && 'truncate',
       )}
+      style={{
+        backgroundColor: `${hex(task.project.color)}26`,
+        boxShadow: `inset 3px 0 0 ${hex(task.project.color)}`,
+      }}
     >
       <span aria-hidden="true">{task.status === 'in_progress' ? '◐ ' : '○ '}</span>
       {taskLabel(task)}
@@ -241,7 +250,7 @@ export function Calendar({
                 <div
                   key={d}
                   role="columnheader"
-                  className="border-b border-border p-2 text-center text-xs text-text-secondary"
+                  className="border-b border-border bg-support-1 p-2 text-center text-xs font-semibold tracking-wide text-primary uppercase"
                 >
                   {weekdayShort(d)}
                 </div>
@@ -253,7 +262,18 @@ export function Calendar({
                     role="gridcell"
                     data-calendar-day={day}
                     {...dropTarget(day, null)}
-                    className="flex min-h-24 flex-col gap-1 border-b border-r border-border p-1"
+                    data-has-tasks={onDay(day).length > 0 || undefined}
+                    className={cn(
+                      'flex min-h-24 flex-col gap-1 border-b border-r border-border p-1',
+                      day === today && 'ring-2 ring-primary ring-inset',
+                    )}
+                    style={
+                      onDay(day).length > 0
+                        ? {
+                            backgroundImage: `linear-gradient(180deg, ${hex(onDay(day)[0]!.task.project.color)}1f, transparent)`,
+                          }
+                        : undefined
+                    }
                   >
                     <span
                       className={cn(
@@ -293,16 +313,22 @@ export function Calendar({
               className="overflow-x-auto rounded-md border border-border"
             >
               <div className="min-w-[720px]">
-                <div className="grid grid-cols-[56px_repeat(7,1fr)] border-b border-border">
+                <div className="grid grid-cols-[56px_repeat(7,1fr)] border-b border-border bg-support-1">
                   <span />
                   {weekDays.map((d) => (
                     <Link
                       key={d}
                       href={href({ cal: 'day', date: d })}
+                      data-has-tasks={onDay(d).length > 0 || undefined}
                       className={cn(
-                        'flex flex-col items-center py-2 text-xs',
-                        d === today ? 'text-primary' : 'text-text-secondary',
+                        'flex flex-col items-center py-2 text-xs font-semibold text-primary uppercase',
+                        d === today && 'bg-primary text-on-primary',
                       )}
+                      style={
+                        onDay(d).length > 0 && d !== today
+                          ? { boxShadow: `inset 0 -3px 0 ${hex(onDay(d)[0]!.task.project.color)}` }
+                          : undefined
+                      }
                     >
                       {weekdayShort(d)}
                       <span className="text-lg font-semibold">{Number(d.slice(8))}</span>
@@ -310,7 +336,9 @@ export function Calendar({
                   ))}
                 </div>
                 <div className="grid grid-cols-[56px_repeat(7,1fr)] border-b border-border">
-                  <span className="p-1 text-xs text-text-secondary">{t('allDay')}</span>
+                  <span className="bg-surface-muted p-1 text-xs font-semibold text-text-secondary">
+                    {t('allDay')}
+                  </span>
                   {weekDays.map((d) => (
                     <div
                       key={d}
@@ -332,7 +360,7 @@ export function Calendar({
                 >
                   {HOURS.map((h) => (
                     <div key={h} className="grid min-h-12 grid-cols-[56px_repeat(7,1fr)]">
-                      <span className="p-1 text-xs text-text-secondary">{`${String(h).padStart(2, '0')}:00`}</span>
+                      <span className="bg-surface-muted p-1 text-xs font-medium text-text-secondary">{`${String(h).padStart(2, '0')}:00`}</span>
                       {weekDays.map((d) => (
                         <div
                           key={d}
@@ -458,8 +486,8 @@ function DayView({
             href={href({ cal: 'day', date: d })}
             aria-current={d === day ? 'date' : undefined}
             className={cn(
-              'flex min-h-11 flex-col items-center rounded-sm text-xs',
-              d === day ? 'text-primary' : 'text-text-secondary',
+              'flex min-h-11 flex-col items-center rounded-sm bg-support-1 text-xs font-semibold text-primary',
+              d === day && 'bg-primary text-on-primary',
             )}
           >
             {weekdayShort(d)}

@@ -85,7 +85,7 @@ export function ViewTabs({
   );
 }
 
-const STATUSES = ['todo', 'in_progress', 'done'] as const;
+const STATUSES = ['todo', 'in_progress', 'on_hold', 'done'] as const;
 const PRIORITIES = [3, 2, 1, 0] as const;
 
 /** Seçimli alanı filtreden çıkarır (exactOptionalPropertyTypes: `undefined` yazmak yerine anahtar silinir). */

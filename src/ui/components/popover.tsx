@@ -36,7 +36,7 @@ export function Popover({
           sideOffset={6}
           collisionPadding={16}
           className={cn(
-            'z-50 flex max-h-[min(80dvh,560px)] flex-col gap-3 overflow-y-auto rounded-md border border-border bg-surface p-4 text-text',
+            'z-50 flex max-h-[min(var(--radix-popover-content-available-height,80dvh),560px)] flex-col gap-3 overflow-y-auto rounded-md border border-border bg-surface p-4 text-text shadow-lg',
             className,
           )}
         >

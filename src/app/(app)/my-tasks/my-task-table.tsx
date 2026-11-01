@@ -14,6 +14,7 @@ import { PROJECT_COLOR_VALUES, type ProjectColorName } from '../projects/project
 import {
   AssigneeCell,
   DueCell,
+  NotesCell,
   PointsCell,
   PriorityCell,
   ProjectCell,
@@ -32,7 +33,12 @@ export type TaskSection = {
   /** Bölüm başlığının renk vurgusu (proje rengi ya da tarih grubunun rengi). */
   color: string;
   /** Bölüme eklenen görevin projesi ve tarihi (D-098: bölümdeki "Görev ekle"). */
-  add: { projectId?: string | undefined; dueDate?: string | undefined };
+  add: {
+    projectId?: string | undefined;
+    dueDate?: string | undefined;
+    /** D-107: statü bölümüne eklenen görev o statüyle başlar. */
+    status?: 'in_progress' | 'on_hold' | 'done' | undefined;
+  };
   tasks: TaskView[];
 };
 
@@ -40,7 +46,7 @@ type Filters = { assignee: string; project: string; priority: string; status: st
 const NO_FILTER: Filters = { assignee: '', project: '', priority: '', status: '', due: '' };
 
 const GRID =
-  'lg:grid lg:grid-cols-[minmax(0,1fr)_170px_104px_150px_96px_124px_60px] lg:items-center';
+  'lg:grid lg:grid-cols-[minmax(0,1fr)_160px_100px_140px_92px_120px_56px_minmax(120px,180px)] lg:items-center';
 const CELL = 'hidden min-w-0 px-2 lg:flex lg:h-full lg:items-center';
 const hex = (color: string) =>
   PROJECT_COLOR_VALUES[color as ProjectColorName] ?? PROJECT_COLOR_VALUES.slate;
@@ -115,6 +121,7 @@ export function MyTaskTable({
           <span className={CELL}>{t('table.priority')}</span>
           <span className={CELL}>{t('table.status')}</span>
           <span className={cn(CELL, 'justify-end')}>{t('table.points')}</span>
+          <span className={CELL}>{t('table.notes')}</span>
         </div>
         {sections.every((s) => s.tasks.length === 0) ? (
           <div className="p-6">
@@ -308,6 +315,9 @@ function TaskLine({
           </span>
           <span className={cn(CELL, 'justify-end max-lg:flex')}>
             <PointsCell task={task} editor={editor} />
+          </span>
+          <span className={cn(CELL, 'max-lg:flex max-lg:w-full')}>
+            <NotesCell task={task} editor={editor} />
           </span>
         </div>
       </div>
@@ -521,7 +531,7 @@ function FilterBar({
         className={select}
       >
         <option value="">{t('filters.allStatuses')}</option>
-        {(['todo', 'in_progress', 'done'] as const).map((s) => (
+        {(['todo', 'in_progress', 'on_hold', 'done'] as const).map((s) => (
           <option key={s} value={s}>
             {t(`status.${s}`)}
           </option>
@@ -570,8 +580,9 @@ function SectionAdd({ section, context }: { section: TaskSection; context: TaskU
       return;
     }
     setPending(true);
-    const result = await apiPost(
-      `/api/v1/workspaces/${context.workspaceId}/tasks`,
+    const base = `/api/v1/workspaces/${context.workspaceId}/tasks` as const;
+    const result = await apiPost<{ id: string; version: number }>(
+      base,
       {
         title: name,
         ...(section.add.projectId ? { projectId: section.add.projectId } : {}),
@@ -579,6 +590,13 @@ function SectionAdd({ section, context }: { section: TaskSection; context: TaskU
       },
       { 'Idempotency-Key': crypto.randomUUID() },
     );
+    const status = section.add.status;
+    if (result.ok && status) {
+      const { id, version } = result.data;
+      // BR-TASK-003: tamamlama tek yoldan (/complete); diğer statüler PATCH ile.
+      if (status === 'done') await apiPost(`${base}/${id}/complete`, { version });
+      else await apiPatch(`${base}/${id}`, { version, status });
+    }
     setPending(false);
     if (!result.ok) return setFailed(true);
     setFailed(false);

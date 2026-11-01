@@ -25,6 +25,7 @@ type Editable = Pick<
   | 'projectId'
   | 'recurrence'
   | 'project'
+  | 'description'
 >;
 
 /**
@@ -357,7 +358,7 @@ export function StatusCell({ task, editor }: { task: Editable; editor: Editor })
         </button>
       }
     >
-      {(['todo', 'in_progress', 'done'] as const).map((s) => (
+      {(['todo', 'in_progress', 'on_hold', 'done'] as const).map((s) => (
         <PopoverClose asChild key={s}>
           <button type="button" className={option} onClick={() => void editor.setStatus(s)}>
             <Pill color={STATUS_COLOR[s]!}>{t(`status.${s}`)}</Pill>
@@ -433,5 +434,60 @@ export function TaskQuickFields({
       <AssigneeCell task={task} editor={editor} context={context} />
       <PointsCell task={task} editor={editor} />
     </div>
+  );
+}
+
+/** Görev notu (açıklama alanı): satırda ilk satırı görünür; tıklayınca düzenlenir, kapanınca kaydedilir. */
+export function NotesCell({ task, editor }: { task: Editable; editor: Editor }) {
+  const t = useTranslations('tasks.inline');
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(task.description ?? '');
+
+  async function save() {
+    const next = value.trim() ? value : null;
+    if (next === (task.description ?? null)) return;
+    if (!(await editor.patch({ description: next }))) setValue(task.description ?? '');
+  }
+
+  return (
+    <Popover
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) void save();
+        setOpen(next);
+      }}
+      label={t('notes', { title: task.title })}
+      className="w-80 p-3"
+      trigger={
+        <button
+          type="button"
+          aria-label={t('notes', { title: task.title })}
+          className={cn(cellButton, 'w-full text-text-secondary')}
+        >
+          <span className="truncate">
+            {task.description ? task.description.split('\n')[0] : '—'}
+          </span>
+        </button>
+      }
+    >
+      <textarea
+        autoFocus
+        value={value}
+        maxLength={20_000}
+        rows={5}
+        aria-label={t('notesField')}
+        placeholder={t('notesPlaceholder')}
+        onChange={(e) => setValue(e.target.value)}
+        className="w-full resize-y rounded-sm border border-border bg-page p-2 text-sm text-text placeholder:text-text-secondary"
+      />
+      <PopoverClose asChild>
+        <button
+          type="button"
+          className="self-end rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-on-primary"
+        >
+          {t('notesSave')}
+        </button>
+      </PopoverClose>
+    </Popover>
   );
 }

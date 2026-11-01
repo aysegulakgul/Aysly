@@ -25,7 +25,7 @@ test.describe('Görevlerim ve hızlı ekleme (D-098: Inbox sayfası kaldırıld�
     await page.getByRole('button', { name: 'Tarih', exact: true }).click();
     await page.getByRole('button', { name: 'Yarın' }).click();
     await page.getByRole('button', { name: 'Uygula' }).click();
-    await page.getByRole('button', { name: 'Görev ekle' }).last().click();
+    await page.getByRole('button', { name: 'Görev ekle', exact: true }).click();
 
     const row = page.getByRole('listitem').filter({ hasText: 'Diş hekimi randevusu al' });
     await expect(row).toBeVisible();

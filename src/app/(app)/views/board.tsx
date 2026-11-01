@@ -19,11 +19,11 @@ import type { TaskUiContext } from '../tasks/task-context';
 import { isOverdue } from '../tasks/task-row';
 import { viewHref } from './filter-bar';
 
-const COLUMNS = ['todo', 'in_progress', 'done'] as const;
+const COLUMNS = ['todo', 'in_progress', 'on_hold', 'done'] as const;
 type Status = (typeof COLUMNS)[number];
 const DONE_LIMIT = 20; // UI_UX §9.3: Tamamlandı sütununda son 20, "Tümünü gör"
 const TAG_LIMIT = 3; // UI_UX §6 BoardCard: en fazla 3 etiket + "+2"
-const GLYPH: Record<Status, string> = { todo: '○', in_progress: '◐', done: '✓' };
+const GLYPH: Record<Status, string> = { todo: '○', in_progress: '◐', on_hold: '‖', done: '✓' };
 
 type Drop = { status: Status; beforeId?: string | undefined; afterId?: string | undefined };
 
@@ -374,7 +374,7 @@ function ColumnAdd({
 }: {
   context: TaskUiContext;
   projectId: string;
-  status: 'todo' | 'in_progress';
+  status: 'todo' | 'in_progress' | 'on_hold';
 }) {
   const t = useTranslations('board');
   const tViews = useTranslations('views');
@@ -395,7 +395,7 @@ function ColumnAdd({
       { title: title.trim(), projectId },
       { 'Idempotency-Key': crypto.randomUUID() },
     );
-    if (created.ok && status === 'in_progress') {
+    if (created.ok && status !== 'todo') {
       await apiPatch(`${base}/${created.data.id}`, { version: created.data.version, status });
     }
     setPending(false);

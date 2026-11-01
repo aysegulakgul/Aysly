@@ -179,6 +179,7 @@ Claude bir faz kapanmadan sonraki fazın kodunu yazmaz. Önceki fazda bulunan bi
   - Bildirim ve Paylaş sağ üst başlıkta; Yaklaşanlar Bugün'ün altında; takvimde alt görevler; kenar çubuğundan "Görev ekle" kalktı.
   - Görevlerim tablosu, görev detayında atanan/puan/yorumlar, Ayarlar · Kişiler, Projeler panosu, `pnpm db:seed-demo`.
   - Görevlerim'de çoklu seçim, toplu işlemler ve satırdan "Projeye taşı" korundu (BR-TASK-008, AC-02).
+- **İlerleme (2026-10-31) — üçüncü geri bildirim (4 madde):** D-107; migration 0011 (görev statüsü Beklemede); hızlı ekleme çipleri ve proje seçimi; takvim renklendirmesi; Görevlerim statü bölümleri ve Notlar sütunu; mobilde açılır pencere taşması düzeltildi.
 - **İlerleme (2026-10-31) — ikinci geri bildirim (12 madde):**
   - Kararlar D-102 (dört proje statüsü), D-103 (1.000 alt görev), D-104 (kayıtlı görünümler kalır), D-105 (örnek veri kullanıcının hesabına), D-106 (satır içi düzenleme, tamamlananlar listede, sütun filtreleri). Migration 0010.
   - Görevlerim, Bugün ve Projeler'de satır içi düzenleme; Görevlerim'de alt görevler, filtreler ve tamamlananlar; menü sırası; renkli tasarım (bölüm renkleri, degrade başlıklar, proje renkli satır çizgisi, renkli özet kartları).

@@ -1,6 +1,6 @@
 # Veri Modeli
 
-> Durum: v0.6 · Son güncelleme: 2026-10-29 · Uygulama durumu: Migration 0000–0010 uygulandı (§7.1); diğer tablolar ilgili fazlarda.
+> Durum: v0.6 · Son güncelleme: 2026-10-29 · Uygulama durumu: Migration 0000–0011 uygulandı (§7.1); diğer tablolar ilgili fazlarda.
 > PostgreSQL + Drizzle ONAYLI (D-044); Docker Desktop üzerinde yerel (D-056). Alan ayrıntıları ve sınırlar D-060 ile onaylı; D-061 sadeleştirmeleri uygulanmıştır.
 > Veritabanı: PostgreSQL 16+ (ONAYLI, D-044). Bu belgedeki alanlar **hedef şemadır**; açık sorulara bağlı alanlar işaretlenmiştir.
 
@@ -347,6 +347,7 @@ Ayrıntı: ARCHITECTURE §12.4. Ek kurallar:
 | 0008 | `drizzle/0008_search_vectors.sql` | `aysly_search_text()` (ı/İ, `unaccent`, küçük harf; D-091), `tasks`/`projects`/`notes`/`goals` üretilmiş `search_vector` + GIN | 7 |
 | 0009 | `drizzle/0009_contacts_points_comments.sql` | `contacts` (D-097), `tasks.story_points` (0–100) ve `tasks.assignee_contact_id` (kişi silinince boşalır; aynı çalışma alanı uygulamada denetlenir), `task_comments` (görevle bileşik FK, görev silinince silinir; D-099) | 9 |
 | 0010 | `drizzle/0010_project_not_started.sql` | `projects_status` CHECK'e `not_started` (D-102); varsayılan `active` korunur (Inbox ve örnek projeler), yeni projeler uygulamada `not_started` | 9 |
+| 0011 | `drizzle/0011_task_on_hold.sql` | `tasks_status` CHECK'e `on_hold` (D-107) | 9 |
 | 0005 | `drizzle/0005_projects_views.sql` | `saved_views` (`pinned` kolonu ve takvim türü yok; D-086), `projects_color` CHECK (12 renk, D-082) | 5 |
 
 Notlar: `idempotency_keys` ilk oluşturma uç noktalarıyla birlikte Faz 4'te eklenecek. Kimlik tablolarının alan adları Better Auth'un beklediği adlardır (`users.email_verified` boolean; DATA_MODEL §3.1'deki `email_verified_at` yerine). Hız sınırı sayaçları `auth_rate_limits` tablosunda tutulur.

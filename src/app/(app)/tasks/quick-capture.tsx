@@ -47,6 +47,8 @@ export function QuickCapture({
   const [fieldError, setFieldError] = useState<string>();
   const [added, setAdded] = useState(false);
   const [dateOpen, setDateOpen] = useState(false);
+  // Hedef proje seçilebilir; seçilmezse görev projesiz eklenir (BR-INBOX-001).
+  const [target, setTarget] = useState<string | undefined>(projectId);
   const key = useRef<string>(newKey());
 
   const expanded = focused || title.length > 0 || failed;
@@ -71,7 +73,7 @@ export function QuickCapture({
     setAdded(false);
     const result = await apiPost(
       `/api/v1/workspaces/${context.workspaceId}/tasks`,
-      { title, priority, ...(due ? { due } : {}), ...(projectId ? { projectId } : {}) },
+      { title, priority, ...(due ? { due } : {}), ...(target ? { projectId: target } : {}) },
       { 'idempotency-key': key.current },
     );
     setPending(false);
@@ -94,6 +96,9 @@ export function QuickCapture({
     if (event.key === 'Escape') reset();
   }
 
+  const projectName = target
+    ? (context.projects.find((p) => p.id === target)?.name ?? t('quickAdd.target'))
+    : t('quickAdd.target');
   const dueLabel = due
     ? `${shortDate(due.date, locale)}${due.time ? ` ${shortTime(due.time, locale, context.timeFormat)}` : ''}`
     : t('date.button');
@@ -135,19 +140,78 @@ export function QuickCapture({
           {fieldError}
         </p>
       ) : null}
-      <div className="flex flex-wrap items-center">
-        {/* Hedef proje: proje seçimi proje sayfalarıyla birlikte gelir; şimdilik her zaman Inbox. */}
-        <span className="inline-flex min-h-11 items-center px-4 text-base font-medium text-text">
-          {t('quickAdd.target')}
-        </span>
+      {/* Seçilebilir olduğu belli olsun diye her seçenek kenarlıklı, simgeli ve ▾ işaretli bir çiptir. */}
+      <div className="flex flex-wrap items-center gap-2 px-3 pb-3">
+        <Popover
+          label={t('quickAdd.projectLabel')}
+          trigger={
+            <button
+              type="button"
+              aria-label={t('quickAdd.projectLabel')}
+              className={cn(
+                'inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 text-sm font-medium transition-colors hover:border-primary hover:text-primary',
+                target
+                  ? 'border-primary bg-support-1 text-primary'
+                  : 'border-border bg-surface text-text',
+              )}
+            >
+              <span aria-hidden="true">▣</span>
+              {projectName}
+              <span aria-hidden="true" className="text-xs">
+                ▾
+              </span>
+            </button>
+          }
+        >
+          <div className="flex w-56 flex-col">
+            <PopoverClose asChild>
+              <button
+                type="button"
+                onClick={() => setTarget(undefined)}
+                className="flex min-h-10 items-center rounded-sm px-3 text-left text-sm text-text hover:bg-surface-muted"
+              >
+                {t('quickAdd.target')}
+              </button>
+            </PopoverClose>
+            {context.projects
+              .filter((p) => p.kind !== 'inbox')
+              .map((p) => (
+                <PopoverClose asChild key={p.id}>
+                  <button
+                    type="button"
+                    onClick={() => setTarget(p.id)}
+                    className={cn(
+                      'flex min-h-10 items-center rounded-sm px-3 text-left text-sm hover:bg-surface-muted',
+                      p.id === target ? 'font-semibold text-primary' : 'text-text',
+                    )}
+                  >
+                    {p.name}
+                  </button>
+                </PopoverClose>
+              ))}
+          </div>
+        </Popover>
         <Popover
           label={t('date.title')}
           open={dateOpen}
           onOpenChange={setDateOpen}
           trigger={
-            <Button variant="ghost" className={cn(due && 'text-primary')}>
+            <button
+              type="button"
+
+              className={cn(
+                'inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 text-sm font-medium transition-colors hover:border-primary hover:text-primary',
+                due
+                  ? 'border-primary bg-support-1 text-primary'
+                  : 'border-border bg-surface text-text',
+              )}
+            >
+              <span aria-hidden="true">◷</span>
               {dueLabel}
-            </Button>
+              <span aria-hidden="true" className="text-xs">
+                ▾
+              </span>
+            </button>
           }
         >
           <DatePickerPanel
@@ -163,9 +227,21 @@ export function QuickCapture({
         <Popover
           label={t('priority.button')}
           trigger={
-            <Button variant="ghost" className={cn(priority > 0 && 'text-primary')}>
-              {priority > 0 ? `⚑ ${t(`priority.${priority}`)}` : t('priority.button')}
-            </Button>
+            <button
+              type="button"
+              className={cn(
+                'inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 text-sm font-medium transition-colors hover:border-primary hover:text-primary',
+                priority > 0
+                  ? 'border-primary bg-support-1 text-primary'
+                  : 'border-border bg-surface text-text',
+              )}
+            >
+              <span aria-hidden="true">⚑</span>
+              {priority > 0 ? t(`priority.${priority}`) : t('priority.button')}
+              <span aria-hidden="true" className="text-xs">
+                ▾
+              </span>
+            </button>
           }
         >
           <div role="radiogroup" aria-label={t('priority.button')} className="flex flex-col">

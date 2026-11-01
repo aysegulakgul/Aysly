@@ -167,6 +167,13 @@ Ayrıntı: [ONBOARDING_AND_PERSONALIZATION.md](ONBOARDING_AND_PERSONALIZATION.md
 | Bugün | Görev satırlarında statü, öncelik, tarih, atanan ve puan detay açmadan düzenlenir. Renkli karşılama alanı ve bölüm renkleri. |
 | Projeler | Dört statü sütunu (Başlamadı, Devam ediyor, Beklemede, Tamamlandı). Kartta proje adı ve rengi, görevlerin statüsü satır içinde değişir. Filtreler: ad araması, statü, renk. |
 
+### 2.8c. Faz 9 — 31 Ekim üçüncü istek (D-107)
+| | |
+|---|---|
+| Hızlı ekle | Proje, tarih ve öncelik ▾ işaretli kenarlıklı çipler; proje seçilebilir. |
+| Takvim | Gün başlıkları ve saat sütunu renkli; görevli günler proje rengiyle tonlu, çipler proje renginde. |
+| Görevlerim | Varsayılan bölümler statüye göre: Başlanmadı, Devam ediyor, Tamamlandı, Beklemede ("Tarihe göre" ve "Projeye göre" sekmeleri duruyor). Yeni "Notlar" sütunu. |
+
 ### 2.9. Hedefler (`/goals`, `/goals/:id`)
 | | |
 |---|---|

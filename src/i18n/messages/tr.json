@@ -346,7 +346,8 @@
       "failed": "Kaydedilemedi. Metnin burada, tekrar deneyebilirsin.",
       "kept": "Başlık ve seçtiğin alanlar korundu.",
       "retry": "Tekrar dene",
-      "added": "Görev eklendi."
+      "added": "Görev eklendi.",
+      "projectLabel": "Proje seç"
     },
     "date": {
       "button": "Tarih",
@@ -422,8 +423,9 @@
       "project": "Proje",
       "status": "Durum",
       "statuses": {
-        "todo": "Yapılacak",
+        "todo": "Başlanmadı",
         "in_progress": "Devam ediyor",
+        "on_hold": "Beklemede",
         "done": "Tamamlandı"
       },
       "priority": "Öncelik",
@@ -561,8 +563,9 @@
       "failed": "Hatırlatıcı kaydedilemedi. Tekrar dene."
     },
     "status": {
-      "todo": "Yapılacak",
+      "todo": "Başlanmadı",
       "in_progress": "Devam ediyor",
+      "on_hold": "Beklemede",
       "done": "Tamamlandı"
     },
     "table": {
@@ -583,7 +586,9 @@
       "groupBy": "Gruplama",
       "byDate": "Tarihe göre",
       "byProject": "Projeye göre",
-      "doneCount": "{count} tamamlandı"
+      "doneCount": "{count} tamamlandı",
+      "byStatus": "Statüye göre",
+      "notes": "Notlar"
     },
     "comments": {
       "title": "Yorumlar",
@@ -616,7 +621,11 @@
       "addSubtask": "{title} için alt görev ekle",
       "addSubtaskPlaceholder": "+ Alt görev ekle (Enter)",
       "loading": "Yükleniyor…",
-      "failed": "Kaydedilemedi. Tekrar dene."
+      "failed": "Kaydedilemedi. Tekrar dene.",
+      "notes": "Notlar: {title}",
+      "notesField": "Görev notu",
+      "notesPlaceholder": "Not ekle…",
+      "notesSave": "Kaydet"
     },
     "filters": {
       "label": "Sütun filtreleri",

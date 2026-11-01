@@ -346,7 +346,8 @@
       "failed": "Couldn’t save. Your text is still here; you can try again.",
       "kept": "Your title and chosen fields were kept.",
       "retry": "Try again",
-      "added": "Task added."
+      "added": "Task added.",
+      "projectLabel": "Choose project"
     },
     "date": {
       "button": "Date",
@@ -422,8 +423,9 @@
       "project": "Project",
       "status": "Status",
       "statuses": {
-        "todo": "To do",
+        "todo": "Not started",
         "in_progress": "In progress",
+        "on_hold": "On hold",
         "done": "Done"
       },
       "priority": "Priority",
@@ -561,8 +563,9 @@
       "failed": "The reminder couldn’t be saved. Try again."
     },
     "status": {
-      "todo": "To do",
+      "todo": "Not started",
       "in_progress": "In progress",
+      "on_hold": "On hold",
       "done": "Done"
     },
     "table": {
@@ -583,7 +586,9 @@
       "groupBy": "Grouping",
       "byDate": "By date",
       "byProject": "By project",
-      "doneCount": "{count} done"
+      "doneCount": "{count} done",
+      "byStatus": "By status",
+      "notes": "Notes"
     },
     "comments": {
       "title": "Comments",
@@ -616,7 +621,11 @@
       "addSubtask": "Add a subtask to {title}",
       "addSubtaskPlaceholder": "+ Add subtask (Enter)",
       "loading": "Loading…",
-      "failed": "Couldn't save. Try again."
+      "failed": "Couldn't save. Try again.",
+      "notes": "Notes: {title}",
+      "notesField": "Task note",
+      "notesPlaceholder": "Add a note…",
+      "notesSave": "Save"
     },
     "filters": {
       "label": "Column filters",

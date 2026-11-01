@@ -92,7 +92,7 @@ export const tasks = pgTable(
       sql`${t.description} is null or char_length(${t.description}) <= 20000`,
     ),
     // BR-TASK-003, BR-TASK-005
-    check('tasks_status', sql`${t.status} in ('todo','in_progress','done')`),
+    check('tasks_status', sql`${t.status} in ('todo','in_progress','on_hold','done')`),
     check('tasks_priority', sql`${t.priority} between 0 and 3`),
     check(
       'tasks_story_points',

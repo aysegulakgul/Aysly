@@ -90,7 +90,7 @@ export function TaskList({
         return by(
           (task) => task.status,
           (k) => t(`detail.statuses.${k}`),
-          ['todo', 'in_progress', 'done'],
+          ['todo', 'in_progress', 'on_hold', 'done'],
         );
       case 'project':
         return by(

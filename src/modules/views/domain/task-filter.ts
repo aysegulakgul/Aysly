@@ -29,8 +29,8 @@ export const TaskFilterSchema = z.strictObject({
   projectId: z.array(Uuid).max(100).default([]),
   /** Boşsa görünümün varsayılanı: listede açık durumlar, panoda tümü. */
   status: z
-    .array(z.enum(['todo', 'in_progress', 'done']))
-    .max(3)
+    .array(z.enum(['todo', 'in_progress', 'on_hold', 'done']))
+    .max(4)
     .default([]),
   priority: z
     .array(z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]))

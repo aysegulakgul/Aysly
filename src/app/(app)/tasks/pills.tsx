@@ -36,6 +36,7 @@ export const PRIORITY_COLOR: Record<number, string> = { 3: 'red', 2: 'amber', 1:
 export const STATUS_COLOR: Record<string, string> = {
   todo: 'slate',
   in_progress: 'blue',
+  on_hold: 'amber',
   done: 'green',
 };
 

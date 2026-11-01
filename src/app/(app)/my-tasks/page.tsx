@@ -7,6 +7,7 @@ import { PageFrame } from '../page-frame';
 import { QuickCapture } from '../tasks/quick-capture';
 import { buildTaskContext } from '../tasks/task-context.server';
 import { TaskDetailPanel } from '../tasks/task-detail';
+import { STATUS_COLOR } from '../tasks/pills';
 import { MyTaskTable, type TaskSection } from './my-task-table';
 import { sectionDueDate } from './sections';
 
@@ -15,6 +16,9 @@ import { sectionDueDate } from './sections';
  * tarihe ya da projeye göre bölümler (`?group=project`), satır başına atanan, tarih, proje, öncelik, statü ve
  * story point; bölüm başına ekleme ve puan toplamı. `?task=` yan panelde görev detayını açar.
  */
+/** D-107: statü bölümleri, ürün sahibinin sırasıyla. */
+const STATUS_SECTIONS = ['todo', 'in_progress', 'done', 'on_hold'] as const;
+
 /** D-100: tarih bölümlerinin renk vurgusu. */
 const GROUP_COLOR: Record<string, string> = {
   overdue: 'red',
@@ -43,23 +47,34 @@ export default async function MyTasksPage({
     buildTaskContext(viewer, scope),
     query.task ? findTaskDetail(scope, query.task) : null,
   ]);
-  const byProject = query.group === 'project';
+  // D-107: varsayılan bölümler statüye göre; tarihe ve projeye göre gruplama sekmelerde.
+  const mode = query.group === 'project' ? 'project' : query.group === 'date' ? 'date' : 'status';
+  const byProject = mode === 'project';
   const all = groups.flatMap((g) => g.tasks);
-  const sections: TaskSection[] = byProject
-    ? context.projects.map((p) => ({
-        key: p.id,
-        title: p.kind === 'inbox' ? t('table.noProject') : p.name,
-        color: p.color,
-        add: { projectId: p.id },
-        tasks: all.filter((task: TaskView) => task.projectId === p.id),
-      }))
-    : groups.map((g) => ({
-        key: g.group,
-        title: t(`groups.${g.group}`),
-        color: GROUP_COLOR[g.group] ?? 'slate',
-        add: { dueDate: sectionDueDate(g.group, context.today) },
-        tasks: g.tasks,
-      }));
+  const sections: TaskSection[] =
+    mode === 'status'
+      ? STATUS_SECTIONS.map((status) => ({
+          key: status,
+          title: t(`status.${status}`),
+          color: STATUS_COLOR[status]!,
+          add: status === 'todo' ? {} : { status },
+          tasks: all.filter((task: TaskView) => task.status === status),
+        }))
+      : byProject
+        ? context.projects.map((p) => ({
+            key: p.id,
+            title: p.kind === 'inbox' ? t('table.noProject') : p.name,
+            color: p.color,
+            add: { projectId: p.id },
+            tasks: all.filter((task: TaskView) => task.projectId === p.id),
+          }))
+        : groups.map((g) => ({
+            key: g.group,
+            title: t(`groups.${g.group}`),
+            color: GROUP_COLOR[g.group] ?? 'slate',
+            add: { dueDate: sectionDueDate(g.group, context.today) },
+            tasks: g.tasks,
+          }));
   const tab = (active: boolean) =>
     cn(
       'flex min-h-9 items-center rounded-sm px-3 text-sm',
@@ -77,8 +92,15 @@ export default async function MyTasksPage({
         <nav aria-label={t('table.groupBy')} className="flex gap-1">
           <Link
             href="/my-tasks"
-            aria-current={byProject ? undefined : 'page'}
-            className={tab(!byProject)}
+            aria-current={mode === 'status' ? 'page' : undefined}
+            className={tab(mode === 'status')}
+          >
+            {t('table.byStatus')}
+          </Link>
+          <Link
+            href="/my-tasks?group=date"
+            aria-current={mode === 'date' ? 'page' : undefined}
+            className={tab(mode === 'date')}
           >
             {t('table.byDate')}
           </Link>

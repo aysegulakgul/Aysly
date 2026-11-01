@@ -44,7 +44,7 @@ test.describe('Görevlerim ve görev detayı', () => {
       priority: 3,
     });
     await create({ title: 'Mobil görünüm testleri' });
-    await page.goto('/my-tasks');
+    await page.goto('/my-tasks?group=date');
     await expect(page.getByRole('heading', { level: 2, name: /Geciken/ })).toBeVisible();
     await expect(page.getByRole('heading', { level: 2, name: /Tarihsiz/ })).toBeVisible();
     // D-100: sütunlu satır — proje, tarih (gecikmişte tehlike renginde), öncelik rozeti.
@@ -147,10 +147,10 @@ test.describe('Görevlerim ve görev detayı', () => {
 
     // Öncelik ve statü detay açmadan değişir.
     await target.getByRole('button', { name: 'Öncelik: Raporu hazırla' }).click();
-    await page.getByRole('button', { name: 'Yüksek' }).click();
+    await page.getByRole('button', { name: 'Yüksek', exact: true }).click();
     await expect(target).toContainText('Yüksek');
     await target.getByRole('button', { name: 'Statü: Raporu hazırla' }).click();
-    await page.getByRole('button', { name: 'Devam ediyor' }).click();
+    await page.getByRole('button', { name: 'Devam ediyor', exact: true }).click();
     await expect(target).toContainText('Devam ediyor');
 
     // Ad satır içinde düzenlenir.
@@ -174,6 +174,23 @@ test.describe('Görevlerim ve görev detayı', () => {
     await expect(row(page, 'Raporu hazırla v2')).toContainText('Yüksek');
     await expect(row(page, 'Raporu hazırla v2')).toContainText('Devam ediyor');
     await expect(row(page, 'Raporu hazırla v2')).toContainText('0/2 ⑂');
+
+    // D-107: statü bölümleri; Beklemede statüsü ve Notlar sütunu.
+    await expect(page.getByRole('heading', { level: 2, name: /Devam ediyor/ })).toBeVisible();
+    const meeting = row(page, 'Toplantı ayarla');
+    await meeting.getByRole('button', { name: 'Notlar: Toplantı ayarla' }).click();
+    await page.getByLabel('Görev notu').fill('Salı 14:00 uygun');
+    await page.getByRole('button', { name: 'Kaydet' }).click();
+    await expect(meeting).toContainText('Salı 14:00 uygun');
+    await meeting.getByRole('button', { name: 'Statü: Toplantı ayarla' }).click();
+    await page.getByRole('button', { name: 'Beklemede', exact: true }).click();
+    await expect(
+      page
+        .locator('section')
+        .filter({ has: page.getByRole('heading', { level: 2, name: /Beklemede/ }) }),
+    ).toContainText('Toplantı ayarla');
+    await page.goto('/my-tasks');
+    await expect(row(page, 'Toplantı ayarla')).toContainText('Salı 14:00 uygun');
 
     // Statü filtresi yalnızca eşleşenleri gösterir.
     await page.getByLabel('Statüye göre filtrele').selectOption('in_progress');

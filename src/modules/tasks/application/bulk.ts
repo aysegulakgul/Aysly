@@ -15,7 +15,7 @@ export type BulkAction =
   | { action: 'complete' }
   | { action: 'reopen' }
   | { action: 'move'; projectId: string }
-  | { action: 'setStatus'; status: 'todo' | 'in_progress' }
+  | { action: 'setStatus'; status: 'todo' | 'in_progress' | 'on_hold' }
   | { action: 'setDue'; due: DueInput | null }
   | { action: 'setPriority'; priority: Priority }
   | { action: 'addTags'; tagNames: readonly string[] }

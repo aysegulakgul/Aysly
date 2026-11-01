@@ -557,6 +557,13 @@ Bu dosya Aysly'deki **ürün ve teknik kararların** tarihçesidir. Kararlar sil
 - Durum: ONAYLI · Tarih: 2026-10-31 · Karar veren: Ürün sahibi (31 Ekim isteği 2, 4, 7, 9, 11)
 - Karar: Görevlerim, Bugün ve Projeler'de alanlar detay açmadan düzenlenir ve anında kaydedilir. Görevlerim'de tamamlanan görevler listede kalır (Tamamlandı statüsü, üstü çizili); statü seçiminden "Tamamlandı" tamamlama işlemini çağırır (BR-TASK-003 tek yol kuralı korunur). Görevlerim ve Projeler'de sütun filtreleri (atanan, proje, öncelik, statü, tarih; projelerde statü ve renk). BR-INBOX-004: Görevlerim kapsamına tamamlanan görevler eklenir.
 
+
+### D-107 — Görev statüsü "Beklemede", statüye göre bölümler, Notlar sütunu (Faz 9)
+- Durum: ONAYLI · Tarih: 2026-10-31 · Karar veren: Ürün sahibi (31 Ekim üçüncü istek: "Başlanmadı, Devam ediyor, tamamlandı ve beklemede")
+- Karar: Görev statüleri Başlanmadı (`todo`, önceki etiket "Yapılacak"), Devam ediyor, Beklemede (`on_hold`, yeni), Tamamlandı. Beklemede açık bir statüdür (sayımlarda, Bugün'de ve tarih gruplarında açık görev gibi). Görevlerim'in varsayılan bölümleri statüye göre (Başlanmadı, Devam ediyor, Tamamlandı, Beklemede); tarihe ve projeye göre gruplama sekmelerde kalır. Bir statü bölümüne eklenen görev o statüyle başlar. Görevlerim'e "Notlar" sütunu eklendi: görevin açıklama alanıdır, satırda ilk satırı görünür ve tıklanınca düzenlenir.
+- Diğer: Hızlı eklemede proje artık seçilebilir; proje, tarih ve öncelik kenarlıklı çipler. Takvimde başlıklar ve dolu günler renkli. Açılır pencereler ekrandaki boş alanla sınırlanır (mobilde tarih penceresinin taşması düzeltildi).
+- Sonuçlar: BR-TASK-003, DATA_MODEL (`tasks_status` CHECK, migration 0011), TaskFilter v1 `status` değerleri, USER_FLOWS.
+
 ---
 
 ## 5. Faz kapanış kayıtları

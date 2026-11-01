@@ -300,6 +300,7 @@ function DetailBody({ detail, context }: { detail: TaskDetailView; context: Task
               >
                 <option value="todo">{t('detail.statuses.todo')}</option>
                 <option value="in_progress">{t('detail.statuses.in_progress')}</option>
+                <option value="on_hold">{t('detail.statuses.on_hold')}</option>
               </select>
             )}
           </Field>

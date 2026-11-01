@@ -174,6 +174,7 @@ Ayrıntılı matris: [ROLES_AND_PERMISSIONS.md](ROLES_AND_PERMISSIONS.md).
 
 ### BR-TASK-003 — Görev durumları ve geçişler
 - **Durum:** ONAYLI (D-041) — durum seti · geçiş kuralı ONAYLI (D-060)
+- **D-107:** Statüler `todo` (Başlanmadı), `in_progress` (Devam ediyor), `on_hold` (Beklemede, açık statü), `done` (Tamamlandı). `done`'a geçiş yine yalnızca tamamlama işlemiyle.
 - **Davranış:** Durumlar: `todo` (Yapılacak), `in_progress` (Devam ediyor), `done` (Tamamlandı). (D-060) Tüm geçişlere izin verilir; `done` durumuna geçiş yalnızca tamamlama işlemiyle yapılır (BR-TASK-004). Arşiv ve çöp **durum değildir**; ayrı alanlardır (BR-DEL-001). `done` dışındaki durumlar "açık" sayılır.
 - **Nerede:** D (enum), DB (`CHECK status IN (...)`).
 

@@ -85,7 +85,7 @@ export function SelectionToggle({ selection, all }: { selection: Selection; all:
 type Action =
   | { action: 'complete' | 'reopen' | 'archive' | 'delete' }
   | { action: 'move'; params: { projectId: string } }
-  | { action: 'setStatus'; params: { status: 'todo' | 'in_progress' } }
+  | { action: 'setStatus'; params: { status: 'todo' | 'in_progress' | 'on_hold' } }
   | { action: 'setPriority'; params: { priority: 0 | 1 | 2 | 3 } }
   | { action: 'setDue'; params: { due: { date: string } | null } }
   | { action: 'addTags' | 'removeTags'; params: { tagNames: string[] } };
@@ -214,6 +214,15 @@ export function BulkBar({ selection, context }: { selection: Selection; context:
                 onClick={() => void run({ action: 'setStatus', params: { status: 'in_progress' } })}
               >
                 {tTasks('detail.statuses.in_progress')}
+              </Button>
+            </PopoverClose>
+            <PopoverClose asChild>
+              <Button
+                variant="ghost"
+                className={menuItem}
+                onClick={() => void run({ action: 'setStatus', params: { status: 'on_hold' } })}
+              >
+                {tTasks('detail.statuses.on_hold')}
               </Button>
             </PopoverClose>
             <PopoverClose asChild>

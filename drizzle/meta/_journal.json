@@ -78,6 +78,13 @@
       "when": 1793461131909,
       "tag": "0010_project_not_started",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1793469009780,
+      "tag": "0011_task_on_hold",
+      "breakpoints": true
     }
   ]
 }

@@ -163,7 +163,7 @@ const BulkBody = z.discriminatedUnion('action', [
   z.strictObject({
     action: z.literal('setStatus'),
     taskIds: TaskIds,
-    params: z.strictObject({ status: z.enum(['todo', 'in_progress']) }),
+    params: z.strictObject({ status: z.enum(['todo', 'in_progress', 'on_hold']) }),
   }),
   z.strictObject({
     action: z.literal('setDue'),

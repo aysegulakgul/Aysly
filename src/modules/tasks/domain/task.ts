@@ -4,9 +4,10 @@ import type { Due } from './due';
 import type { Recurrence } from './recurrence';
 
 /** BR-TASK-003 (D-041): durumlar. `done`'a yalnızca tamamlama işlemiyle geçilir. */
-export const TASK_STATUSES = ['todo', 'in_progress', 'done'] as const;
+/** D-107: Başlanmadı (`todo`), Devam ediyor, Beklemede (`on_hold`), Tamamlandı. */
+export const TASK_STATUSES = ['todo', 'in_progress', 'on_hold', 'done'] as const;
 export type TaskStatus = (typeof TASK_STATUSES)[number];
-export const OPEN_STATUSES = ['todo', 'in_progress'] as const;
+export const OPEN_STATUSES = ['todo', 'in_progress', 'on_hold'] as const;
 
 /** BR-TASK-005: 0 = yok, 1 = düşük, 2 = orta, 3 = yüksek. */
 export type Priority = 0 | 1 | 2 | 3;
